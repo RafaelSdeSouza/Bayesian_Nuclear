@@ -1,0 +1,14 @@
+t(d,n)              ! title
+1 1                 ! charge projectile and target
+3.01550070d0        ! mass projectile in u
+2.01355320d0        ! mass target in u
+5                ! number of samples from MCMC output [5000]
+1                   ! output rate samples (0=no/1=yes) for plotting pdf's 
+0.0                 ! y_initial [y0]
+5.0e-5              ! E_min (MeV) [xi] best we can do with COUFRA in Alain's code
+10.0                ! E_max (MeV) [xf] ***
+1.0d-10             ! accuracy [eps]
+1.0d-10             ! initial step size (MeV) [h1] ***
+0.0                 ! minimum step size (MeV) [hmin]
+1.0d-02             ! maximum step size (MeV) [hmax]
+10.0                ! dx for intermediate output [dxsav]

@@ -1,0 +1,55 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue255;\red245\green245\blue245;\red255\green0\blue0;
+}
+\margl1440\margr1440\vieww15360\viewh16800\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 ####################################################\
+### to install JAGS from source:\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \expnd0\expndtw0\kerning0
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\ri720\partightenfactor0
+\cf0 \cb1 \kerning1\expnd0\expndtw0 if you do not have the JAGS folder:\
+- download and open the \cf2 JAGS \cf0 .tar file from: \
+  https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Source/\
+- you can put the JAGS folder anywhere, for example in the MCMC directory; \
+\pard\pardeftab720\ri720\partightenfactor0
+\cf0   cd into \cf2 JAGS\cf0  folder\cf2 \cb3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \
+if you have JAGS folder:\
+- use existing folder for the following...\
+\
+\pard\pardeftab720\partightenfactor0
+\cf4 TO ADD NEW FUNCTIONS TO JAGS:\
+have a look at the document "**AlvaroGomez...." and follow the\
+instructions highlighted in yellow; you don't need "SFactor...",\
+only "sfactorTdn..."\cf0 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\ri720\partightenfactor0
+\cf0 go into the JAGS folder and type the four commands:\
+\cf2 make clean\
+autoreconf --force --install
+\f1 \cf0 \expnd0\expndtw0\kerning0
+\
+
+\f0 \cf2 \kerning1\expnd0\expndtw0 ./configure \
+make\
+make install\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 [one more thing you will be needing for the R plot of the S-factor:\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 gfortran -shared -m64 -o tdn_p.so tdn_p.f\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 go into R and try to run:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf2 source("MCMCsfactorTdn.R")\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+}
