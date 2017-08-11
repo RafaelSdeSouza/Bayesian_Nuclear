@@ -24,7 +24,7 @@ rm(list=ls())
 ######################################################################
 ## ARTIFICIAL DATA GENERATION 
 
-N <- 500
+N <- 50
 
 obsx1 <- log(runif(N, exp(0.0), exp(0.2)))
 
