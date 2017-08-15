@@ -1,6 +1,8 @@
 
 require(stats4)
 require(bbmle)
+
+
 sfactorTdn_fast<-function(x=x, e1=e1, gin=gin, gout=gout){
 res <- vector()
 y <- vector()
@@ -27,7 +29,7 @@ return(y)
 
 
 
-N <- 50
+N <- 100
 obsx1 <- log(runif(N, exp(0.0), exp(0.2)))
 obsy1 <- sfactorTdn_fast(obsx1,e1=0.0912,gin=2.93,gout=0.0794)
 plot(obsx1,obsy1)  
@@ -37,7 +39,11 @@ chi2 <- function(x, e1, gin, gout){
  sum((obsy1 -sfactorTdn_fast(x=obsx1,e1, gin, gout))^2)
 }
 
-fit<-mle2(chi2, start = list(e1 = 1,gin= 5,gout = 0.1))  
+fit<-mle2(chi2, start = list(e1 = 01,gin= 1,gout = 0.1))  
+
+
+
+
 confint(fit)
 
 
