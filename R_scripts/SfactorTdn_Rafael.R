@@ -24,7 +24,7 @@ rm(list=ls())
 ######################################################################
 ## ARTIFICIAL DATA GENERATION 
 
-N <- 60
+N <- 50
 
 obsx1 <- log(runif(N, exp(0.0), exp(0.2)))
 
@@ -61,6 +61,8 @@ for (i in 1:length(obsx1)){
 # import jags package 
 library(rjags)
 library(runjags)
+library(R2jags)
+library(mcmcplots)
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")  
 load.module("nuclear")  
@@ -82,10 +84,10 @@ for (i in 1:length(obsx1)) {
   # Hyperpriors
 
 ##
-   e1 ~ dhalfcauchy(10)
+   e1 ~ dt(0, pow(2.5,-2), 1)T(0,)
    gout ~ dgamma(0.5,0.5)
-   gin0 ~ dgamma(0.5,0.5)
-   gin <-  gin0 + gout
+   gin ~ dgamma(0.5,0.5+gout)
+#   gin <-  gin0 + gout
 
 
 #  gin ~ dunif(0, 100)
@@ -122,7 +124,7 @@ n.update <- 1000
 n.iter   <- 10000  
 n.chains <- 3
 n.thin   <- 10
-inits <- function () { list(e1 = runif(1,0,5),gin0=runif(1,2,10),gout=runif(1,0.01,1)) }
+inits <- function () { list(e1 = runif(1,0,5),gin=runif(1,2,10),gout=runif(1,0.01,1)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 
@@ -135,10 +137,10 @@ out <- jags(data = list('obsx1' = obsx1, ## jags wants all data in a list
               inits = inits,
               parameters = c("e1", "gin", "gout"),
               model.file = f,
-              n.thin = 10,
-              n.chains = 3,
-              n.burnin = 25000,
-              n.iter = 50000)
+              n.thin = 20,
+              n.chains = 6,
+              n.burnin = 30000,
+              n.iter = 60000)
 denplot(out)
 mcmcplot(out)
 traplot(out)
@@ -148,7 +150,7 @@ results <- run.jags(model=f,  data = list('obsx1' = obsx1, ## jags wants all dat
                                           'obsy1' = obsy1,
                                           'errobsy1' = errobsy1),
                     monitor=c("e1", "gin", "gout"), n.chains=4,
-                    thin=10,adapt=10000,niter=15000,
+                    thin=10,adapt=10000,
                     inits=list(inits1=inits(),inits2=inits(),inits3=inits(),inits4=inits()))
 
 
