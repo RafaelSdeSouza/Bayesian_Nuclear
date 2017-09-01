@@ -73,7 +73,7 @@ cat('model {
 # LIKELIHOOD
 for (i in 1:length(obsx1)) {
   obsy1[i] ~ dnorm(y1[i], pow(errobsy1[i], -2))
-  y1[i] <- sfactorTdn_fast(obsx1[i], e1, gin, gout)    
+  y1[i] <- sfactor3Hedp(obsx1[i], e1, gin, gout)    
 }    
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
@@ -139,8 +139,8 @@ out <- jags(data = list('obsx1' = obsx1, ## jags wants all data in a list
               model.file = f,
               n.thin = 20,
               n.chains = 6,
-              n.burnin = 30000,
-              n.iter = 60000)
+              n.burnin = 300,
+              n.iter = 600)
 denplot(out)
 mcmcplot(out)
 traplot(out)
