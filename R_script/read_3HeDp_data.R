@@ -19,9 +19,9 @@ Kra87m <- read.csv(paste(path,"hdp_kra87m.csv",sep="/"),header = T,sep="") %>%
           mutate(.,Syst= 0.078) %>% 
           mutate(.,dat="Kra87m")
 
-hdp_kra87b <- read.csv(paste(path,"hdp_kra87b.csv",sep="/"),header = T,sep="")  %>% 
+Kra87b <- read.csv(paste(path,"hdp_kra87b.csv",sep="/"),header = T,sep="")  %>% 
               mutate(.,Syst= 0.06) %>%  
-              mutate(.,dat="hdp_kra87b")
+              mutate(.,dat="Kra87b")
 
 zhi77b <- read.table(paste(path,"hdp_zhi77b.dat",sep="/"),header = F) %>%
           set_colnames(c("E","E_rr","S","Stat"))  %>%  
@@ -43,13 +43,14 @@ gei99d <- read.table(paste(path,"hdp_gei99d.dat",sep="/"),header = F) %>%
   mutate(.,dat="gei99d")
 
 
-ensamble <- rbind(Mol80,Kra87m,hdp_kra87b,zhi77b,gei99b,gei99d)
+ensamble <- rbind(Mol80,Kra87m,Kra87b,zhi77b,gei99b,gei99d)
 
 write.csv(ensamble,"ensamble.csv",row.names = F)
 
 ggplot(ensamble,aes(x=E,y=S,color=dat,shape=dat))+geom_point(size=2.85)+
   theme_bw()+scale_x_log10()+scale_color_hc() +
-  coord_cartesian(xlim=c(5e-3,1))
+  coord_cartesian(xlim=c(5e-3,1))+geom_vline(xintercept = 0.2, linetype="dotted", 
+                                             color = "blue", size=1.5)
 
 
 
