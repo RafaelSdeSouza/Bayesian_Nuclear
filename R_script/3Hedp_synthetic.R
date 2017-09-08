@@ -11,11 +11,6 @@
 # Fortran code tdn_plot.f is needed in this R script for plotting the
 # S-factor only
 #
-
-# Er=0.35779 MeV
-# g_i^2=1.0085 MeV
-# g_f^2=0.025425 MeV
-
 ######################################################################
 # preparation: remove all variables from the work space
 rm(list=ls())
@@ -26,6 +21,41 @@ rm(list=ls())
 # errors of each datum [i]
 #
 # energy is in units of MeV, and the S-factor in MeVb; 
+######################################################################
+## ARTIFICIAL DATA GENERATION 
+
+N <- 300
+
+obsx1 <- log(runif(N, exp(0.01), exp(1)))
+
+res <- vector()
+obsy1 <- vector()
+errobsy1 <- vector()
+
+# Barker values:
+# Er  = 0.0912 MeV
+# g^2_in = 2.93 MeV         ! reduced width of deuteron
+# g^2_out = 0.0794 MeV      ! reduced width of neutron
+
+res[2] <- 0.15   # resonance energy
+res[3] <-  2.93    # reduced width incoming
+res[4] <- 0.0794   # reduced width outgoing
+
+for (i in 1:length(obsx1)){
+   res[1] <- obsx1[i]
+   write.table(res, file="He3dp_AD.in", quote=TRUE, 
+                        row.names=FALSE, col.names=FALSE)
+
+   # Load the fortran code needed to calculate S-factor curve
+   if(!is.loaded("He3dp_AD_Sub"))
+   dyn.load("He3dp_AD.so") 
+   .Fortran("He3dp_AD_Sub")
+
+   tab1 <- read.table("He3dp_AD.out", header=FALSE)
+
+   errobsy1[i] <- 1
+   obsy1[i] <- rnorm( 1, tab1[1,2], errobsy1[i] )
+}
 
 ######################################################################                 
 # import jags package 
@@ -33,40 +63,17 @@ library(rjags)
 library(runjags)
 library(R2jags)
 library(mcmcplots)
-library(magrittr)
-library(dplyr)
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")  
 load.module("nuclear")  
 # 
-    
-######################################################################
-## Read DATA GENERATION 
-ensamble <- read.csv("ensamble.csv",header = T)  %>%
-  mutate(Stat=replace(Stat,Stat==0, 0.1)) 
+######################################################################                 
+cat('model {
 
-
-#index <- sample(seq(1:125),50,replace = F)
-#ensamble <- ensamble[index,]
-
-obsy = ensamble$S    # Response variable
-obsx =  ensamble$E   # Predictors
-erry = ensamble$Stat
-
-
-model.data <- list(obsy = obsy,    # Response variable
-                   obsx =  obsx,   # Predictors
-                   erry = erry,
-                   N = nrow(ensamble)    # Sample size
-)
-
-
-######################################################################
-Model <- "model{
 # LIKELIHOOD
-for (i in 1:N) {
-  obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-  y[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau, -2))  
+for (i in 1:length(obsx1)) {
+  obsy1[i] ~ dnorm(y1[i], pow(tau, -2))
+  y1[i] <- sfactor3Hedp(obsx1[i], e1, gin, gout)    
 }    
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
@@ -74,14 +81,36 @@ for (i in 1:N) {
 # width;
 
 ## Physical priors:
-# 
-  tau ~ dgamma(0.01,0.01)
-  e1 ~ dt(0, pow(2.5,-2), 1)T(0,)
-  gout ~ dlnorm(0,1)
-  gin ~ dnorm(1,1)T(0,)
-}"
+  # Hyperpriors
+
+##
+   
+   tau ~dgamma(1e-3,1e-3)
+   e1 ~ dt(0, pow(2.5,-2), 1)T(0,)
+   
+   gout ~ dnorm(0,1)T(0,)
+   gin ~ dnorm(1,1)T(0,)
 
 
+
+#  gin ~ dunif(0, 100)
+#  gout ~ dunif(0, 100)
+#  gin ~ dunif(0, 10)
+#  gout ~ dunif(gin, 10)
+
+#  gin ~ dgamma(0.5,100)
+#  gout ~ dgamma(0.5,100)
+  
+#  gin ~ dgamma(0.5,rl1)
+#  gout ~ dgamma(0.5,rl2)
+#  rl1 ~ dunif(0,500)
+#  rl2 ~ dunif(0,500)
+  
+#  gin ~ dchisqr(1)T(gout,)
+#  gin ~ dchisqr(1)
+#  gout ~ dchisqr(1)
+
+}', file={f <- tempfile()})
 ######################################################################
 # n.adapt:  number of iterations in the chain for adaptation (n.adapt) 
 #           [JAGS will use to choose the sampler and to assure optimum 
@@ -93,32 +122,59 @@ for (i in 1:N) {
 # n.chains: number of mcmc chains
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
-
-inits <- function () { list(e1 = runif(1,0,10),gin=runif(1,4,10),gout=runif(1,0.001,3)) }
+n.adapt  <- 5000   
+n.update <- 1000  
+n.iter   <- 10000  
+n.chains <- 3
+n.thin   <- 10
+inits <- function () { list(e1 = runif(1,0,0.3),gin=runif(1,2,10),gout=runif(1,0.01,1)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 
 
 
 # JAGS model with R2Jags;
-Normfit <- jags(data = model.data,
+out <- jags(data = list('obsx1' = obsx1, ## jags wants all data in a list
+                        'obsy1' = obsy1),
               inits = inits,
               parameters = c("e1", "gin", "gout"),
-              model = textConnection(Model),
+              model.file = f,
               n.thin = 10,
               n.chains = 5,
-              n.burnin = 5000,
-              n.iter = 15000)
-denplot(Normfit,c("e1", "gin", "gout"),style="plain")
-mcmcplot(Normfit)
-traplot(Normfit,c("e1", "gin", "gout"),style="plain")
+              n.burnin = 7000,
+              n.iter = 12000)
+denplot(out)
+mcmcplot(out)
+traplot(out)
 
+# JAGS model with runjags;
+results <- run.jags(model=f,  data = list('obsx1' = obsx1, ## jags wants all data in a list
+                                          'obsy1' = obsy1,
+                                          'errobsy1' = errobsy1),
+                    monitor=c("e1", "gin", "gout"), n.chains=4,
+                    thin=10,adapt=10000,
+                    inits=list(inits1=inits(),inits2=inits(),inits3=inits(),inits4=inits()))
+
+
+# JAGS model;
+#
+ourmodel <- jags.model(f,
+                data = list('obsx1' = obsx1, ## jags wants all data in a list
+                            'obsy1' = obsy1,
+                            'errobsy1' = errobsy1),
+                    inits = list(e1 = 1, gin = 6, gout = 0.1),
+                    n.chains = n.chains,
+                    n.adapt = n.adapt)
+# burnin 
+update(ourmodel, n.update, progress.bar="none") 
 
 # variable.names are variables to be recorded in output file of samples
-mcmcChain <- as.mcmc(Normfit)
-write.matrix(as.matrix(mcmcChain[,-1]),"samples.dat")
-
-
+mcmcChain <- coda.samples(ourmodel, 
+                    variable.names=c('e1', 'gin', 'gout' 
+#                    ,'rl1','rl2'
+#                    ,'s1', 's2', 'r1', 'r2'
+                    ), 
+                    n.iter=n.iter, n.thin=n.thin)
 ######################################################################
 # output results on screen
 cat("", "\n")    # output empty line
@@ -160,7 +216,7 @@ library(emdbook)
 library(magicaxis)
 
 # first determine plot ranges
-pdf("MCMC3He_dp.pdf",width=10,height=5,onefile=F)
+pdf("MCMCsfactorTdn_c.pdf",width=10,height=5,onefile=F)
 par(mfcol=c(1,1), mar=c(4.0,7.0,1.0,6.0), oma=c(0.5,1.0,0.5,1.0), tck=0.02, 
      las=1)
 
@@ -234,8 +290,8 @@ add.error.bars <- function(X,Y,dX,dY,w,col){
 }
 
 # add data - circles
-points( obsx, obsy, col="black", pch=1, cex=1.2 )
-add.error.bars(obsx, obsy, 0.0, erry, 0.0, col="black" )  
+points( obsx1, obsy1, col="black", pch=1, cex=1.2 )
+add.error.bars(obsx1, obsy1, 0.0, errobsy1, 0.0, col="black" )  
 
 dev.off()
 ######################################################################
