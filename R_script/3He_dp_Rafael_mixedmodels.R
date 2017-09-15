@@ -44,34 +44,33 @@ load.module("nuclear")
 ## Read DATA GENERATION 
 ensamble <- read.csv("ensamble.csv",header = T)  %>%
   mutate(Stat=replace(Stat,Stat==0,0.1)) %>%
-  filter(.,dat!="Lac05")
+  filter(.,dat!="Lac05")  %>% droplevels(.)
 #%>%
 #  filter(.,dat!="gei99b") %>%
 #  filter(.,dat!="gei99d") %>%
 #  filter(.,dat!="Mol80") %>%
 #  filter(.,dat!="Kra87m") %>%
 #  filter(.,dat!="zhi77b")
- 
+
+re <- as.numeric(ensamble$dat)
+Nre <- length(unique(ensamble$dat))   
 
 
 #index <- sample(seq(1:125),50,replace = F)
 #ensamble <- ensamble[index,]
 
-N <- nrow(ensamble)
-obsy <- ensamble$S    # Response variable
-obsx <-  ensamble$E   # Predictors
-erry <- ensamble$Stat
-weigth <- rep(1,N)
-not1 <- which(obsx == min(obsx))
-not2 <- which(obsx == max(obsx))
-not3 <- which(obsy == max(obsy))
-weigth[c(not1,not2,not3)] <- 10
+obsy = ensamble$S    # Response variable
+obsx =  ensamble$E   # Predictors
+erry = ensamble$Stat
+
 
 model.data <- list(obsy = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
                    erry = erry,
-                   weigth = weigth,
-                   N = nrow(ensamble)    # Sample size
+                   re = re,  # random effect
+                   N = nrow(ensamble),    # Sample size
+                   a0 = rep(0,Nre), # priors for scale parameters
+                   A0 = diag(Nre)
 )
 
 
@@ -80,36 +79,24 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
   obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-  y[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau/weigth[i], -2)) 
+  y[i] ~ dnorm(mu[i],pow(tau, -2)) 
+  mu[i] <- sfactor3Hedp(obsx[i], e1, gin, gout) 
 }    
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
 # resonance energy, initial reduced width, final reduced 
 # width;
+    tau ~  dgamma(0.01,0.01)
+    e1 ~   dgamma(0.01,0.01)
+    gout ~ dgamma(0.01,0.01)
+    gin ~ dgamma(0.01,0.01)
 
-## Physical priors:
-# 
+# Priors for random intercept groups
+a ~ dmnorm(a0, tau.plot * A0[,])
+# Priors for the two sigmas and taus
+  tau.plot <- 1 / (sigma.plot * sigma.plot)
+  sigma.plot ~ dunif(0.001, 10)
 
-tau ~  dgamma(0.01,0.01)
-    
-e1 ~   dgamma(sh0,ra0)
-sh0 <- pow(m0,2) / pow(sd0,2)
-ra0 <- m0/pow(sd0,2)
-m0 ~  dunif(0.3,0.6) 
-sd0 ~  dunif(0.5,1.5) 
-
-
-gout ~ dnorm(sh,ra)
-sh <- pow(m,2) / pow(sd,2)
-ra <- m/pow(sd,2)
-m ~ dunif(0.02,0.08) 
-sd ~ dunif(0.1,1) 
-
-gin ~ dgamma(sh2,ra2)
-sh2 <- pow(m2,2) / pow(sd2,2)
-ra2 <- m2/pow(sd2,2)
-m2 ~ dunif(0.5,1.5) 
-sd2 ~ dunif(0.1,1)
 }"
 
 
@@ -125,7 +112,8 @@ sd2 ~ dunif(0.1,1)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = rnorm(1,0.5,0.1),gin=runif(1,0.8,1.2),gout=runif(1,0.01,0.05)) }
+inits <- function () { list(e1 = runif(1,0,10),gin=runif(1,1,5),gout=runif(1,0.001,1),
+                            a = rnorm(Nre, 0, 1)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 
@@ -134,23 +122,13 @@ inits <- function () { list(e1 = rnorm(1,0.5,0.1),gin=runif(1,0.8,1.2),gout=runi
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
               inits = inits,
-              parameters = c("e1", "gin", "gout"),
+              parameters = c("e1", "gin", "gout","a"),
               model = textConnection(Model),
-              n.thin = 5,
+              n.thin = 1,
               n.chains = 5,
               n.burnin = 5000,
-              n.iter = 10000)
-mcmcChain <- as.mcmc(Normfit)[,-1]
-
-tmp = Reduce('+', mcmcChain)
-result = tmp/length(mcmcChain)
-mcmcChain <- mcmcChain[[1]]
-
-
-
-
-#fit <- combine.mcmc(mcmcChain)
-
+              n.iter = 15000)
+mcmcChain <- as.mcmc(Normfit)[,-c(1:7)]
 
 # Plots
 denplot(Normfit,c("e1", "gin", "gout"),style="plain")

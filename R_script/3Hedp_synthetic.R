@@ -26,7 +26,7 @@ rm(list=ls())
 
 N <- 300
 
-obsx1 <- log(runif(N, exp(0.01), exp(1)))
+obsx1 <- runif(N,0.001,1)
 
 res <- vector()
 obsy1 <- vector()
@@ -37,9 +37,9 @@ errobsy1 <- vector()
 # g^2_in = 2.93 MeV         ! reduced width of deuteron
 # g^2_out = 0.0794 MeV      ! reduced width of neutron
 
-res[2] <- 0.15   # resonance energy
-res[3] <-  2.93    # reduced width incoming
-res[4] <- 0.0794   # reduced width outgoing
+res[2] <-   0.35779   # resonance energy
+res[3] <-  1.0085    # reduced width incoming
+res[4] <- 0.025425   # reduced width outgoing
 
 for (i in 1:length(obsx1)){
    res[1] <- obsx1[i]
