@@ -24,7 +24,7 @@ rm(list=ls())
 ######################################################################
 ## ARTIFICIAL DATA GENERATION 
 
-N <- 300
+N <- 500
 
 obsx1 <- runif(N,0.001,1)
 
@@ -37,7 +37,7 @@ errobsy1 <- vector()
 # g^2_in = 2.93 MeV         ! reduced width of deuteron
 # g^2_out = 0.0794 MeV      ! reduced width of neutron
 
-res[2] <-   0.35779   # resonance energy
+res[2] <-   0.35779+ 0.01   # resonance energy
 res[3] <-  1.0085    # reduced width incoming
 res[4] <- 0.025425   # reduced width outgoing
 
@@ -53,7 +53,7 @@ for (i in 1:length(obsx1)){
 
    tab1 <- read.table("He3dp_AD.out", header=FALSE)
 
-   errobsy1[i] <- 1
+   errobsy1[i] <- 0
    obsy1[i] <- rnorm( 1, tab1[1,2], errobsy1[i] )
 }
 

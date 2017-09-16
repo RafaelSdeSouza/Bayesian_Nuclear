@@ -46,11 +46,6 @@ ensamble <- read.csv("ensamble.csv",header = T)  %>%
   mutate(Stat=replace(Stat,Stat==0,0.1)) %>%
   filter(.,dat!="Lac05")
 #%>%
- # mutate(.,S = ifelse(dat == "Kra87m", S*0.94,S))
-
-
- 
-#%>%
 #  filter(.,dat!="gei99b") %>%
 #  filter(.,dat!="gei99d") %>%
 #  filter(.,dat!="Mol80") %>%
@@ -71,11 +66,11 @@ obsy <- ensamble$S    # Response variable
 obsx <-  ensamble$E   # Predictors
 erry <- ensamble$Stat
 weigth <- rep(1,N)
-#not1 <- which(obsx <= 0.1)
-#not2 <- which(obsx == max(obsx))
-#not3 <- which(obsy == max(obsy))
-#weigth[c(not1)] <- 10
-#weigth[c(not3)] <- 40
+not1 <- which(obsx <= 0.1)
+not2 <- which(obsx == max(obsx))
+not3 <- which(obsy == max(obsy))
+weigth[c(not1)] <- 10
+weigth[c(not3)] <- 40
 
 model.data <- list(obsy = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
@@ -84,18 +79,13 @@ model.data <- list(obsy = obsy,    # Response variable
                    N = nrow(ensamble)    # Sample size
 )
 
-#g <- data.frame(obsx1,obsy1)
-#ggplot(ensamble,aes(x=E,S))+geom_point()+
-#  geom_line(data=g,aes(x=obsx1,y=obsy1))
-
 
 ######################################################################
 Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
   obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-#  y[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau/weigth[i], -2)) 
-   y[i] <- sfactor3Hedp(obsx[i], e1, gin, gout)
+  y[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau/weigth[i], -2)) 
 }    
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
@@ -105,15 +95,15 @@ for (i in 1:N) {
 ## Physical priors:
 # 
 
-#tau ~  dgamma(0.01,0.01)
+tau ~  dgamma(0.01,0.01)
 
-#e1 ~   dgamma(0.01,0.01)
+e1 ~   dgamma(0.01,0.01)
 
-e1 ~   dgamma(sh0,ra0)
-sh0 <- pow(m0,2) / pow(sd0,2)
-ra0 <- m0/pow(sd0,2)
-m0  <- 0.35
-sd0 ~  dunif(0.05,0.1) 
+#e1 ~   dgamma(sh0,ra0)
+#sh0 <- pow(m0,2) / pow(sd0,2)
+#ra0 <- m0/pow(sd0,2)
+#m0  <- 0.35
+#sd0 ~  dunif(0.1,0.2) 
 
 gin ~ dgamma(0.01,0.01)
 #gin ~ dgamma(sh2,ra2)
@@ -144,7 +134,7 @@ gout ~ dgamma(0.01,0.01)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = rnorm(1,0.35,0.1),gin=runif(1,0.9,1.1),gout=runif(1,0.01,0.03)) }
+inits <- function () { list(e1 = rnorm(1,0.5,0.1),gin=runif(1,0.8,1.2),gout=runif(1,0.01,0.05)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 
@@ -161,9 +151,9 @@ Normfit <- jags(data = model.data,
               n.iter = 10000)
 mcmcChain <- as.mcmc(Normfit)[,-1]
 
-#tmp = Reduce('+', mcmcChain)
-#result = tmp/length(mcmcChain)
-#mcmcChain <- mcmcChain[[1]]
+tmp = Reduce('+', mcmcChain)
+result = tmp/length(mcmcChain)
+mcmcChain <- mcmcChain[[1]]
 
 
 
@@ -233,8 +223,8 @@ yLim = c(0,20)
 # plot axes only...add lines...then data
 plot( 1, type="n", lwd=2 , col="black" , xlim=xLim, ylim=yLim, 
        axes=FALSE, main="", xlab = "", ylab = "",
-      cex=1.5 , cex.lab=1.3, cex.axis=1.0,
-      cex.main=1.0, log="x")
+       cex=1.5 , cex.lab=1.3, cex.axis=1.0,log="x",
+       cex.main=1.0 )
 # control distance between axis and label [line=...]
 title(xlab="Energy (MeV)", line=2, cex.lab=1.3)
 title(ylab="S-Factor (MeV b)", line=2, cex.lab=1.3)
