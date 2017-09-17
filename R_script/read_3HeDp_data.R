@@ -7,6 +7,13 @@ files <- list.files(path = path)
 
 # Data of interest
 
+Lac05 <-  read.table(paste(path,"hdp_thm05b.dat",sep="/"),header = F) %>%
+  set_colnames(.,c("E","E_rr","S","Stat")) %>%
+  mutate(.,Syst=0.15) %>%  
+  mutate(.,dat="Lac05") %>% 
+  select(.,c(-E_rr))
+
+
 Mol80 <- read.table(paste(path,"hdp_mol80b.dat",sep="/"),header = F) %>%
          set_colnames(.,c("E","Syst","S","Stat")) %>%
          mutate(.,Syst= c(0.28,0.55,0.65,0.72,0.67,0.69,0.58,
@@ -43,11 +50,11 @@ gei99d <- read.table(paste(path,"hdp_gei99d.dat",sep="/"),header = F) %>%
   mutate(.,dat="gei99d")
 
 
-ensamble <- rbind(Mol80,Kra87m,Kra87b,zhi77b,gei99b,gei99d)
+ensamble <- rbind(Lac05,Mol80,Kra87m,Kra87b,zhi77b,gei99b,gei99d)
 
 #write.csv(ensamble,"ensamble.csv",row.names = F)
 
-ggplot(ensamble,aes(x=E,y=S,color=dat,shape=dat))+geom_point(size=2.85)+
+ggplot(ensamble,aes(x=E,y=S,color=dat))+geom_point(size=2.85)+
   theme_bw()+scale_x_log10()+scale_color_hc() +
   coord_cartesian(xlim=c(5e-3,1))+geom_vline(xintercept = 0.2, linetype="dotted", 
   color = "blue", size=1.5)
