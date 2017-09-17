@@ -45,12 +45,12 @@ gei99d <- read.table(paste(path,"hdp_gei99d.dat",sep="/"),header = F) %>%
 
 ensamble <- rbind(Mol80,Kra87m,Kra87b,zhi77b,gei99b,gei99d)
 
-write.csv(ensamble,"ensamble.csv",row.names = F)
+#write.csv(ensamble,"ensamble.csv",row.names = F)
 
 ggplot(ensamble,aes(x=E,y=S,color=dat,shape=dat))+geom_point(size=2.85)+
   theme_bw()+scale_x_log10()+scale_color_hc() +
   coord_cartesian(xlim=c(5e-3,1))+geom_vline(xintercept = 0.2, linetype="dotted", 
-                                             color = "blue", size=1.5)
+  color = "blue", size=1.5)
 
 
 
