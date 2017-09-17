@@ -1,4 +1,4 @@
-# tdn analysis
+# He3dp analysis
 #
 # purpose: ARTIFICIAL DATA
 #
@@ -65,17 +65,11 @@ N <- nrow(ensamble)
 obsy <- ensamble$S    # Response variable
 obsx <-  ensamble$E   # Predictors
 erry <- ensamble$Stat
-weigth <- rep(1,N)
-not1 <- which(obsx <= 0.1)
-not2 <- which(obsx == max(obsx))
-not3 <- which(obsy == max(obsy))
-weigth[c(not1)] <- 10
-weigth[c(not3)] <- 40
+
 
 model.data <- list(obsy = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
                    erry = erry,
-                   weigth = weigth,
                    N = nrow(ensamble)    # Sample size
 )
 
@@ -84,26 +78,46 @@ model.data <- list(obsy = obsy,    # Response variable
 Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
-  obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-  y[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau/weigth[i], -2)) 
+ 
+  obsy[i] ~ dlnorm(yL[i], pow(erryL[i], -2))
+  yL[i] <- log(y[i])-0.5*log(1+(pow(cerry[i],2)/pow(y[i],2)))
+  erryL[i] <- sqrt(log(1+(pow(cerry[i],2)/pow(y[i],2))))
+  p.alt[i] ~ dcat(p[])
+  cerry[i] <- erry[i]*phi[p.alt[i]]
+  y[i] <- n.norm * z[i]
+  z[i] <- a.scale*sfactor3Hedp(obsx[i], e1, gin, gout)
 }    
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
 # resonance energy, initial reduced width, final reduced 
 # width;
 
+a.scale ~ dgamma(0.01,0.01)
+
+### lognormal density:
+  n.norm ~ dlnorm(logmu, pow(logsigma, -2))
+  logmu <- log(1.0)      # median of factor uncertainty is 1.0
+  logsigma <- log(1.05)  # factor uncertainty is 
+
+# for case that measured errors are correct:
+  phi[1] <- 1
+  # for case that measured errors are too optimistic:
+  phi[2] ~ dunif(1,50)
+  p[1] ~ dunif(0,1)
+  p[2] <- 1-p[1]
+
 ## Physical priors:
 # 
 
 tau ~  dgamma(0.01,0.01)
 
-e1 ~   dgamma(0.01,0.01)
+#e1 ~   dgamma(0.01,0.01)
 
-#e1 ~   dgamma(sh0,ra0)
-#sh0 <- pow(m0,2) / pow(sd0,2)
-#ra0 <- m0/pow(sd0,2)
-#m0  <- 0.35
-#sd0 ~  dunif(0.1,0.2) 
+e1 ~   dgamma(sh0,ra0)
+sh0 <- pow(m0,2) / pow(sd0,2)
+ra0 <- m0/pow(sd0,2)
+m0  <- 0.35
+sd0 ~  dunif(0.5,1) 
 
 gin ~ dgamma(0.01,0.01)
 #gin ~ dgamma(sh2,ra2)
@@ -134,7 +148,7 @@ gout ~ dgamma(0.01,0.01)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = rnorm(1,0.5,0.1),gin=runif(1,0.8,1.2),gout=runif(1,0.01,0.05)) }
+inits <- function () { list(e1 = runif(1,0.2,0.8),gin=runif(1,0.8,1.2),gout=runif(1,0.01,0.05)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 
@@ -143,12 +157,12 @@ inits <- function () { list(e1 = rnorm(1,0.5,0.1),gin=runif(1,0.8,1.2),gout=runi
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
               inits = inits,
-              parameters = c("e1", "gin", "gout"),
+              parameters = c("e1", "gin", "gout","a.scale"),
               model = textConnection(Model),
               n.thin = 5,
               n.chains = 3,
-              n.burnin = 5000,
-              n.iter = 10000)
+              n.burnin = 7500,
+              n.iter = 15000)
 mcmcChain <- as.mcmc(Normfit)[,-1]
 
 tmp = Reduce('+', mcmcChain)

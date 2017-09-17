@@ -79,23 +79,52 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
   obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-  y[i] ~ dnorm(mu[i],pow(tau, -2)) 
-  mu[i] <- sfactor3Hedp(obsx[i], e1, gin, gout) 
-}    
+  y[i] <-  sfactor3Hedp(obsx[i], e1, gin, gout) + a[re[i]]
+  }
+
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
 # resonance energy, initial reduced width, final reduced 
 # width;
     tau ~  dgamma(0.01,0.01)
-    e1 ~   dgamma(0.01,0.01)
-    gout ~ dgamma(0.01,0.01)
-    gin ~ dgamma(0.01,0.01)
+#    e1 ~   dgamma(0.01,0.01)
+
+e1 ~   dgamma(sh0,ra0)
+sh0 <- pow(m0,2) / pow(sd0,2)
+ra0 <- m0/pow(sd0,2)
+m0  <- 0.35
+sd0 ~  dunif(0.05,0.1) 
+
+#gin ~ dgamma(0.01,0.01)
+gin ~ dgamma(sh2,ra2)
+sh2 <- pow(m2,2) / pow(sd2,2)
+ra2 <- m2/pow(sd2,2)
+m2 ~ dunif(0.75,1.25) 
+sd2 ~ dunif(0.1,0.5)
+
+#gout ~ dgamma(0.01,0.01)
+gout ~ dnorm(sh,ra)
+sh <- pow(m,2) / pow(sd,2)
+ra <- m/pow(sd,2)
+m ~ dunif(0.01,0.03) 
+sd ~ dunif(0.1,0.5) 
+
+
+
+
+
+# Priors for random intercept groups
 
 # Priors for random intercept groups
 a ~ dmnorm(a0, tau.plot * A0[,])
 # Priors for the two sigmas and taus
-  tau.plot <- 1 / (sigma.plot * sigma.plot)
-  sigma.plot ~ dunif(0.001, 10)
+tau.plot <- 1 / (sigma.plot * sigma.plot)
+sigma.plot ~ dunif(0.001, 10)
+
+
+#for (k in 1:6){
+#a[k] ~ dlnorm(log(1),log(1.04))
+#}
 
 }"
 
@@ -112,8 +141,8 @@ a ~ dmnorm(a0, tau.plot * A0[,])
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0,10),gin=runif(1,1,5),gout=runif(1,0.001,1),
-                            a = rnorm(Nre, 0, 1)) }
+inits <- function () { list(e1 = runif(1,0.3,1),gin=runif(1,0.5,1.5),gout=runif(1,0.001,0.05),
+                            a = rnorm(6, 0, 1)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 
@@ -124,11 +153,15 @@ Normfit <- jags(data = model.data,
               inits = inits,
               parameters = c("e1", "gin", "gout","a"),
               model = textConnection(Model),
-              n.thin = 1,
-              n.chains = 5,
-              n.burnin = 5000,
-              n.iter = 15000)
-mcmcChain <- as.mcmc(Normfit)[,-c(1:7)]
+              n.thin = 10,
+              n.chains = 10,
+              n.burnin = 10000,
+              n.iter = 30000)
+mcmcChain <- as.mcmc(Normfit)[,8:10]
+tmp = Reduce('+', mcmcChain)
+result = tmp/length(mcmcChain)
+#result[,1] <- mcmcChain[[1]][,1]
+mcmcChain <- result
 
 # Plots
 denplot(Normfit,c("e1", "gin", "gout"),style="plain")
