@@ -104,15 +104,15 @@ sd0 ~  dunif(0.025,0.05)
 gin ~ dgamma(sh2,ra2)
 sh2 <- pow(m2,2) / pow(sd2,2)
 ra2 <- m2/pow(sd2,2)
-m2 ~ dunif(0.75,1.25) 
-sd2 ~ dunif(0.1,0.5)
+m2 ~ dunif(1,1.2) 
+sd2 ~ dunif(0.1,0.25)
 
 #gout ~ dgamma(0.01,0.01)
 gout ~ dnorm(sh,ra)
 sh <- pow(m,2) / pow(sd,2)
 ra <- m/pow(sd,2)
 m ~ dunif(0.01,0.03) 
-sd ~ dunif(0.1,0.5) 
+sd ~ dunif(0.1,0.25) 
 
 
 # Priors for random intercept groups
