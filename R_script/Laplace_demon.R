@@ -14,8 +14,7 @@ PGF <- function(Data) return(c(rnormv(Data$J,0,0.01),
                                log(rhalfcauchy(1,1))))
 MyData <- list(J=J, PGF=PGF, N=N, mon.names=mon.names,
                parm.names=parm.names) #Notice that X and y are not included here
-write.table(cbind(y,X), "X.csv", sep=",", row.names=FALSE,
-            col.names=FALSE)
+
 Model <- function(parm, Data)
 {
   ### Parameters
