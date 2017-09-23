@@ -14,7 +14,7 @@
 ######################################################################
 # preparation: remove all variables from the work space
 rm(list=ls())
-#set.seed(123)
+set.seed(123)
 ######################################################################
 # data input
 # format: obsx, obsy, errobsy; the latter are the individual statistical 
@@ -24,9 +24,11 @@ rm(list=ls())
 ######################################################################
 ## ARTIFICIAL DATA GENERATION 
 
-N <- 25
+N <- 80
 
-obsx1 <- log(runif(N, exp(0.0), exp(0.2)))
+#obsx1 <- runif(N,0,0.7)
+obsx1 <- exp(runif(N,log(1e-3),log(0.7)))
+
 
 res <- vector()
 obsy1 <- vector()
@@ -60,6 +62,8 @@ for (i in 1:length(obsx1)){
 ######################################################################                 
 # import jags package 
 library(rjags)
+require(RcppGSL)
+library(R2jags)
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")  
 load.module("nuclear")  
@@ -70,36 +74,34 @@ cat('model {
 # LIKELIHOOD
 for (i in 1:length(obsx1)) {
   obsy1[i] ~ dnorm(y1[i], pow(errobsy1[i], -2))
-  y1[i] <- sfactorTdn_fast(obsx1[i], e1, gin, gout)    
+  y1[i] ~ dnorm(sfactorTdn(obsx1[i], e1, gin, gout),pow(tau,-2))    
 }    
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
 # resonance energy, initial reduced width, final reduced 
 # width;
 
-## uniform priors:
-#  e1 ~ dnorm(0.0, pow(1, -2))T(0,)
-  e1 ~ dunif(0.0, 10.0)
-  gin ~ dnorm(0.0, pow(10, -2))T(0,)
-  gout ~ dnorm(0.0, pow(10, -2))T(0,)
+   tau ~dgamma(0.01,0.01)
 
-
-#  gin ~ dunif(0, 100)
-#  gout ~ dunif(0, 100)
-#  gin ~ dunif(0, 10)
-#  gout ~ dunif(gin, 10)
-
-#  gin ~ dgamma(0.5,100)
-#  gout ~ dgamma(0.5,100)
-  
-#  gin ~ dgamma(0.5,rl1)
-#  gout ~ dgamma(0.5,rl2)
-#  rl1 ~ dunif(0,500)
-#  rl2 ~ dunif(0,500)
-  
-#  gin ~ dchisqr(1)T(gout,)
-#  gin ~ dchisqr(1)
-#  gout ~ dchisqr(1)
+  e1 ~   dgamma(sh0,ra0)
+  sh0 <- pow(m0,2) / pow(sd0,2)
+  ra0 <- m0/pow(sd0,2)
+  m0  <- 0.1
+  sd0 ~  dunif(0.1,1) 
+    
+   # gin ~ dgamma(0.01,0.01)
+    gin ~ dgamma(sh2,ra2)
+    sh2 <- pow(m2,2) / pow(sd2,2)
+    ra2 <- m2/pow(sd2,2)
+    m2 <- 3 
+    sd2 <- 1
+    
+    #gout ~ dgamma(0.01,0.01)
+    gout ~ dnorm(sh,ra)
+    sh <- pow(m,2) / pow(sd,2)
+    ra <- m/pow(sd,2)
+    m  <- 0.1
+    sd <- 1 
 
 }', file={f <- tempfile()})
 ######################################################################
@@ -114,32 +116,59 @@ for (i in 1:length(obsx1)) {
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 n.adapt  <- 1000   
-n.update <- 5000  
-n.iter   <- 10000  
+n.update <- 3000  
+n.iter   <- 7000  
 n.chains <- 3
 n.thin   <- 1
-
+inits <- function () { list(e1 = runif(1,0.04,0.1),gin=runif(1,2.9,3.2),gout=runif(1,0.07,0.09)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 # JAGS model;
 #
-ourmodel <- jags.model(f,
+ourmodel <- jags(model.file =f,
                 data = list('obsx1' = obsx1, ## jags wants all data in a list
                             'obsy1' = obsy1,
                             'errobsy1' = errobsy1),
-#                    inits = list(e1 = 0.091, gin = 2.9, gout = 0.079),
-                    n.chains = n.chains,
-                    n.adapt = n.adapt)
+                parameters = c("e1", "gin", "gout"),
+                n.thin = 5,
+                n.chains = 3,
+                n.burnin = 15000,
+                n.iter = 25000)
+
+mcmcChain <- as.mcmc(ourmodel)[,-1]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # burnin 
-update(ourmodel, n.update, progress.bar="none") 
+#update(ourmodel, n.update, progress.bar="none") 
 
 # variable.names are variables to be recorded in output file of samples
-mcmcChain <- coda.samples(ourmodel, 
-                    variable.names=c('e1', 'gin', 'gout' 
+#mcmcChain <- coda.samples(ourmodel, 
+#                    variable.names=c('e1', 'gin', 'gout' 
 #                    ,'rl1','rl2'
 #                    ,'s1', 's2', 'r1', 'r2'
-                    ), 
-                    n.iter=n.iter, n.thin=n.thin)
+#                    ), 
+#                    n.iter=n.iter, n.thin=n.thin)
+
+
 ######################################################################
 # output results on screen
 cat("", "\n")    # output empty line
@@ -223,7 +252,7 @@ nsamp = nrow(samplesmat)
 # calculate for these energies and the set of Bayesian samples for
 # Er, g^2_i, g^2_f the S_factor curve using Fortran code
 
-for ( i in round(seq(from=1,to=nsamp,length=500)) ) {
+for ( i in round(seq(from=1,to=nsamp,length=2000)) ) {
 # output samples to file for S-factor calculation; for each set of samples,
 # the values for the 3 parameters are written to file on separate lines 
    cat(samplesmat[i,], fill=1, file="tdn.in")

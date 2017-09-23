@@ -30,17 +30,19 @@ Kernel configured for up to 8 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3 4 5 6 7
 Primary memory available: 32.00 gigabytes
-Default processor set: 299 tasks, 1180 threads, 8 processors
-Load average: 1.28, Mach factor: 6.71
+Default processor set: 338 tasks, 1562 threads, 8 processors
+Load average: 1.04, Mach factor: 6.94
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
+PATH: /Users/rafaeldesouza/anaconda/bin
 PATH: /usr/local/bin
 PATH: /usr/bin
 PATH: /bin
 PATH: /usr/sbin
 PATH: /sbin
+PATH: /opt/X11/bin
 
 
 ## ----------- ##
@@ -401,7 +403,7 @@ configure:12663: checking for shl_load
 configure:12663: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_shl_load", referenced from:
-      _main in conftest-47f85c.o
+      _main in conftest-3c9220.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:12663: $? = 1
@@ -716,7 +718,7 @@ configure:13124: checking for argz_add
 configure:13124: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_add", referenced from:
-      _main in conftest-8900db.o
+      _main in conftest-036328.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13124: $? = 1
@@ -795,7 +797,7 @@ configure:13124: checking for argz_append
 configure:13124: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_append", referenced from:
-      _main in conftest-d2c12e.o
+      _main in conftest-16edfe.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13124: $? = 1
@@ -874,7 +876,7 @@ configure:13124: checking for argz_count
 configure:13124: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_count", referenced from:
-      _main in conftest-e4caa0.o
+      _main in conftest-8376d2.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13124: $? = 1
@@ -953,7 +955,7 @@ configure:13124: checking for argz_create_sep
 configure:13124: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_create_sep", referenced from:
-      _main in conftest-9bb2e0.o
+      _main in conftest-91112e.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13124: $? = 1
@@ -1032,7 +1034,7 @@ configure:13124: checking for argz_insert
 configure:13124: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_insert", referenced from:
-      _main in conftest-12daf0.o
+      _main in conftest-9e6ca5.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13124: $? = 1
@@ -1111,7 +1113,7 @@ configure:13124: checking for argz_next
 configure:13124: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_next", referenced from:
-      _main in conftest-99431b.o
+      _main in conftest-8a8361.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13124: $? = 1
@@ -1190,7 +1192,7 @@ configure:13124: checking for argz_stringify
 configure:13124: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_stringify", referenced from:
-      _main in conftest-7e4470.o
+      _main in conftest-a24653.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13124: $? = 1
