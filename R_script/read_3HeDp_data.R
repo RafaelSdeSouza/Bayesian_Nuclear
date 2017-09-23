@@ -16,9 +16,9 @@ Lac05 <-  read.table(paste(path,"hdp_thm05b.dat",sep="/"),header = F) %>%
 
 Mol80 <- read.table(paste(path,"hdp_mol80b.dat",sep="/"),header = F) %>%
          set_colnames(.,c("E","Syst","S","Stat")) %>%
-         mutate(.,Syst= c(0.28,0.55,0.65,0.72,0.67,0.69,0.58,
+         mutate(.,Syst= mean(c(0.28,0.55,0.65,0.72,0.67,0.69,0.58,
                           0.52,0.44,0.4,0.29,0.2,0.15,0.11,
-                          0.09,0.08,0.07,0.06)) %>%
+                          0.09,0.08,0.07,0.06)/S)) %>%
         select(.,c("E","S","Stat","Syst")) %>%
         mutate(.,dat="Mol80")
 
@@ -52,7 +52,7 @@ gei99d <- read.table(paste(path,"hdp_gei99d.dat",sep="/"),header = F) %>%
 
 ensamble <- rbind(Lac05,Mol80,Kra87m,Kra87b,zhi77b,gei99b,gei99d)
 
-#write.csv(ensamble,"ensamble.csv",row.names = F)
+write.csv(ensamble,"ensamble.csv",row.names = F)
 
 ggplot(ensamble,aes(x=E,y=S,color=dat))+geom_point(size=2.85)+
   theme_bw()+scale_x_log10()+scale_color_hc() +

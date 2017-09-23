@@ -62,15 +62,19 @@ Nre <- length(unique(ensamble$dat))
 obsy = ensamble$S    # Response variable
 obsx =  ensamble$E   # Predictors
 erry = ensamble$Stat
+syst = ensamble$Syst
 
+syst <- unique(syst)
+syst <- round(c(syst,syst[5]),3)
 
 model.data <- list(obsy = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
                    erry = erry,
                    re = re,  # random effect
                    N = nrow(ensamble),    # Sample size
-                   a0 = rep(0,Nre), # priors for scale parameters
-                   A0 = diag(Nre)
+#                   a0 = rep(0,Nre), # priors for scale parameters
+#                   A0 = diag(Nre), 
+                   syst = syst
 )
 
 
@@ -79,23 +83,53 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
   obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-  y[i] ~ dnorm(mu[i],pow(tau, -2)) 
-  mu[i] <- sfactor3Hedp(obsx[i], e1, gin, gout) 
-}    
+  y[i] <-  scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout) 
+#+ a[re[i]]
+  }
+
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
 # resonance energy, initial reduced width, final reduced 
 # width;
-    tau ~  dgamma(0.01,0.01)
-    e1 ~   dgamma(0.01,0.01)
-    gout ~ dgamma(0.01,0.01)
-    gin ~ dgamma(0.01,0.01)
+#    tau ~  dgamma(0.01,0.01)
+#    e1 ~   dgamma(0.01,0.01)
+
+e1 ~   dgamma(sh0,ra0)
+sh0 <- pow(m0,2) / pow(sd0,2)
+ra0 <- m0/pow(sd0,2)
+m0  <- 0.35
+sd0 ~  dunif(0.025,0.05) 
+
+#gin ~ dgamma(0.01,0.01)
+gin ~ dgamma(sh2,ra2)
+sh2 <- pow(m2,2) / pow(sd2,2)
+ra2 <- m2/pow(sd2,2)
+m2 ~ dunif(1,1.2) 
+sd2 ~ dunif(0.1,0.25)
+
+#gout ~ dgamma(0.01,0.01)
+gout ~ dnorm(sh,ra)
+sh <- pow(m,2) / pow(sd,2)
+ra <- m/pow(sd,2)
+m ~ dunif(0.01,0.03) 
+sd ~ dunif(0.1,0.25) 
+
 
 # Priors for random intercept groups
-a ~ dmnorm(a0, tau.plot * A0[,])
+#a ~ dmnorm(a0, tau.plot * A0[,])
 # Priors for the two sigmas and taus
-  tau.plot <- 1 / (sigma.plot * sigma.plot)
-  sigma.plot ~ dunif(0.001, 10)
+#tau.plot <- 1 / (sigma.plot * sigma.plot)
+#sigma.plot ~ dunif(0.001, 10)
+
+# This is not performing so well, as it still alows things like 1.8, which is undesirable
+
+#for (k in 1:6){
+#scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
+#}
+
+for (k in 1:6){
+scale[k] ~ dunif(1-3*syst[k],1+3*syst[k])
+}
 
 }"
 
@@ -112,8 +146,8 @@ a ~ dmnorm(a0, tau.plot * A0[,])
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0,10),gin=runif(1,1,5),gout=runif(1,0.001,1),
-                            a = rnorm(Nre, 0, 1)) }
+inits <- function () { list(e1 = runif(1,0.3,1),gin=runif(1,0.5,1.5),gout=runif(1,0.001,0.05),
+                            a = rnorm(6, 0, 1),scale=runif(6, 1, 1.01)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 
@@ -122,13 +156,18 @@ inits <- function () { list(e1 = runif(1,0,10),gin=runif(1,1,5),gout=runif(1,0.0
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
               inits = inits,
-              parameters = c("e1", "gin", "gout","a"),
+              parameters = c("e1", "gin", "gout","scale"),
               model = textConnection(Model),
-              n.thin = 1,
+              n.thin = 10,
               n.chains = 5,
               n.burnin = 5000,
-              n.iter = 15000)
-mcmcChain <- as.mcmc(Normfit)[,-c(1:7)]
+              n.iter = 10000)
+mcmcChain <- as.mcmc(Normfit)[,2:4]
+tmp = Reduce('+', mcmcChain)
+result = tmp/length(mcmcChain)
+#result[,1] <- mcmcChain[[1]][,1]
+mcmcChain <- result
+
 
 # Plots
 denplot(Normfit,c("e1", "gin", "gout"),style="plain")
@@ -236,8 +275,14 @@ for ( i in round(seq(from=1,to=nsamp,length=1000)) ) {
 
    # read data from file
    mydat <- read.table("He3dp.out", header=FALSE)
-
-   lines( mydat[,1], mydat[,2], col=adjustcolor("red", alpha=0.02)) 
+# One line for each scale (approximate, just using mean value)
+   
+   lines( mydat[,1], Normfit$BUGSoutput$mean$scale[1]*mydat[,2], col=adjustcolor("red", alpha=0.02))
+   lines( mydat[,1], Normfit$BUGSoutput$mean$scale[2]*mydat[,2], col=adjustcolor("blue", alpha=0.02)) 
+   lines( mydat[,1], Normfit$BUGSoutput$mean$scale[3]*mydat[,2], col=adjustcolor("green", alpha=0.02)) 
+   lines( mydat[,1], Normfit$BUGSoutput$mean$scale[4]*mydat[,2], col=adjustcolor("orange", alpha=0.02)) 
+   lines( mydat[,1], Normfit$BUGSoutput$mean$scale[5]*mydat[,2], col=adjustcolor("brown", alpha=0.02)) 
+   lines( mydat[,1], Normfit$BUGSoutput$mean$scale[6]*mydat[,2], col=adjustcolor("gray", alpha=0.02)) 
 }
 ######################################################################
 # function for error bars;
@@ -256,8 +301,8 @@ add.error.bars <- function(X,Y,dX,dY,w,col){
 }
 
 # add data - circles
-points( obsx, obsy, col="black", pch=1, cex=1.2 )
-add.error.bars(obsx, obsy, 0.0, erry, 0.0, col="black" )  
+points( obsx, obsy, col=ensamble$dat, pch=1, cex=1.2 )
+add.error.bars(obsx, obsy, 0.0, erry, 0.0, col=ensamble$dat )  
 
 dev.off()
 ######################################################################
