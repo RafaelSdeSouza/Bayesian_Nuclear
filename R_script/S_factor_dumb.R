@@ -69,8 +69,8 @@ omega <- (2*jr+1)/((2*jt+1)*(2*jp+1));
 }
 
 
-N <- 30
-x1 <- exp(runif(N, log(1e-3), log(1)))
+N <- 300
+x1 <- exp(seq(log(1e-3), log(1),length.out=N))
 res <- vector()
 y1 <- vector()
 # Barker values:
@@ -100,10 +100,11 @@ for (i in 1:length(x1)){
 
 
 # Test
-plot(x1,Sfactor(x1,0.0912,2.93,0.0794),log="x",ylim=c(0,35),
-     xlim=c(1e-3,1),col="red",cex=0.5)
-par(new=TRUE)
-plot(x1,y1,col="green",log="x",ylim=c(0,35),xlim=c(1e-3,1),cex=0.5)
 
+
+plot(x1,y1,col="green",log="x",ylim=c(0,35),xlim=c(1e-3,1),cex=1.5)
+#par(new=TRUE)
+lines(x1,Sfactor(x1,0.0912,2.93,0.0794),ylim=c(0,35),
+      xlim=c(1e-3,1),col="red",cex=1.25)
 
 hist((Sfactor(x1,0.0912,2.93,0.0794)-y1))

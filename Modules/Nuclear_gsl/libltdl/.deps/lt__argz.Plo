@@ -15,7 +15,7 @@ lt__argz.lo: lt__argz.c ../config.h libltdl/lt__argz.h \
   /usr/include/sys/_types/_ucontext.h \
   /usr/include/sys/_types/_sigset_t.h /usr/include/sys/_types/_size_t.h \
   /usr/include/sys/_types/_uid_t.h /usr/include/sys/resource.h \
-  /Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.1.0/include/stdint.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stdint.h \
   /usr/include/stdint.h /usr/include/sys/_types/_int8_t.h \
   /usr/include/sys/_types/_int16_t.h /usr/include/sys/_types/_int32_t.h \
   /usr/include/sys/_types/_int64_t.h /usr/include/_types/_uint8_t.h \
@@ -62,8 +62,8 @@ lt__argz.lo: lt__argz.c ../config.h libltdl/lt__argz.h \
   /usr/include/sys/_types/_fsblkcnt_t.h \
   /usr/include/sys/_types/_fsfilcnt_t.h libltdl/lt__glibc.h \
   libltdl/slist.h libltdl/lt_system.h \
-  /Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.1.0/include/stddef.h \
-  /Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.1.0/include/__stddef_max_align_t.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stddef.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h \
   /usr/include/assert.h /usr/include/string.h /usr/include/strings.h \
   /usr/include/secure/_string.h /usr/include/secure/_common.h
 
@@ -127,7 +127,7 @@ libltdl/lt__argz.h:
 
 /usr/include/sys/resource.h:
 
-/Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.1.0/include/stdint.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stdint.h:
 
 /usr/include/stdint.h:
 
@@ -275,9 +275,9 @@ libltdl/slist.h:
 
 libltdl/lt_system.h:
 
-/Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.1.0/include/stddef.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stddef.h:
 
-/Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.1.0/include/__stddef_max_align_t.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h:
 
 /usr/include/assert.h:
 

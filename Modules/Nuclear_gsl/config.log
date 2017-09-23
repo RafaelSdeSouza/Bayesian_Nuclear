@@ -30,12 +30,14 @@ Kernel configured for up to 8 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3 4 5 6 7
 Primary memory available: 32.00 gigabytes
-Default processor set: 332 tasks, 1494 threads, 8 processors
-Load average: 1.38, Mach factor: 6.62
+Default processor set: 313 tasks, 1165 threads, 8 processors
+Load average: 0.80, Mach factor: 7.19
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
+PATH: /opt/local/bin
+PATH: /opt/local/sbin
 PATH: /Users/rafaeldesouza/anaconda/bin
 PATH: /usr/local/bin
 PATH: /usr/bin
@@ -81,18 +83,18 @@ configure:3316: found /usr/bin/gcc
 configure:3327: result: gcc
 configure:3556: checking for C compiler version
 configure:3565: gcc --version >&5
-Apple LLVM version 8.1.0 (clang-802.0.42)
+Apple LLVM version 9.0.0 (clang-900.0.37)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
-Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/usr/include/c++/4.2.1
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+Configured with: --prefix=/Applications/Xcode.app/Contents/Developer/usr --with-gxx-include-dir=/usr/include/c++/4.2.1
 configure:3576: $? = 0
 configure:3565: gcc -v >&5
-Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/usr/include/c++/4.2.1
-Apple LLVM version 8.1.0 (clang-802.0.42)
+Configured with: --prefix=/Applications/Xcode.app/Contents/Developer/usr --with-gxx-include-dir=/usr/include/c++/4.2.1
+Apple LLVM version 9.0.0 (clang-900.0.37)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 configure:3576: $? = 0
 configure:3565: gcc -V >&5
 clang: error: argument to '-V' is missing (expected 1 value)
@@ -151,8 +153,8 @@ configure:4435: result: /usr/bin/grep -E
 configure:4440: checking for fgrep
 configure:4502: result: /usr/bin/grep -F
 configure:4537: checking for ld used by gcc
-configure:4604: result: /Library/Developer/CommandLineTools/usr/bin/ld
-configure:4611: checking if the linker (/Library/Developer/CommandLineTools/usr/bin/ld) is GNU ld
+configure:4604: result: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+configure:4611: checking if the linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) is GNU ld
 configure:4626: result: no
 configure:4638: checking for BSD- or MS-compatible name lister (nm)
 configure:4692: result: /usr/bin/nm -B
@@ -160,7 +162,7 @@ configure:4822: checking the name lister (/usr/bin/nm -B) interface
 configure:4829: gcc -c -g -O2  conftest.c >&5
 configure:4832: /usr/bin/nm -B "conftest.o"
 configure:4835: output
-0000000000000210 S _some_variable
+00000000000001ec S _some_variable
 configure:4842: result: BSD nm
 configure:4845: checking whether ln -s works
 configure:4849: result: yes
@@ -170,7 +172,7 @@ configure:5036: checking how to convert x86_64-apple-darwin16.7.0 file names to 
 configure:5076: result: func_convert_file_noop
 configure:5083: checking how to convert x86_64-apple-darwin16.7.0 file names to toolchain format
 configure:5103: result: func_convert_file_noop
-configure:5110: checking for /Library/Developer/CommandLineTools/usr/bin/ld option to reload object files
+configure:5110: checking for /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld option to reload object files
 configure:5117: result: -r
 configure:5191: checking for objdump
 configure:5207: found /usr/bin/objdump
@@ -255,7 +257,7 @@ configure:7582: $? = 0
 configure:7596: gcc -E  conftest.c
 conftest.c:11:10: fatal error: 'ac_nonexistent.h' file not found
 #include <ac_nonexistent.h>
-         ^
+         ^~~~~~~~~~~~~~~~~~
 1 error generated.
 configure:7596: $? = 1
 configure: failed program was:
@@ -276,7 +278,7 @@ configure:7641: $? = 0
 configure:7655: gcc -E  conftest.c
 conftest.c:11:10: fatal error: 'ac_nonexistent.h' file not found
 #include <ac_nonexistent.h>
-         ^
+         ^~~~~~~~~~~~~~~~~~
 1 error generated.
 configure:7655: $? = 1
 configure: failed program was:
@@ -359,7 +361,7 @@ configure:9186: $? = 0
 configure:9208: result: yes
 configure:9216: checking if gcc supports -c -o file.o
 configure:9263: result: yes
-configure:9296: checking whether the gcc linker (/Library/Developer/CommandLineTools/usr/bin/ld) supports shared libraries
+configure:9296: checking whether the gcc linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) supports shared libraries
 configure:10555: result: yes
 configure:10795: checking dynamic linker characteristics
 configure:11613: result: darwin16.7.0 dyld
@@ -403,7 +405,7 @@ configure:12665: checking for shl_load
 configure:12665: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_shl_load", referenced from:
-      _main in conftest-cb03d5.o
+      _main in conftest-ce5259.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:12665: $? = 1
@@ -595,7 +597,7 @@ configure:13088: checking for argz.h
 configure:13088: gcc -c -g -O2  conftest.c >&5
 conftest.c:64:10: fatal error: 'argz.h' file not found
 #include <argz.h>
-         ^
+         ^~~~~~~~
 1 error generated.
 configure:13088: $? = 1
 configure: failed program was:
@@ -718,7 +720,7 @@ configure:13126: checking for argz_add
 configure:13126: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_add", referenced from:
-      _main in conftest-1043dc.o
+      _main in conftest-a62629.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13126: $? = 1
@@ -797,7 +799,7 @@ configure:13126: checking for argz_append
 configure:13126: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_append", referenced from:
-      _main in conftest-f2e2fb.o
+      _main in conftest-bc10fb.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13126: $? = 1
@@ -876,7 +878,7 @@ configure:13126: checking for argz_count
 configure:13126: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_count", referenced from:
-      _main in conftest-c4b470.o
+      _main in conftest-83e5b8.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13126: $? = 1
@@ -955,7 +957,7 @@ configure:13126: checking for argz_create_sep
 configure:13126: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_create_sep", referenced from:
-      _main in conftest-e2335d.o
+      _main in conftest-1737ac.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13126: $? = 1
@@ -1034,7 +1036,7 @@ configure:13126: checking for argz_insert
 configure:13126: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_insert", referenced from:
-      _main in conftest-1cbb27.o
+      _main in conftest-ddc8ff.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13126: $? = 1
@@ -1113,7 +1115,7 @@ configure:13126: checking for argz_next
 configure:13126: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_next", referenced from:
-      _main in conftest-0e6686.o
+      _main in conftest-ed1bc3.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13126: $? = 1
@@ -1192,7 +1194,7 @@ configure:13126: checking for argz_stringify
 configure:13126: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture x86_64:
   "_argz_stringify", referenced from:
-      _main in conftest-4ef450.o
+      _main in conftest-ac646c.o
 ld: symbol(s) not found for architecture x86_64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:13126: $? = 1
@@ -1291,7 +1293,7 @@ configure:13422: checking for dl.h
 configure:13422: gcc -c -g -O2  conftest.c >&5
 conftest.c:69:10: fatal error: 'dl.h' file not found
 #include <dl.h>
-         ^
+         ^~~~~~
 1 error generated.
 configure:13422: $? = 1
 configure: failed program was:
@@ -1369,7 +1371,7 @@ configure:13422: checking for sys/dl.h
 configure:13422: gcc -c -g -O2  conftest.c >&5
 conftest.c:69:10: fatal error: 'sys/dl.h' file not found
 #include <sys/dl.h>
-         ^
+         ^~~~~~~~~~
 1 error generated.
 configure:13422: $? = 1
 configure: failed program was:
@@ -1447,7 +1449,7 @@ configure:13422: checking for dld.h
 configure:13422: gcc -c -g -O2  conftest.c >&5
 conftest.c:69:10: fatal error: 'dld.h' file not found
 #include <dld.h>
-         ^
+         ^~~~~~~
 1 error generated.
 configure:13422: $? = 1
 configure: failed program was:
@@ -1564,18 +1566,18 @@ configure:13571: found /usr/bin/g++
 configure:13582: result: g++
 configure:13609: checking for C++ compiler version
 configure:13618: g++ --version >&5
-Apple LLVM version 8.1.0 (clang-802.0.42)
+Apple LLVM version 9.0.0 (clang-900.0.37)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
-Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/usr/include/c++/4.2.1
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+Configured with: --prefix=/Applications/Xcode.app/Contents/Developer/usr --with-gxx-include-dir=/usr/include/c++/4.2.1
 configure:13629: $? = 0
 configure:13618: g++ -v >&5
-Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/usr/include/c++/4.2.1
-Apple LLVM version 8.1.0 (clang-802.0.42)
+Configured with: --prefix=/Applications/Xcode.app/Contents/Developer/usr --with-gxx-include-dir=/usr/include/c++/4.2.1
+Apple LLVM version 9.0.0 (clang-900.0.37)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 configure:13629: $? = 0
 configure:13618: g++ -V >&5
 clang: error: argument to '-V' is missing (expected 1 value)
@@ -1601,7 +1603,7 @@ configure:13927: $? = 0
 configure:13941: g++ -E  conftest.cpp
 conftest.cpp:44:10: fatal error: 'ac_nonexistent.h' file not found
 #include <ac_nonexistent.h>
-         ^
+         ^~~~~~~~~~~~~~~~~~
 1 error generated.
 configure:13941: $? = 1
 configure: failed program was:
@@ -1655,7 +1657,7 @@ configure:13986: $? = 0
 configure:14000: g++ -E  conftest.cpp
 conftest.cpp:44:10: fatal error: 'ac_nonexistent.h' file not found
 #include <ac_nonexistent.h>
-         ^
+         ^~~~~~~~~~~~~~~~~~
 1 error generated.
 configure:14000: $? = 1
 configure: failed program was:
@@ -1704,10 +1706,10 @@ configure: failed program was:
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 configure:14162: checking for ld used by g++
-configure:14229: result: /Library/Developer/CommandLineTools/usr/bin/ld
-configure:14236: checking if the linker (/Library/Developer/CommandLineTools/usr/bin/ld) is GNU ld
+configure:14229: result: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+configure:14236: checking if the linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) is GNU ld
 configure:14251: result: no
-configure:14306: checking whether the g++ linker (/Library/Developer/CommandLineTools/usr/bin/ld) supports shared libraries
+configure:14306: checking whether the g++ linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) supports shared libraries
 configure:15379: result: yes
 configure:15415: g++ -c -g -O2  conftest.cpp >&5
 configure:15418: $? = 0
@@ -1725,7 +1727,7 @@ configure:16037: $? = 0
 configure:16059: result: yes
 configure:16064: checking if g++ supports -c -o file.o
 configure:16111: result: yes
-configure:16141: checking whether the g++ linker (/Library/Developer/CommandLineTools/usr/bin/ld) supports shared libraries
+configure:16141: checking whether the g++ linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) supports shared libraries
 configure:16181: result: yes
 configure:16322: checking dynamic linker characteristics
 configure:17067: result: darwin16.7.0 dyld
@@ -1885,8 +1887,8 @@ lt_cv_ld_reload_flag=-r
 lt_cv_module_path_var=DYLD_LIBRARY_PATH
 lt_cv_nm_interface='BSD nm'
 lt_cv_objdir=.libs
-lt_cv_path_LD=/Library/Developer/CommandLineTools/usr/bin/ld
-lt_cv_path_LDCXX=/Library/Developer/CommandLineTools/usr/bin/ld
+lt_cv_path_LD=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+lt_cv_path_LDCXX=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
 lt_cv_path_NM='/usr/bin/nm -B'
 lt_cv_path_mainfest_tool=no
 lt_cv_prog_compiler_c_o=yes
@@ -1966,7 +1968,7 @@ INSTALL_SCRIPT='${INSTALL}'
 INSTALL_STRIP_PROGRAM='$(install_sh) -c -s'
 JAGS_MAJOR='4'
 JAGS_MINOR='0'
-LD='/Library/Developer/CommandLineTools/usr/bin/ld'
+LD='/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld'
 LDFLAGS=''
 LIBADD_DL=' '
 LIBADD_DLD_LINK=''
