@@ -1,6 +1,6 @@
 ## ARTIFICIAL DATA GENERATION 
 
-N <- 30
+N <- 300
 
 obsx1 <- exp(seq(log(1e-3), log(1),length.out=N))
 
@@ -38,9 +38,8 @@ for (i in 1:length(obsx1)){
 # Test
 
 
-plot(obsx1,obsy1,col="green",log="x",ylim=c(0,35),xlim=c(1e-3,1),cex=1.5)
+plot(obsx1,obsy1,col="green",log="x",ylim=c(0,25),xlim=c(1e-3,1),cex=1.5)
 #par(new=TRUE)
-lines(obsx1,Sfactor_He3dp(obsx1,0.35,1.0085,0.025425),ylim=c(0,35),
+lines(obsx1,Sfactor_He3dp(obsx1,0.35,1.0085,0.025425),ylim=c(0,25),
       xlim=c(1e-3,1),col="red",cex=1.25)
 
-hist((Sfactor(x1,0.0912,2.93,0.0794)-y1))
