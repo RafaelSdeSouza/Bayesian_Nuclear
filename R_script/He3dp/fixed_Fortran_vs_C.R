@@ -25,7 +25,7 @@ rm(list=ls())
 ######################################################################
 ## ARTIFICIAL DATA GENERATION 
 
-N <- 5000
+N <- 500
 
 obsx1 <- exp(runif(N,log(0.001),log(1)))
 
@@ -78,8 +78,8 @@ cat('model {
     for (i in 1:length(obsx1)) {
     obsy1[i] ~ dnorm(obsx1[i],tau)
 
-    yt[i] <- sfactorBW(obsx1[i], 0.0912, 2.93, 0.0794)
-    yk[i] <- sfactorTdn(obsx1[i], 0.0912 , 2.93, 0.0794)
+    yt[i] <- sfactorBW(obsx1[i], e1, 2.93, 0.0794)
+    yk[i] <- sfactor3Hedp(obsx1[i], 0.0912 , 2.93, 0.0794)
     }    
    tau ~ dgamma(0.1,0.1)
    e1 ~ dgamma(0.1,0.1)
@@ -93,12 +93,12 @@ inits <- function () { list(e1 = runif(1,0,0.3),gin=runif(1,2,10),gout=runif(1,0
 
 # JAGS model with R2Jags;
 out <- jags(data = list('obsx1' = obsx1,'obsy1' = obsy1),
-            parameters = c("e1","yt","yk"),
+            parameters = c("yt","yk","e1"),
             model.file = f,
             n.thin = 10,
             n.chains = 3,
             n.burnin = 50,
-            n.iter = 100,jags.module = c("nuclear"))
+            n.iter = 100)
 
 plot(obsx1,obsy1,col="red",xlim=c(0.001,0.3),ylim=c(0,30),cex=0.4,log="x")
 par(new=TRUE)

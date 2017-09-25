@@ -70,7 +70,7 @@ N <- nrow(ensamble)
 obsy <- ensamble$S    # Response variable
 obsx <-  ensamble$E   # Predictors
 erry <- ensamble$Stat
-weigth <- rep(1,N)
+
 #not1 <- which(obsx <= 0.1)
 #not2 <- which(obsx == max(obsx))
 #not3 <- which(obsy == max(obsy))
@@ -80,7 +80,6 @@ weigth <- rep(1,N)
 model.data <- list(obsy = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
                    erry = erry,
-                   weigth = weigth,
                    N = nrow(ensamble)    # Sample size
 )
 
@@ -94,8 +93,8 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
   obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-#  y[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau/weigth[i], -2)) 
-   y[i] <- sfactor3Hedp(obsx[i], e1, gin, gout)
+   y[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau, -2)) 
+#   y[i] <- sfactor3Hedp(obsx[i], e1, gin, gout)
 }    
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
@@ -105,24 +104,24 @@ for (i in 1:N) {
 ## Physical priors:
 # 
 
-#tau ~  dgamma(0.01,0.01)
+tau ~  dgamma(0.01,0.01)
 
-#e1 ~   dgamma(0.01,0.01)
+e1 ~   dgamma(0.01,0.01)
 
-e1 ~   dgamma(sh0,ra0)
-sh0 <- pow(m0,2) / pow(sd0,2)
-ra0 <- m0/pow(sd0,2)
-m0  <- 0.35
-sd0 ~  dunif(0.05,0.1) 
+#e1 ~   dgamma(sh0,ra0)
+#sh0 <- pow(m0,2) / pow(sd0,2)
+#ra0 <- m0/pow(sd0,2)
+#m0  <- 0.5
+#sd0 <-  1 
 
-gin ~ dgamma(0.01,0.01)
+gin ~ dunif(0.01,10)
 #gin ~ dgamma(sh2,ra2)
 #sh2 <- pow(m2,2) / pow(sd2,2)
 #ra2 <- m2/pow(sd2,2)
 #m2 ~ dunif(0.75,1.25) 
 #sd2 ~ dunif(0.1,0.5)
 
-gout ~ dgamma(0.01,0.01)
+gout ~ dunif(0.01,10)
 #gout ~ dnorm(sh,ra)
 #sh <- pow(m,2) / pow(sd,2)
 #ra <- m/pow(sd,2)
@@ -144,7 +143,7 @@ gout ~ dgamma(0.01,0.01)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = rnorm(1,0.35,0.1),gin=runif(1,0.9,1.1),gout=runif(1,0.01,0.03)) }
+inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif(1,0.01,1)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 
@@ -155,7 +154,7 @@ Normfit <- jags(data = model.data,
               inits = inits,
               parameters = c("e1", "gin", "gout"),
               model = textConnection(Model),
-              n.thin = 5,
+              n.thin = 10,
               n.chains = 3,
               n.burnin = 5000,
               n.iter = 10000)

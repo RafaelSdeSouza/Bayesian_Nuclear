@@ -65,7 +65,7 @@ library(runjags)
 library(R2jags)
 library(mcmcplots)
 ## for block updating [we do not need to center predictor variables]
-#load.module("glm")  
+load.module("glm")  
 load.module("nuclear")  
 # 
 ######################################################################                 
@@ -87,14 +87,10 @@ for (i in 1:length(obsx1)) {
 ##
    
    tau ~dgamma(1e-3,1e-3)
-   e1 ~ dunif(0.0, 10.0)
-   gin ~ dnorm(0, pow(10, -2))T(0,)
-    gout ~ dnorm(0, pow(10, -2))T(0,)
+   e1 ~ dnorm(0.0, 0.01)
 
-
-
-#  gin ~ dunif(0, 100)
-#  gout ~ dunif(0, 100)
+  gin ~ dunif(0, 100)
+  gout ~ dunif(0, 100)
 #  gin ~ dunif(0, 10)
 #  gout ~ dunif(gin, 10)
 
@@ -127,7 +123,7 @@ n.update <- 1000
 n.iter   <- 10000  
 n.chains <- 3
 n.thin   <- 10
-inits <- function () { list(e1 = runif(1,0,0.3),gin=runif(1,2,10),gout=runif(1,0.01,1)) }
+inits <- function () { list(e1 = runif(1,0.5,10),gin=runif(1,2,10),gout=runif(1,0.01,1)) }
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
 
@@ -141,8 +137,8 @@ out <- jags(data = list('obsx1' = obsx1, ## jags wants all data in a list
               model.file = f,
               n.thin = 50,
               n.chains = 3,
-              n.burnin = 7500,
-              n.iter = 15000)
+              n.burnin = 5000,
+              n.iter = 10000)
 denplot(out)
 mcmcplot(out)
 traplot(out)
