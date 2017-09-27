@@ -107,7 +107,7 @@ nuclear_la-nuclear.lo: nuclear.cc /usr/local/include/JAGS/module/Module.h \
   /usr/local/include/JAGS/distribution/Distribution.h \
   /usr/local/include/JAGS/distribution/VectorDist.h \
   /usr/local/include/JAGS/distribution/ArrayDist.h \
-  functions/sfactor3Hedp.h functions/sfactorTdn.h functions/sfactorBW.h
+  functions/sfactor3Hedp.h functions/sfactorTdn.h
 
 /usr/local/include/JAGS/module/Module.h:
 
@@ -406,5 +406,3 @@ nuclear_la-nuclear.lo: nuclear.cc /usr/local/include/JAGS/module/Module.h \
 functions/sfactor3Hedp.h:
 
 functions/sfactorTdn.h:
-
-functions/sfactorBW.h:

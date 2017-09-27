@@ -11,7 +11,7 @@ namespace nuclear {
  * sfactorTdn returns the astrophysical S-factor as a function of energy.  It
  * returns a vector of S-factor predictions for a vector of energies.
  * <pre>
- * obsy1 = sfactorTdnF(obsx1, e1, gi, gf)
+ * obsy1 = sfactorTdn(obsx1, e1, gi, gf)
  * </pre>
  */
 
@@ -22,12 +22,11 @@ class sfactorTdn : public ArrayFunction {
     void evaluate(double *x, std::vector<double const *> const &args,
                     std::vector<std::vector<unsigned int> > const &dims) const;
                     
-    void coul(int, double, double, double&, double&) const;
     
-   /*void PenFactor(const double E, const double L, const double R,
+   void PenFactor(const double E, const double L, const double R,
    				const double mue,
 				const double qQ,
-				double& P, double& S) const;*/
+				double& P, double& S) const;
     
                 
 	bool checkParameterDim(std::vector<std::vector<unsigned int> > const &dims) const;
