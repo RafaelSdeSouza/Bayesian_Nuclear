@@ -6,7 +6,7 @@
 #
 # - uses the function sfactorTdn_fast(obsx1[i], e1, gin, gout), which
 #   is a C++ version of a Fortran code that includes Coulomb wave
-#   function calculations; JAGS has been recompiled with this C++ function 
+#   function calculations; JAGS has been recompiled with this C++ function
 #
 ######################################################################
 # preparation: remove all variables from the work space
@@ -14,29 +14,29 @@ rm(list=ls())
 set.seed(123)
 ######################################################################
 # data input
-# format: obsx, obsy, errobsy; the latter are the individual statistical 
+# format: obsx, obsy, errobsy; the latter are the individual statistical
 # errors of each datum [i]
 #
-# energy is in units of MeV, and the S-factor in MeVb; 
+# energy is in units of MeV, and the S-factor in MeVb;
 
-######################################################################                 
-# import packages 
+######################################################################
+# import packages
 library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr)
 library(dplyr);require(ggsci)
 source("https://raw.githubusercontent.com/johnbaums/jagstools/master/R/jagsresults.R")
 ## for block updating [we do not need to center predictor variables]
-load.module("glm")  
-load.module("nuclear")  
+load.module("glm")
+load.module("nuclear")
 
 ## for block updating [we do not need to center predictor variables]
-load.module("glm")  
-load.module("nuclear")  
-# 
-    
+load.module("glm")
+load.module("nuclear")
+#
+
 ######################################################################
-## Read DATA GENERATION 
+## Read DATA GENERATION
 ensamble <- read.csv("ensamble.csv",header = T)  %>%
   mutate(Stat=replace(Stat,Stat==0,0.1)) %>%
   filter(.,dat!="Lac05")
@@ -48,7 +48,7 @@ ensamble <- read.csv("ensamble.csv",header = T)  %>%
 #  filter(.,dat!="Mol80") %>%
 #  filter(.,dat!="Kra87m") %>%
 #  filter(.,dat!="zhi77b")
- 
+
 # Literature
 #  0.35779   # resonance energy
 #  1.0085    # reduced width incoming
@@ -68,7 +68,7 @@ model.data <- list(obsy = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
                    erry = erry,
                    N = nrow(ensamble), # Sample size
-                   M = M, 
+                   M = M,
                    xx = xx
 )
 
@@ -78,12 +78,12 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
     obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-     y[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau, -2)) 
+     y[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau, -2))
 #    y[i] <- sfactor3Hedp(obsx[i], e1, gin, gout)
-} 
+}
 
 # Predicted values
-    
+
 for (j in 1:M){
 mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout)
 yx[j] ~ dnorm(mux[j],pow(tau,-2))
@@ -91,7 +91,7 @@ yx[j] ~ dnorm(mux[j],pow(tau,-2))
 
 # PRIORS
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
-# resonance energy, initial reduced width, final reduced 
+# resonance energy, initial reduced width, final reduced
 # width;
 
  tau ~  dgamma(0.01,0.01)
@@ -104,20 +104,20 @@ yx[j] ~ dnorm(mux[j],pow(tau,-2))
 
 
 ######################################################################
-# n.adapt:  number of iterations in the chain for adaptation (n.adapt) 
-#           [JAGS will use to choose the sampler and to assure optimum 
-#           mixing of the MCMC chain; will be discarded] 
-# n.udpate: number of iterations for burnin; these will be discarded to 
+# n.adapt:  number of iterations in the chain for adaptation (n.adapt)
+#           [JAGS will use to choose the sampler and to assure optimum
+#           mixing of the MCMC chain; will be discarded]
+# n.udpate: number of iterations for burnin; these will be discarded to
 #           allow the chain to converge before iterations are stored
-# n.iter:   number of iterations to store in the final chain as samples 
-#           from the posterior distribution 
+# n.iter:   number of iterations to store in the final chain as samples
+#           from the posterior distribution
 # n.chains: number of mcmc chains
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
 inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif(1,0.01,1)) }
-# "f": is the model specification from above; 
-# data = list(...): define all data elements that are referenced in the 
+# "f": is the model specification from above;
+# data = list(...): define all data elements that are referenced in the
 
 
 
@@ -133,6 +133,7 @@ Normfit <- jags(data = model.data,
 
 traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
+caterplot(Normfit  ,c("e1", "gin", "gout"))
 
 
 
@@ -142,7 +143,7 @@ x <- xx
 gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3=y[,"0.5%"],upr1=y[,"75%"],
                     upr2=y[,"97.5%"],upr3=y[,"99.5%"])
 gobs <- data.frame(obsx,obsy,erry,set)
-gobs$set <- as.factor(gobs$set) 
+gobs$set <- as.factor(gobs$set)
 
 
 ggplot(gobs,aes(x=obsx,y=obsy))+
@@ -163,6 +164,6 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
         axis.title = element_text(family = "Trebuchet MS", color="#666666", face="bold", size=15),
         axis.text  = element_text(size=12),
         strip.text = element_text(size=10),
-        strip.background = element_rect("gray85")) + 
+        strip.background = element_rect("gray85")) +
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
 
