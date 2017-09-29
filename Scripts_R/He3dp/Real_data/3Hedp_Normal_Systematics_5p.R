@@ -111,13 +111,13 @@ scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
 
 tau ~  dunif(0.01,10)
 e1 ~   dunif(0,10)
-gout ~ dgamma(0.01,0.01)
-gin ~ dgamma(0.01,0.01)
+gout ~ dunif(0,10)
+gin ~  dunif(gout,20)
 
 # Channel radius
 
-ri ~ dlnorm(log(6),0.1)
-rf ~ dlnorm(log(5),0.1)
+ri ~ dlnorm(log(6),2)
+rf ~ dlnorm(log(5),2)
 
 }"
 
@@ -148,8 +148,8 @@ Normfit <- jags(data = model.data,
                 model = textConnection(Model),
                 n.thin = 10,
                 n.chains = 4,
-                n.burnin = 25000,
-                n.iter = 50000)
+                n.burnin = 10000,
+                n.iter = 20000)
 
 jagsresults(x=Normfit , params=c("e1", "gin", "gout","ri","rf","tau"))
 
