@@ -24,8 +24,8 @@ set.seed(123)
 library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr)
-library(dplyr);require(ggsci)
-source("https://raw.githubusercontent.com/johnbaums/jagstools/master/R/jagsresults.R")
+library(dplyr);require(ggsci);require(ggmcmc)
+source("jagsresults.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
 load.module("nuclear")
@@ -109,15 +109,15 @@ scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
 # resonance energy, initial reduced width, final reduced
 # width;
 
-tau ~  dgamma(0.01,0.01)
+tau ~  dunif(0.01,10)
 e1 ~   dunif(0,10)
-gin ~ dunif(0.001,10)
-gout ~ dunif(0.001,10)
+gout ~ dgamma(0.01,0.01)
+gin ~ dgamma(0.01,0.01)
 
 # Channel radius
 
-ri ~ dunif(5,7)
-rf ~ dunif(3,6)
+ri ~ dlnorm(log(6),0.1)
+rf ~ dlnorm(log(5),0.1)
 
 }"
 
@@ -147,18 +147,41 @@ Normfit <- jags(data = model.data,
                 parameters = c("e1", "gin", "gout","ri","rf","tau","mux","scale"),
                 model = textConnection(Model),
                 n.thin = 10,
-                n.chains = 3,
-                n.burnin = 5000,
-                n.iter = 10000)
+                n.chains = 4,
+                n.burnin = 25000,
+                n.iter = 50000)
 
 jagsresults(x=Normfit , params=c("e1", "gin", "gout","ri","rf","tau"))
-            
+
+   
+
+###################################  Nice plots with ggmcmc package
+
+L.radon.intercepts <- data.frame(
+  Parameter=paste("scale[", seq(1:4), "]", sep=""),
+  Label=levels(ensamble$dat))
+head(L.radon.intercepts)
+S <- ggs(as.mcmc(Normfit),par_labels=L.radon.intercepts, family = "scale")
+ggs_caterpillar(S) + theme_wsj() +
+  theme(legend.position = "top",
+  legend.background = element_rect(colour = "white", fill = "white"),
+   plot.background = element_rect(colour = "white", fill = "white"),
+   panel.background = element_rect(colour = "white", fill = "white"),
+   legend.key = element_rect(colour = "white", fill = "white"),
+   axis.title = element_text(family = "Trebuchet MS", color="#666666", face="bold", size=15),
+   axis.text  = element_text(size=12),
+   strip.text = element_text(size=10),
+  strip.background = element_rect("gray85")) + geom_vline(xintercept = 1,linetype="dashed",color="red",alpha=0.7) +
+ ylab("Dataset")
+####################################################
+
+
 traplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
 caterplot(Normfit,c("scale"),style="plain")
 
 
-# Plot
+# Plot of predicted values
 y <- jagsresults(x=Normfit , params=c('mux'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 x <- xx
 gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3=y[,"0.5%"],upr1=y[,"75%"],
