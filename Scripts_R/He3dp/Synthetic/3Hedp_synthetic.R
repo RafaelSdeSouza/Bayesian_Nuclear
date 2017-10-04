@@ -88,8 +88,8 @@ cat('model {
 # n.chains: number of mcmc chains
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
-n.burnin  <- 7000   
-n.iter   <- 15000  
+n.burnin  <- 700   
+n.iter   <- 1500  
 n.chains <- 4
 n.thin   <- 5
 inits <- function () { list(e1 = runif(1,0.1,0.75),gin=runif(1,2,10),gout=runif(1,0.01,1)) }
