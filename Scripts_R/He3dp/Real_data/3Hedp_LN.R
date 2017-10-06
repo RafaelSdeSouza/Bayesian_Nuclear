@@ -11,7 +11,7 @@
 ######################################################################
 # preparation: remove all variables from the work space
 rm(list=ls())
-set.seed(123)
+set.seed(43)
 ######################################################################
 # data input
 # format: obsx, obsy, errobsy; the latter are the individual statistical
@@ -53,7 +53,7 @@ ensamble <- read.csv("ensamble.csv",header = T)  %>%
 #  0.35779   # resonance energy
 #  1.0085    # reduced width incoming
 #  0.025425   # reduced width outgoing
-
+ensamble <- ensamble[-31,]
 
 N <- nrow(ensamble)
 obsy <- ensamble$S    # Response variable
@@ -80,11 +80,31 @@ Model <- "model{
 # LIKELIHOOD
 
 # Gamma
+#for (i in 1:N) {
+#obsy[i] ~ dnorm(yt[i], pow(erry[i],-2))
+#yt[i] ~  dgamma(sh[i], ra[i])
+#sh[i] <- pow(mu[i],2)/pow(tau,2)
+#ra[i] <- mu[i]/pow(tau,2)
+#mu[i] <- sfactor3Hedp(obsx[i], e1, gin, gout)
+#}
+
+# LN
+
 for (i in 1:N) {
-   obsy[i] ~ dnorm(yt[i], pow(erry[i],-2))
-   yt[i] ~  dlnorm(muL[i], pow(sigmaL,-2))
-   log(muL[i]) <- mu[i] + pow(sigmaL,2)/2
-   mu[i] <- sfactor3Hedp(obsx[i], e1, gin, gout)
+
+#        obsy[i] ~ dlnorm(yt[i], pow(tau,-2))
+#        yt[i] <- log(mu[i]) - 0.5*log(1+(pow(tau/mu[i],2)))  
+#        mu[i] <- sfactor3Hedp(obsx[i], e1, gin, gout)
+
+
+
+
+     obsy[i] ~ dlnorm(yt[i], pow(sigmaL[i],-2))
+     yt[i] <- log(mu[i]) - 0.5*log(1+(pow(sigmaL[i]/mu[i],2)))  
+     sigmaL[i] <- sqrt(log(1+pow(erry[i],2)/pow(mu[i],2)))
+     mu[i] ~ dlnorm(eta[i],pow(tau,-2))
+     eta[i] <- log(muT[i]) - 0.5*log(1+(pow(tau/muT[i],2)))  
+     muT[i] <- sfactor3Hedp(obsx[i], e1, gin, gout)
  }
 
 # Predicted values
@@ -98,10 +118,10 @@ mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout)
 # resonance energy, initial reduced width, final reduced
 # width;
 
- sigmaL ~  dgamma(0.01,0.01)
- e1 ~ dunif(0,10)
- gin ~ dunif(gout,10)
- gout ~ dunif(0.01,10)
+ tau  ~ dgamma(0.01,0.01) 
+ e1 ~ dgamma(0.01,0.01)
+ gin ~ dgamma(0.01,0.01)
+ gout ~ dgamma(0.01,0.01)
 
 }"
 
@@ -118,7 +138,7 @@ mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.2,10),gin=runif(1,0.8,5),gout=runif(1,0.01,2)) }
+inits <- function () { list(e1 = runif(1,0.2,2),gin=runif(1,0.3,1.5),gout=runif(1,0.01,2)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -127,7 +147,7 @@ inits <- function () { list(e1 = runif(1,0.2,10),gin=runif(1,0.8,5),gout=runif(1
 # JAGS model with R2Jags;
 LNormfit <- jags(data = model.data,
                 inits = inits,
-                parameters = c("e1", "gin", "gout","tau","mux"),
+                parameters = c("e1", "gin", "gout","mux"),
                 model = textConnection(Model),
                 n.thin = 5,
                 n.chains = 4,

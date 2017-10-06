@@ -101,7 +101,7 @@ mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout)
 
  tau ~  dgamma(0.01,0.01)
  e1 ~ dunif(0,10)
- gin ~ dunif(gout,10)
+ gin ~ dunif(0.01,10)
  gout ~ dunif(0.01,10)
 
 }"
