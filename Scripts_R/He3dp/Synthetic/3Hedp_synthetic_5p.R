@@ -30,15 +30,27 @@ source("https://raw.githubusercontent.com/johnbaums/jagstools/master/R/jagsresul
 load.module("glm")
 load.module("nuclear")
 
+
+######################################################################
+# Literature
+# Radii
+# ri = 6
+# rf = 5
+#  0.35779   # resonance energy
+#  1.0085    # reduced width incoming
+#  0.025425   # reduced width outgoing
+
+
+
 ######################################################################
 ## ARTIFICIAL DATA GENERATION
 
-N <- 150
+N <- 100
 
 #obsx1 <- runif(N,0,0.7)
 obsx1 <- exp(runif(N,log(1e-3),log(1)))
-errobsy1 <- runif(N,0.25,1.25)
-obsy1 <- rnorm(N, sfactor3Hedp(obsx1 ,0.35779,1.0085,0.025425),errobsy1)
+errobsy1 <- runif(N,0.1,0.5)
+obsy1 <- rnorm(N, sfactor3Hedp_5p(obsx1 ,0.35779,1.0085,0.025425,6,5),errobsy1)
 
 M <- 150
 xx <- seq(min(obsx1),max(obsx1),length.out = M)
@@ -56,15 +68,15 @@ cat('model {
     # LIKELIHOOD
     for (i in 1:N) {
     obsy[i] ~ dnorm(y1[i], pow(erry[i], -2))
-    y1[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau,-2))
-  #  y1[i] <- sfactor3Hedp(obsx[i], e1, gin, gout)
+#    y1[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout,r_i,r_f),pow(tau,-2))
+    y1[i] <- sfactor3Hedp_5p(obsx[i], e1, 1.0085,0.025425,r_i,r_f)
     }
 
     # Predicted values
 
     for (j in 1:M){
-    mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout)
-    yx[j] ~ dnorm(mux[j],pow(tau,-2))
+    mux[j] <- sfactor3Hedp_5p(xx[j], e1, 1.0085,0.025425,r_i,r_f)
+#    yx[j] ~ dnorm(mux[j],pow(tau,-2))
     }
 
     # PRIORS
@@ -74,8 +86,20 @@ cat('model {
 
     tau ~ dunif(0,100)
     e1 ~ dunif(0,20)
-    gin ~ dunif(1e-4,10)
-    gout ~ dunif(1e-4,10)
+#    gin ~ dunif(1e-4,20)
+#    gout ~ dunif(1e-4,20)
+
+   r_i ~ dgamma(shi,rai)
+   shi <- pow(mi,2) / pow(sdi,2)
+   rai <- mi/pow(sdi,2)
+   mi ~ dunif(5.5,6.5)
+   sdi <- 0.2
+
+   r_f ~ dgamma(shf,raf)
+   shf <- pow(mf,2) / pow(sdf,2)
+    raf <- mf/pow(sdf,2)
+    mf ~ dunif(4.5,5.5)
+    sdf <- 0.2
     }', file={f <- tempfile()})
 ######################################################################
 # n.adapt:  number of iterations in the chain for adaptation (n.adapt)
@@ -88,32 +112,37 @@ cat('model {
 # n.chains: number of mcmc chains
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
-<<<<<<< HEAD
-n.burnin  <- 7000
-n.iter   <- 15000
-=======
-n.burnin  <- 700   
-n.iter   <- 1500  
->>>>>>> fb608ab55aa3313140d77313b2da6b21b02b6371
-n.chains <- 4
-n.thin   <- 5
-inits <- function () { list(e1 = runif(1,0.1,0.75),gin=runif(1,2,10),gout=runif(1,0.01,1)) }
+n.burnin  <- 5000
+n.iter   <- 10000
+n.chains <- 3
+n.thin   <- 10
+inits <- function () { list(e1 = runif(1,0.1,10),gin=runif(1,0.01,20),gout=runif(1,0.01,20)) }
 # "f": is the model specification from above;
 
-# JAGS model with R2Jags;
+# JAGS model with R2jags;
 out <- jags(data = model.data,
             inits = inits,
-            parameters = c("e1", "gin", "gout","mux","yx"),
+            parameters = c("e1","mux","r_i","r_f"),
             model.file = f,
             n.thin = n.thin,
             n.chains = n.chains,
             n.burnin = n.burnin,
             n.iter = n.iter)
-jagsresults(x=out, params=c("e1", "gin", "gout"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+# JAGS model with R2jags;
+
+library(runjags)
+out2 <- autorun.jags(data = model.data,
+            inits = inits,
+            monitor = c("e1", "gin", "gout","r_i","r_f"),
+            model = f,
+            n.chains = 5, thin = 20,  method= "rjags", interactive=TRUE)
 
 
-traplot(out ,c("e1", "gin", "gout"),style="plain")
-denplot(out ,c("e1", "gin", "gout"),style="plain")
+jagsresults(x=out, params=c("e1", "gin", "gout","r_i","r_f"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+traplot(out ,c("e1", "gin", "gout","r_i","r_f"),style="plain")
+denplot(out ,c("e1", "gin", "gout","r_i","r_f"),style="plain")
 
 
 # Plot
@@ -124,11 +153,8 @@ gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3
 gobs <- data.frame(obsx1,obsy1,errobsy1)
 
 
-# Import the kitten
-img <- image_read('http://thecatapi.com/api/images/get?size=med')
+
 ggplot(gobs,aes(x=obsx1,y=obsy1))+
-  annotation_custom(rasterGrob(img, width=unit(1,"npc"), height=unit(1,"npc")), 
-                    -Inf, Inf, -Inf, Inf) +
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y=NULL), fill=c("#BF9663"),show.legend=FALSE) +
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL), alpha=0.75, fill = c("#7BA696"),show.legend=FALSE) +
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL), alpha=0.45, fill=c("#2D5873"),show.legend=FALSE) +
@@ -145,4 +171,4 @@ ggplot(gobs,aes(x=obsx1,y=obsy1))+
         axis.text  = element_text(size=12),
         strip.text = element_text(size=10),
         strip.background = element_rect("gray85")) +
-  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
