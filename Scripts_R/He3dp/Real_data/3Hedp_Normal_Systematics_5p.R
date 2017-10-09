@@ -150,7 +150,7 @@ Normfit <- jags(data = model.data,
                 parameters.to.save  = c("e1", "gin", "gout","ri","rf","tau","mux","scale"),
                 model.file  = textConnection(Model),
                 n.thin = 1,
-                n.chains = 3,
+                n.chains = 4,
                 n.burnin = 5000,
                 n.iter = 10000)
 
