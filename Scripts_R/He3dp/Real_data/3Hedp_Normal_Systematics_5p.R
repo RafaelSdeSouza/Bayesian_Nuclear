@@ -30,10 +30,7 @@ source("jagsresults.R")
 load.module("glm")
 load.module("nuclear")
 
-## for block updating [we do not need to center predictor variables]
-load.module("glm")
-load.module("nuclear")
-#
+
 
 ######################################################################
 ## Read DATA GENERATION
@@ -67,6 +64,10 @@ set <- ensamble$dat
 syst = unique(ensamble$Syst)
 syst <- syst[-3]
 
+# Literature radii
+ri0 <- 6
+rf0 <- 5
+
 M <- 500
 xx <- seq(min(obsx),max(obsx),length.out = M)
 
@@ -87,13 +88,13 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp_5p(obsx[i], e1, gin, gout,ri,rf),pow(tau, -2))
+y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp_5p(obsx[i], e1, gin, gout, ri, rf),pow(tau, -2))
 }
 
 # Predicted values
 
 for (j in 1:M){
-mux[j] <- sfactor3Hedp_5p(xx[j], e1, gin, gout,ri,rf)
+mux[j] <- sfactor3Hedp_5p(xx[j], e1, gin, gout,ri, rf)
 yx[j] ~ dnorm(mux[j],pow(tau,-2))
 }
 
@@ -111,13 +112,16 @@ scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
 
 tau ~  dunif(0.01,10)
 e1 ~   dunif(0,10)
-gout ~ dunif(0,10)
-gin ~  dunif(gout,20)
+gout ~ dunif(0,50)
+gin ~  dunif(0,50)
 
 # Channel radius
 
-ri ~ dlnorm(log(6),2)
-rf ~ dlnorm(log(5),2)
+ri ~ ddexp(4,lambda_i)
+rf ~ ddexp(5,lambda_f)
+#ri ~ dunif(3,7)
+lambda_i ~ dunif(50,100)
+lambda_f ~ dunif(50,100)
 
 }"
 
@@ -134,8 +138,7 @@ rf ~ dlnorm(log(5),2)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif(1,0.01,1),ri=runif(1,5.5,6.5),
-                            rf = runif(1,4.5,5.5) ) }
+inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif(1,0.01,1) ) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -144,14 +147,14 @@ inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters = c("e1", "gin", "gout","ri","rf","tau","mux","scale"),
-                model = textConnection(Model),
-                n.thin = 10,
-                n.chains = 4,
-                n.burnin = 10000,
-                n.iter = 20000)
+                parameters.to.save  = c("e1", "gin", "gout","ri","rf","tau","mux","scale"),
+                model.file  = textConnection(Model),
+                n.thin = 1,
+                n.chains = 3,
+                n.burnin = 5000,
+                n.iter = 10000)
 
-jagsresults(x=Normfit , params=c("e1", "gin", "gout","ri","rf","tau"))
+jagsresults(x = Normfit , params = c("e1", "gin", "gout","ri","rf","tau"))
 
    
 
