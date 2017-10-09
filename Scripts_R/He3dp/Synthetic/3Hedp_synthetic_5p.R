@@ -45,6 +45,8 @@ load.module("nuclear")
 ######################################################################
 ## ARTIFICIAL DATA GENERATION
 
+ri0 <- 6
+rf0 <- 5
 N <- 100
 
 #obsx1 <- runif(N,0,0.7)
@@ -59,7 +61,9 @@ model.data <- list(obsy = obsy1,    # Response variable
                    erry = errobsy1,
                    N = N, # Sample size
                    M = M,
-                   xx = xx
+                   xx = xx,
+                   ri0 = ri0,
+                   rf0 = rf0
 )
 #
 ######################################################################
@@ -69,13 +73,13 @@ cat('model {
     for (i in 1:N) {
     obsy[i] ~ dnorm(y1[i], pow(erry[i], -2))
 #    y1[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout,r_i,r_f),pow(tau,-2))
-    y1[i] <- sfactor3Hedp_5p(obsx[i], e1, 1.0085,0.025425,r_i,r_f)
+    y1[i] <- sfactor3Hedp_5p(obsx[i], e1, gin, gout,ri0 + dr,rf0 + df)
     }
 
     # Predicted values
 
     for (j in 1:M){
-    mux[j] <- sfactor3Hedp_5p(xx[j], e1, 1.0085,0.025425,r_i,r_f)
+    mux[j] <- sfactor3Hedp_5p(xx[j], e1, gin, gout, ri0 + dr,rf0 + df)
 #    yx[j] ~ dnorm(mux[j],pow(tau,-2))
     }
 
@@ -86,20 +90,18 @@ cat('model {
 
     tau ~ dunif(0,100)
     e1 ~ dunif(0,20)
-#    gin ~ dunif(1e-4,20)
-#    gout ~ dunif(1e-4,20)
+    gin ~ dunif(1e-4,20)
+    gout ~ dunif(1e-4,20)
 
-   r_i ~ dgamma(shi,rai)
-   shi <- pow(mi,2) / pow(sdi,2)
-   rai <- mi/pow(sdi,2)
-   mi ~ dunif(5.5,6.5)
-   sdi <- 0.2
+   dr ~ ddexp(0,lambdar)
+   df ~ ddexp(0,lambdaf)
+   lambdar ~ dunif(1e2,1e3)
+   lambdaf ~ dunif(1e2,1e3)
 
-   r_f ~ dgamma(shf,raf)
-   shf <- pow(mf,2) / pow(sdf,2)
-    raf <- mf/pow(sdf,2)
-    mf ~ dunif(4.5,5.5)
-    sdf <- 0.2
+# Final radii
+r_i <- ri0 + dr
+r_f <- rf0 + df
+
     }', file={f <- tempfile()})
 ######################################################################
 # n.adapt:  number of iterations in the chain for adaptation (n.adapt)
@@ -112,22 +114,25 @@ cat('model {
 # n.chains: number of mcmc chains
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
-n.burnin  <- 5000
-n.iter   <- 10000
+n.burnin  <- 10000
+n.iter   <- 15000
 n.chains <- 3
 n.thin   <- 10
-inits <- function () { list(e1 = runif(1,0.1,10),gin=runif(1,0.01,20),gout=runif(1,0.01,20)) }
+inits <- function() { list(e1 = runif(1,0.1,10),gin = runif(1,0.01,20),gout = runif(1,0.01,20)) }
 # "f": is the model specification from above;
 
 # JAGS model with R2jags;
 out <- jags(data = model.data,
             inits = inits,
-            parameters = c("e1","mux","r_i","r_f"),
+            parameters.to.save  = c("e1","gin", "gout","r_i","r_f","mux"),
             model.file = f,
             n.thin = n.thin,
             n.chains = n.chains,
             n.burnin = n.burnin,
             n.iter = n.iter)
+
+
+
 
 # JAGS model with R2jags;
 
