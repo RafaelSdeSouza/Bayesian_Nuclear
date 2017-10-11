@@ -64,8 +64,11 @@ set <- ensamble$dat
 syst = unique(ensamble$Syst)
 #syst <- syst[-3]
 
-M <- 1000
-xx <- seq(min(obsx),max(obsx),length.out = M)
+M <- 500
+xx <- exp(seq(log(min(obsx)),log(max(obsx)),length.out = M))
+
+
+
 
 model.data <- list(obsy = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
@@ -140,9 +143,12 @@ Normfit <- jags(data = model.data,
                 parameters = c("e1", "gin", "gout","tau","mux","yx","scale"),
                 model = textConnection(Model),
                 n.thin = 10,
-                n.chains = 5,
-                n.burnin = 20000,
-                n.iter = 40000)
+                n.chains = 4,
+                n.burnin = 35000,
+                n.iter = 50000)
+
+jagsresults(x=Normfit , params=c("e1", "gin", "gout","tau"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
 
 traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
