@@ -24,31 +24,31 @@ set.seed(123)
 library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr)
-library(dplyr);require(ggsci);require(ggmcmc)
-source("jagsresults.R")
+library(dplyr);require(ggsci)
+source("https://raw.githubusercontent.com/johnbaums/jagstools/master/R/jagsresults.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
 load.module("nuclear")
 
 
-
 ######################################################################
 ## Read DATA GENERATION
-ensamble <- read.csv("ensamble.csv",header = T,stringsAsFactors=FALSE)  %>%
-  mutate(Stat=replace(Stat,Stat==0,0.1)) %>%
-  mutate(dat=replace(dat,dat %in% c("gei99b","gei99d"),"Gei99")) %>%
-  mutate(dat=replace(dat,dat %in% c("Kra87m","Kra87b"),"Kra87")) %>%
-  mutate(dat=replace(dat,dat == "zhi77b","Zhi77")) %>%
-  filter(.,dat!="Lac05")  %>% droplevels(.) %>%
-  mutate(dat=as.factor(dat))
+#ensamble <- read.csv("ensamble.csv",header = T,stringsAsFactors=FALSE)  %>%
+#  mutate(Stat=replace(Stat,Stat==0,0.1)) %>%
+#  mutate(dat=replace(dat,dat %in% c("gei99b","gei99d"),"Gei99")) %>%
+#  mutate(dat=replace(dat,dat %in% c("Kra87m","Kra87b"),"Kra87")) %>%
+#  mutate(dat=replace(dat,dat == "zhi77b","Zhi77")) %>%
+ # filter(.,dat!="Lac05")  %>% droplevels(.) %>%
+ # mutate(dat=as.factor(dat))
 
+ensamble <- read.csv("ensamble_Tdn.csv",header = T) 
 
 re <- as.numeric(ensamble$dat)
 Nre <- length(unique(ensamble$dat))
 
 # Radius
-# ri = 6
-# rf = 5
+# r_i = 6
+# r_f = 5
 
 # Literature
 #  0.35779   # resonance energy
@@ -62,13 +62,9 @@ obsx <-  ensamble$E   # Predictors
 erry <- ensamble$Stat
 set <- ensamble$dat
 syst = unique(ensamble$Syst)
-syst <- syst[-3]
+#syst <- syst[-3]
 
-# Literature radii
-ri0 <- 6
-rf0 <- 5
-
-M <- 500
+M <- 1000
 xx <- seq(min(obsx),max(obsx),length.out = M)
 
 model.data <- list(obsy = obsy,    # Response variable
@@ -88,13 +84,14 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp_5p(obsx[i], e1, gin, gout, ri, rf),pow(tau, -2))
+y[i] ~ dnorm(scale[re[i]]*sfactorTdn(obsx[i], e1, gin, gout),pow(tau, -2))
+#y[i] <- scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout)
 }
 
 # Predicted values
 
 for (j in 1:M){
-mux[j] <- sfactor3Hedp_5p(xx[j], e1, gin, gout,ri, rf)
+mux[j] <- sfactorTdn(xx[j], e1, gin, gout)
 yx[j] ~ dnorm(mux[j],pow(tau,-2))
 }
 
@@ -110,18 +107,11 @@ scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
 # resonance energy, initial reduced width, final reduced
 # width;
 
-tau ~  dunif(0.01,10)
+tau ~  dgamma(0.01,0.01)
 e1 ~   dunif(0,10)
-gout ~ dunif(0,10)
-gin ~  dgamma(0.01,0.01)
+gin ~ dunif(0.001,10)
+gout ~ dunif(0.001,10)
 
-# Channel radius
-
-ri ~ ddexp(4,lambda_i)
-rf ~ ddexp(5,lambda_f)
-#ri ~ dunif(3,7)
-lambda_i ~ dunif(5,100)
-lambda_f ~ dunif(5,100)
 
 }"
 
@@ -138,7 +128,7 @@ lambda_f ~ dunif(5,100)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0,5),gin=runif(1,0,10),gout=runif(1,0,10) ) }
+inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,1,5),gout=runif(1,0.01,1)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -147,44 +137,20 @@ inits <- function () { list(e1 = runif(1,0,5),gin=runif(1,0,10),gout=runif(1,0,1
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("e1", "gin", "gout","ri","rf","tau","mux","scale"),
-                model.file  = textConnection(Model),
-                n.thin = 20,
+                parameters = c("e1", "gin", "gout","tau","mux","yx","scale"),
+                model = textConnection(Model),
+                n.thin = 10,
                 n.chains = 5,
-                n.burnin = 5000,
-                n.iter = 10000)
+                n.burnin = 20000,
+                n.iter = 40000)
 
-jagsresults(x = Normfit , params = c("e1", "gin", "gout","ri","rf","tau"))
-
-   
-
-###################################  Nice plots with ggmcmc package
-
-L.radon.intercepts <- data.frame(
-  Parameter=paste("scale[", seq(1:4), "]", sep=""),
-  Label=levels(ensamble$dat))
-head(L.radon.intercepts)
-S <- ggs(as.mcmc(Normfit),par_labels=L.radon.intercepts, family = "scale")
-ggs_caterpillar(S) + theme_wsj() +
-  theme(legend.position = "top",
-  legend.background = element_rect(colour = "white", fill = "white"),
-   plot.background = element_rect(colour = "white", fill = "white"),
-   panel.background = element_rect(colour = "white", fill = "white"),
-   legend.key = element_rect(colour = "white", fill = "white"),
-   axis.title = element_text(family = "Trebuchet MS", color="#666666", face="bold", size=15),
-   axis.text  = element_text(size=12),
-   strip.text = element_text(size=10),
-  strip.background = element_rect("gray85")) + geom_vline(xintercept = 1,linetype="dashed",color="red",alpha=0.7) +
- ylab("Dataset")
-####################################################
+traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
+denplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
+caterplot(Normfit,c("scale","tau"),style="plain")
 
 
-traplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
-denplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
-caterplot(Normfit,c("scale"),style="plain")
 
-
-# Plot of predicted values
+# Plot
 y <- jagsresults(x=Normfit , params=c('mux'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 x <- xx
 gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3=y[,"0.5%"],upr1=y[,"75%"],
@@ -212,5 +178,4 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
         axis.text  = element_text(size=12),
         strip.text = element_text(size=10),
         strip.background = element_rect("gray85")) +
-  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
-
+  ggtitle(expression(paste("t(d,n)",NULL^"4","He")))

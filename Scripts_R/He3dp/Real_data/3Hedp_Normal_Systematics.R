@@ -30,21 +30,19 @@ source("https://raw.githubusercontent.com/johnbaums/jagstools/master/R/jagsresul
 load.module("glm")
 load.module("nuclear")
 
-## for block updating [we do not need to center predictor variables]
-load.module("glm")
-load.module("nuclear")
-#
 
 ######################################################################
 ## Read DATA GENERATION
-ensamble <- read.csv("ensamble.csv",header = T,stringsAsFactors=FALSE)  %>%
-  mutate(Stat=replace(Stat,Stat==0,0.1)) %>%
-  mutate(dat=replace(dat,dat %in% c("gei99b","gei99d"),"Gei99")) %>%
-  mutate(dat=replace(dat,dat %in% c("Kra87m","Kra87b"),"Kra87")) %>%
-  mutate(dat=replace(dat,dat == "zhi77b","Zhi77")) %>%
-  filter(.,dat!="Lac05")  %>% droplevels(.) %>%
-  mutate(dat=as.factor(dat))
+#ensamble <- read.csv("ensamble.csv",header = T,stringsAsFactors=FALSE)  %>%
+#  mutate(Stat=replace(Stat,Stat==0,0.1)) %>%
+#  mutate(dat=replace(dat,dat %in% c("gei99b","gei99d"),"Gei99")) %>%
+#  mutate(dat=replace(dat,dat %in% c("Kra87m","Kra87b"),"Kra87")) %>%
+#  mutate(dat=replace(dat,dat == "zhi77b","Zhi77")) %>%
+ # filter(.,dat!="Lac05")  %>% droplevels(.) %>%
+ # mutate(dat=as.factor(dat))
 
+ensamble <- read.csv("ensamble_final.csv",header = T) %>%
+  mutate(Syst=replace(Syst,Syst==0.06,0.078)) 
 
 re <- as.numeric(ensamble$dat)
 Nre <- length(unique(ensamble$dat))
@@ -65,7 +63,7 @@ obsx <-  ensamble$E   # Predictors
 erry <- ensamble$Stat
 set <- ensamble$dat
 syst = unique(ensamble$Syst)
-syst <- syst[-3]
+#syst <- syst[-3]
 
 M <- 500
 xx <- seq(min(obsx),max(obsx),length.out = M)

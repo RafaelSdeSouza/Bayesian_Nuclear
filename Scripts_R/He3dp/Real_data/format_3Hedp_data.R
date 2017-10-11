@@ -27,7 +27,7 @@ Kra87m <- read.csv(paste(path,"hdp_kra87m.csv",sep="/"),header = T,sep="") %>%
           mutate(.,dat="Kra87m")
 
 Kra87b <- read.csv(paste(path,"hdp_kra87b.csv",sep="/"),header = T,sep="")  %>% 
-              mutate(.,Syst= 0.06) %>%  
+              mutate(.,Syst= 0.078) %>%  
               mutate(.,dat="Kra87b")
 
 zhi77b <- read.table(paste(path,"hdp_zhi77b.dat",sep="/"),header = F) %>%
