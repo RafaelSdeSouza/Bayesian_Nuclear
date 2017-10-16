@@ -38,10 +38,12 @@ load.module("nuclear")
 #  mutate(dat=replace(dat,dat %in% c("gei99b","gei99d"),"Gei99")) %>%
 #  mutate(dat=replace(dat,dat %in% c("Kra87m","Kra87b"),"Kra87")) %>%
 #  mutate(dat=replace(dat,dat == "zhi77b","Zhi77")) %>%
- # filter(.,dat!="Lac05")  %>% droplevels(.) %>%
- # mutate(dat=as.factor(dat))
+# filter(.,dat!="Lac05")  %>% droplevels(.) %>%
+# mutate(dat=as.factor(dat))
 
 ensamble <- read.csv("ensamble_Tdn.csv",header = T) 
+
+
 
 re <- as.numeric(ensamble$dat)
 Nre <- length(unique(ensamble$dat))
@@ -87,14 +89,15 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactorTdn_5p(obsx[i], e1, gin, gout, ri, rf),pow(tau, -2))
+y[i] ~ dt(scale[re[i]]*sfactorTdn(obsx[i], e1, gin, gout),pow(tau, -2),nu)
+#y[i] <- scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout)
 }
 
 # Predicted values
 
 for (j in 1:M){
-mux[j] <- sfactorTdn_5p(xx[j], e1, gin, gout, ri, rf)
-yx[j] ~ dnorm(mux[j],pow(tau,-2))
+mux[j] <- sfactorTdn(xx[j], e1, gin, gout)
+yx[j] ~ dt(mux[j],pow(tau,-2),nu)
 }
 
 
@@ -109,9 +112,8 @@ scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
 # resonance energy, initial reduced width, final reduced
 # width;
 
-ri ~ dunif(2,8)
-rf ~ dunif(2,8)
-
+nu0 ~ dgamma(0.01,0.01)
+nu <- 1 + nu0 
 tau ~  dgamma(0.01,0.01)
 e1 ~   dunif(0,10)
 gin ~ dgamma(0.01,0.01)
@@ -142,20 +144,19 @@ inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,1,5),gout=runif(1,0
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters = c("e1", "gin", "gout","tau","mux","yx","scale","ri","rf"),
+                parameters = c("e1", "gin", "gout","tau","mux","yx","scale","nu"),
                 model = textConnection(Model),
                 n.thin = 10,
-                n.chains = 10,
-                n.burnin = 20000,
-                n.iter = 40000)
+                n.chains = 3,
+                n.burnin = 25000,
+                n.iter = 50000)
+
+jagsresults(x=Normfit , params=c("e1", "gin", "gout","tau","nu"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
-jagsresults(x=Normfit , params=c("e1", "gin", "gout","tau","ri","rf"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
-
-
-traplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
-denplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
-caterplot(Normfit,c("scale","tau"),style="plain")
+traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
+denplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
+caterplot(Normfit,c("scale"),style="plain")
 
 
 

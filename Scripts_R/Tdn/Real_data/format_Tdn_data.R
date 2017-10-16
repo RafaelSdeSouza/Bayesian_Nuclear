@@ -23,7 +23,17 @@ Jarmie86 <- read.table("data_jarmie.dat") %>%
   mutate(.,dat="Jar86 ")
 
 
-ensamble <- rbind(Bame57, Brown87,Jarmie86)
+Con52 <- read.table("data_conner.dat") %>%
+  set_colnames(.,c("E","S","Stat")) %>%
+  mutate(.,Syst= mean(0.02*S)) %>%
+  mutate(.,dat="Con52 ")
+
+# Remove bad points
+
+ensamble <- rbind(Bame57, Brown87,Jarmie86,Con52)
+
+#ensamble <- rbind(Bame57, Brown87,Jarmie86)
+
 
 write.csv(ensamble,"ensamble_Tdn.csv",row.names = F)
 
