@@ -4,7 +4,7 @@
 # If you modify the code, please keep this header. Thanks!
 
 
-plot_dist <- function(dist, labels=c(), scale = 1, color="skyblue", plot_dist_name=T) {
+plot_dist <- function(dist, labels=c(), scale = 1,  color="skyblue", plot_dist_name=T) {
   old_par <- par(mar = c(0.3, 0, 0, 0), xaxt='n', yaxt='n',ann=FALSE, bty="n", xpd=NA)  
   x <- dist$x
   y <- do.call(dist$ddist, c(list(x=x), dist$ddist_params))
