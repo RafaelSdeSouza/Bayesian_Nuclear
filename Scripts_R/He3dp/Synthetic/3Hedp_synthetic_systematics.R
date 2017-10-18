@@ -34,12 +34,18 @@ load.module("nuclear")
 ## ARTIFICIAL DATA GENERATION
 
 N <- 100
+Nre <- 4
+re <- rep(1:Nre, each = 25)
+set.seed(123)
+a <- rlnorm(Nre, meanlog = 0, sdlog = 0.1)
+print(a, 2)
+
 
 #obsx1 <- runif(N,0,0.7)
-tau <- 1.5
+tau <- 1.25
 obsx1 <- exp(runif(N,log(1e-3),log(1)))
 errobsy1 <- runif(N,0.25,1.25)
-y1 <- rnorm(N, sfactor3Hedp(obsx1 ,0.35779,1.0085,0.025425),errobsy1)
+y1 <- rnorm(N, a[re]*sfactor3Hedp(obsx1 ,0.35779,1.0085,0.025425),errobsy1)
 obsy1 <- rnorm(N,y1,tau)
 
 M <- 150
@@ -49,29 +55,35 @@ model.data <- list(obsy = obsy1,    # Response variable
                    erry = errobsy1,
                    N = N, # Sample size
                    M = M,
-                   xx = xx
+                   xx = xx,
+                   Nre = Nre,
+                   re = re
 )
-#
+
 ######################################################################
 cat('model {
-
+    
     # LIKELIHOOD
     for (i in 1:N) {
     obsy[i] ~ dnorm(y1[i], pow(erry[i], -2))
-    y1[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau,-2))
+    y1[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau,-2))
     }
-
+    
     # Predicted values
-
+    
     for (j in 1:M){
     mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout)
     yx[j] ~ dnorm(mux[j],pow(tau,-2))
     }
-
+    
     # PRIORS
     # e1, gin, gout are defined as in tdn.f (by Alain Coc):
     # resonance energy, initial reduced width, final reduced
     # width;
+    
+    for (k in 1:Nre){
+    scale[k] ~ dlnorm(0,10)
+    }
 
     tau ~ dunif(0,100)
     e1 ~ dunif(0,20)
@@ -101,13 +113,13 @@ inits <- function () { list(e1 = runif(1,0.1,0.75),gin=runif(1,2,10),gout=runif(
 # JAGS model with R2Jags;
 out <- jags(data = model.data,
             inits = inits,
-            parameters = c("e1", "gin", "gout","tau","mux","yx"),
+            parameters = c("e1", "gin", "gout","tau","mux","yx","scale"),
             model.file = f,
             n.thin = n.thin,
             n.chains = n.chains,
             n.burnin = n.burnin,
             n.iter = n.iter)
-jagsresults(x=out, params=c("e1", "gin", "gout","tau"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x=out, params=c("e1", "gin", "gout","tau","scale"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 traplot(out ,c("e1", "gin", "gout"),style="plain")
@@ -119,21 +131,21 @@ y <- jagsresults(x=out, params=c('mux'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.
 x <- xx
 gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3=y[,"0.5%"],upr1=y[,"75%"],
                     upr2=y[,"97.5%"],upr3=y[,"99.5%"])
-gobs <- data.frame(obsx1,obsy1,errobsy1)
+gobs <- data.frame(obsx1,obsy1,errobsy1,re)
 
 
 # Import the kitten
 #img <- image_read('http://thecatapi.com/api/images/get?size=med')
-pdf("plot/He3dp_synthetic.pdf",height = 7,width = 8)
+pdf("plot/He3dp_synthetic_syst.pdf",height = 7,width = 8)
 ggplot(gobs,aes(x=obsx1,y=obsy1))+
-#  annotation_custom(rasterGrob(img, width=unit(1,"npc"), height=unit(1,"npc")), 
-#                    -Inf, Inf, -Inf, Inf) +
+  #  annotation_custom(rasterGrob(img, width=unit(1,"npc"), height=unit(1,"npc")), 
+  #                    -Inf, Inf, -Inf, Inf) +
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y=NULL), fill=c("#deebf7"),show.legend=FALSE) +
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL), fill = c("#9ecae1"),show.legend=FALSE) +
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL), fill=c("#3182bd"),show.legend=FALSE) +
-  geom_point(colour="#969696")+
+  geom_point(shape=re,size=2,color=re)+
   geom_errorbar(data=gobs,mapping=aes(x=obsx1,y=obsy1,ymin=obsy1-errobsy1,ymax=obsy1+errobsy1),alpha=0.85,
-                colour="#969696",width=0.05)+
+                colour=re,width=0.05)+
   geom_line(data=gdata,aes(x=xx,y=mean),colour="#ffffff",linetype="dashed",size=1,show.legend=FALSE)+
   theme_wsj() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
   theme(legend.position = "none",
@@ -150,13 +162,14 @@ dev.off()
 
 
 
-S <- ggs(as.mcmc(out)[,c("e1", "gin", "gout","tau")])
+S <- ggs(as.mcmc(out)[,c("e1", "gin", "gout","tau","scale[1]","scale[2]","scale[3]","scale[4]")])
 
 S$Parameter <- revalue(S$Parameter, c("e1"="E[r]", "gin"="Gamma['in']",
-                                      "gout"="Gamma['out']","tau"="tau"))
-vline.dat <- data.frame(Parameter=factor(c("E[r]","Gamma['in']","Gamma['out']","tau")), vl=c(0.35779,1.0085,0.025425,1.5))
+                                      "gout"="Gamma['out']","tau"="tau",
+                                      "scale[1]" = "a[1]","scale[2]" = "a[2]","scale[3]" = "a[3]","scale[4]" = "a[4]"))
+vline.dat <- data.frame(Parameter=factor(c("E[r]","Gamma['in']","Gamma['out']","tau","a[1]","a[2]","a[3]","a[4]")), vl=c(0.35779,1.0085,0.025425,1.25,0.95, 0.98, 1.17, 1.01))
 
-pdf("plot/He3dp_synthetic_posterior.pdf",height = 7,width = 8)
+pdf("plot/He3dp_synthetic_posterior_syst.pdf",height = 12,width = 8)
 ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
   geom_density(alpha=0.75) + 
   theme_wsj() +
@@ -171,7 +184,7 @@ ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
         strip.text = element_text(size=15),
         strip.background = element_rect("white")) + 
   geom_vline(aes(xintercept=vl), data=vline.dat,linetype="dashed",color="gray75",size=1) +
-  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
+  facet_wrap(~Parameter,scales="free",ncol=2,nrow=4,labeller=label_parsed) +
   ylab("Posterior probability") + xlab("Parameter value")+
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
 dev.off()
@@ -191,7 +204,8 @@ ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
         strip.background = element_rect("white")) + 
-  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
+  facet_wrap(~Parameter,scales="free",ncol=2,nrow=4,labeller=label_parsed) +
   ylab("Parameter value") + xlab("Iteration")+
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
 dev.off()
+#
