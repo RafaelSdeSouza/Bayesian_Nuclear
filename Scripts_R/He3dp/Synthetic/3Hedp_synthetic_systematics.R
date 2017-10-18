@@ -143,11 +143,13 @@ ggplot(gobs,aes(x=obsx1,y=obsy1))+
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y=NULL), fill=c("#deebf7"),show.legend=FALSE) +
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL), fill = c("#9ecae1"),show.legend=FALSE) +
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL), fill=c("#3182bd"),show.legend=FALSE) +
-  geom_point(shape=re,size=2,color=re)+
+  geom_point(data=gobs,shape=re,size=3,colour="#969696")+
   geom_errorbar(data=gobs,mapping=aes(x=obsx1,y=obsy1,ymin=obsy1-errobsy1,ymax=obsy1+errobsy1),alpha=0.85,
-                colour=re,width=0.05)+
+                colour="#969696",width=0.025)+
+  scale_shape_cleveland()+
   geom_line(data=gdata,aes(x=xx,y=mean),colour="#ffffff",linetype="dashed",size=1,show.legend=FALSE)+
-  theme_wsj() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
+  theme_wsj() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
+  scale_x_log10()  +
   theme(legend.position = "none",
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
@@ -162,14 +164,23 @@ dev.off()
 
 
 
-S <- ggs(as.mcmc(out)[,c("e1", "gin", "gout","tau","scale[1]","scale[2]","scale[3]","scale[4]")])
+#S <- ggs(as.mcmc(out)[,c("e1", "gin", "gout","tau","scale[1]","scale[2]","scale[3]","scale[4]")])
+
+#S$Parameter <- revalue(S$Parameter, c("e1"="E[r]", "gin"="Gamma['in']",
+#                                      "gout"="Gamma['out']","tau"="tau",
+#                                      "scale[1]" = "a[1]","scale[2]" = "a[2]","scale[3]" = "a[3]","scale[4]" = "a[4]"))
+#vline.dat <- data.frame(Parameter=factor(c("E[r]","Gamma['in']","Gamma['out']","tau","a[1]","a[2]","a[3]","a[4]")), vl=c(0.35779,1.0085,0.025425,1.25,0.95, 0.98, 1.17, 1.01))
+
+
+S <- ggs(as.mcmc(out)[,c("e1", "gin", "gout","tau")])
 
 S$Parameter <- revalue(S$Parameter, c("e1"="E[r]", "gin"="Gamma['in']",
-                                      "gout"="Gamma['out']","tau"="tau",
-                                      "scale[1]" = "a[1]","scale[2]" = "a[2]","scale[3]" = "a[3]","scale[4]" = "a[4]"))
-vline.dat <- data.frame(Parameter=factor(c("E[r]","Gamma['in']","Gamma['out']","tau","a[1]","a[2]","a[3]","a[4]")), vl=c(0.35779,1.0085,0.025425,1.25,0.95, 0.98, 1.17, 1.01))
+"gout"="Gamma['out']","tau"="tau"))
+vline.dat <- data.frame(Parameter=factor(c("E[r]","Gamma['in']","Gamma['out']","tau")), vl=c(0.35779,1.0085,0.025425,1.25))
 
-pdf("plot/He3dp_synthetic_posterior_syst.pdf",height = 12,width = 8)
+
+
+pdf("plot/He3dp_synthetic_posterior_syst.pdf",height = 7,width = 8)
 ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
   geom_density(alpha=0.75) + 
   theme_wsj() +
@@ -184,13 +195,13 @@ ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
         strip.text = element_text(size=15),
         strip.background = element_rect("white")) + 
   geom_vline(aes(xintercept=vl), data=vline.dat,linetype="dashed",color="gray75",size=1) +
-  facet_wrap(~Parameter,scales="free",ncol=2,nrow=4,labeller=label_parsed) +
+  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
   ylab("Posterior probability") + xlab("Parameter value")+
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
 dev.off()
 
 
-pdf("plot/He3dp_synthetic_trace_syst.pdf",height = 12,width = 8)
+pdf("plot/He3dp_synthetic_trace_syst.pdf",height = 7,width = 8)
 ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
   geom_line(alpha=0.5,size=0.25) + 
   theme_wsj() +
@@ -204,8 +215,36 @@ ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
         strip.background = element_rect("white")) + 
-  facet_wrap(~Parameter,scales="free",ncol=2,nrow=4,labeller=label_parsed) +
+  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
   ylab("Parameter value") + xlab("Iteration")+
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
 dev.off()
 #
+
+
+
+Sa <- ggs(as.mcmc(out),family="scale")
+
+Sa$Parameter <- revalue(Sa$Parameter, c("scale[1]" = "a[1]","scale[2]" = "a[2]","scale[3]" = "a[3]","scale[4]" = "a[4]"))
+vlinea.dat <- data.frame(Parameter=factor(c("a[1]","a[2]","a[3]","a[4]")), vl=c(0.95, 0.98, 1.17, 1.01))
+
+
+pdf("plot/He3dp_synthetic_scale_syst.pdf",height = 7,width = 5.5)
+ggs_caterpillar(Sa) + aes(color=Parameter) +
+  theme_wsj() +
+  scale_color_tableau()+
+  geom_point(data=vlinea.dat ,aes(y=Parameter, x = vl),size=3.75,shape=11,color="gray10") +
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=15),
+        strip.background = element_rect("white")) + 
+#  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
+#  ylab("Parameter value") + 
+  xlab("Highest Probability Density")+
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+dev.off()
