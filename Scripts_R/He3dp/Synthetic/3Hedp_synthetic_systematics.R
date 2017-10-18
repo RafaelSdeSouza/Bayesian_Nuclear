@@ -190,7 +190,7 @@ ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
 dev.off()
 
 
-pdf("plot/He3dp_synthetic_trace.pdf",height = 7,width = 8)
+pdf("plot/He3dp_synthetic_trace_syst.pdf",height = 12,width = 8)
 ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
   geom_line(alpha=0.5,size=0.25) + 
   theme_wsj() +
