@@ -142,8 +142,8 @@ Normfit <- jags(data = model.data,
                 model = textConnection(Model),
                 n.thin = 10,
                 n.chains = 3,
-                n.burnin = 5000,
-                n.iter = 10000)
+                n.burnin = 10000,
+                n.iter = 20000)
 
 traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
@@ -180,3 +180,55 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
         strip.text = element_text(size=10),
         strip.background = element_rect("gray85")) +
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
+
+
+
+
+
+S <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","tau","scale[1]","scale[2]","scale[3]","scale[4]")])
+
+S$Parameter <- revalue(S$Parameter, c("e1"="E[r]", "gin"="Gamma['in']",
+                                      "gout"="Gamma['out']","tau"="tau",
+                                      "scale[1]" = "a[1]","scale[2]" = "a[2]","scale[3]" = "a[3]","scale[4]" = "a[4]"))
+vline.dat <- data.frame(Parameter=factor(c("E[r]","Gamma['in']","Gamma['out']","tau","a[1]","a[2]","a[3]","a[4]")), vl=c(0.35779,1.0085,0.025425,1.25,0.95, 0.98, 1.17, 1.01))
+
+pdf("plot/He3dp_synthetic_posterior_syst.pdf",height = 12,width = 8)
+ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
+  geom_density(alpha=0.75) + 
+  theme_wsj() +
+  scale_fill_tableau()+
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=15),
+        strip.background = element_rect("white")) + 
+  geom_vline(aes(xintercept=vl), data=vline.dat,linetype="dashed",color="gray75",size=1) +
+  facet_wrap(~Parameter,scales="free",ncol=2,nrow=4,labeller=label_parsed) +
+  ylab("Posterior probability") + xlab("Parameter value")+
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+dev.off()
+
+
+pdf("plot/He3dp_synthetic_trace_syst.pdf",height = 12,width = 8)
+ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
+  geom_line(alpha=0.5,size=0.25) + 
+  theme_wsj() +
+  scale_color_tableau()+
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=15),
+        strip.background = element_rect("white")) + 
+  facet_wrap(~Parameter,scales="free",ncol=2,nrow=4,labeller=label_parsed) +
+  ylab("Parameter value") + xlab("Iteration")+
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+dev.off()
+#
