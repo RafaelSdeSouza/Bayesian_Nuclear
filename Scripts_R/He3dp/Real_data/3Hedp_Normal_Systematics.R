@@ -24,7 +24,7 @@ set.seed(123)
 library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr)
-library(dplyr);require(ggsci)
+library(dplyr);require(ggsci);require(ggmcmc);require(plyr)
 source("https://raw.githubusercontent.com/johnbaums/jagstools/master/R/jagsresults.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
@@ -159,44 +159,44 @@ gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3
 gobs <- data.frame(obsx,obsy,erry,set)
 gobs$set <- as.factor(gobs$set)
 
-
+pdf("plot/He3dp_syst.pdf",height = 7,width = 8)
 ggplot(gobs,aes(x=obsx,y=obsy))+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.7,fill=c("gray70"),show.legend=FALSE)+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("gray50"),show.legend=FALSE) +
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("gray30"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.7,fill=c("#deebf7"),show.legend=FALSE)+
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("#9ecae1"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("#3182bd"),show.legend=FALSE) +
   geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=set,shape=set),size=2)+
-  geom_errorbar(data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),width=0.005)+
+  geom_errorbar(data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),width=0.025)+
   geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
   scale_colour_futurama(name="Dataset")+
-  scale_shape(name="Dataset")+
+  scale_shape_stata(name="Dataset")+
   theme_wsj() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
   theme(legend.position = "top",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(family = "Trebuchet MS", color="#666666", face="bold", size=15),
+        axis.title = element_text(color="#666666", face="bold", size=15),
         axis.text  = element_text(size=12),
         strip.text = element_text(size=10),
         strip.background = element_rect("gray85")) +
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
+dev.off()
 
 
 
 
-
-S <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","tau","scale[1]","scale[2]","scale[3]","scale[4]")])
+S <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","tau")])
 
 S$Parameter <- revalue(S$Parameter, c("e1"="E[r]", "gin"="Gamma['in']",
-                                      "gout"="Gamma['out']","tau"="tau",
-                                      "scale[1]" = "a[1]","scale[2]" = "a[2]","scale[3]" = "a[3]","scale[4]" = "a[4]"))
-vline.dat <- data.frame(Parameter=factor(c("E[r]","Gamma['in']","Gamma['out']","tau","a[1]","a[2]","a[3]","a[4]")), vl=c(0.35779,1.0085,0.025425,1.25,0.95, 0.98, 1.17, 1.01))
+                                      "gout"="Gamma['out']","tau"="tau"))
 
-pdf("plot/He3dp_synthetic_posterior_syst.pdf",height = 12,width = 8)
+
+
+pdf("plot/He3dp_posterior_syst.pdf",height = 7,width = 8)
 ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
   geom_density(alpha=0.75) + 
   theme_wsj() +
-  scale_fill_tableau()+
+  scale_fill_futurama()+
   theme(legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
@@ -206,18 +206,17 @@ ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
         strip.background = element_rect("white")) + 
-  geom_vline(aes(xintercept=vl), data=vline.dat,linetype="dashed",color="gray75",size=1) +
-  facet_wrap(~Parameter,scales="free",ncol=2,nrow=4,labeller=label_parsed) +
+  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
   ylab("Posterior probability") + xlab("Parameter value")+
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
 dev.off()
 
 
-pdf("plot/He3dp_synthetic_trace_syst.pdf",height = 12,width = 8)
+pdf("plot/He3dp_trace_syst.pdf",height = 7,width = 8)
 ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
   geom_line(alpha=0.5,size=0.25) + 
   theme_wsj() +
-  scale_color_tableau()+
+  scale_color_futurama()+
   theme(legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
@@ -227,8 +226,53 @@ ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
         strip.background = element_rect("white")) + 
-  facet_wrap(~Parameter,scales="free",ncol=2,nrow=4,labeller=label_parsed) +
+  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
   ylab("Parameter value") + xlab("Iteration")+
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
 dev.off()
 #
+
+
+
+Sa <- ggs(as.mcmc(Normfit),family="scale")
+
+Sa$Parameter <- revalue(Sa$Parameter, c("scale[1]" = "Gei99","scale[2]" = "Kra87","scale[3]" = "Mol80","scale[4]" = "Zhi77"))
+
+pdf("plot/He3dp_scale_syst.pdf",height = 7,width = 4)
+ggs_caterpillar(Sa) + aes(color=Parameter) +
+  theme_wsj() +
+  scale_color_futurama()+
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=15),
+        strip.background = element_rect("white")) + 
+  #  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
+  #  ylab("Parameter value") + 
+  xlab("Highest Probability Density")+
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) +
+  geom_vline(xintercept = 1,linetype="dashed",color="gray")
+dev.off()
+
+pdf("plot/He3dp_trace_scale_syst.pdf",height = 7,width = 8)
+ggplot(data=Sa,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
+  geom_line(alpha=0.5,size=0.25) + 
+  theme_wsj() +
+  scale_color_futurama()+
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=15),
+        strip.background = element_rect("white")) + 
+  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
+  ylab("Parameter value") + xlab("Iteration")+
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+dev.off()
