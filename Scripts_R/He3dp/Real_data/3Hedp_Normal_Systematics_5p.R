@@ -34,7 +34,7 @@ load.module("nuclear")
 
 ######################################################################
 ## Read DATA GENERATION
-ensamble <- read.csv("ensamble.csv",header = T,stringsAsFactors=FALSE)  %>%
+ensamble <- read.csv("ensamble_final.csv",header = T,stringsAsFactors=FALSE)  %>%
   mutate(Stat=replace(Stat,Stat==0,0.1)) %>%
   mutate(dat=replace(dat,dat %in% c("gei99b","gei99d"),"Gei99")) %>%
   mutate(dat=replace(dat,dat %in% c("Kra87m","Kra87b"),"Kra87")) %>%
@@ -112,16 +112,16 @@ scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
 
 tau ~  dunif(0.01,10)
 e1 ~   dunif(0,10)
-gout ~ dunif(0,10)
-gin ~  dgamma(0.01,0.01)
+gout ~ dnorm(0.1,1)T(0,)
+gin ~  dnorm(6,1)T(0,)
 
 # Channel radius
 
-ri ~ ddexp(4,lambda_i)
-rf ~ ddexp(5,lambda_f)
+ri ~ dunif(3,6)
+rf ~ ddexp(5,100)
 #ri ~ dunif(3,7)
-lambda_i ~ dunif(5,100)
-lambda_f ~ dunif(5,100)
+#lambda_i ~ dunif(5,100)
+#lambda_f ~ dunif(5,100)
 
 }"
 
@@ -138,7 +138,7 @@ lambda_f ~ dunif(5,100)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0,5),gin=runif(1,0,10),gout=runif(1,0,10) ) }
+inits <- function () { list(e1 = 0.38,gin= 6,gout=0.1,ri=4,rf=5) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -149,8 +149,8 @@ Normfit <- jags(data = model.data,
                 inits = inits,
                 parameters.to.save  = c("e1", "gin", "gout","ri","rf","tau","mux","scale"),
                 model.file  = textConnection(Model),
-                n.thin = 20,
-                n.chains = 5,
+                n.thin = 10,
+                n.chains = 4,
                 n.burnin = 5000,
                 n.iter = 10000)
 
