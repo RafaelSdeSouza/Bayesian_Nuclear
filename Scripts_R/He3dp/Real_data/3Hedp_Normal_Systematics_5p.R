@@ -23,12 +23,13 @@ set.seed(123)
 # import packages
 library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
-require(nuclear);library(magrittr)
-library(dplyr);require(ggsci);require(ggmcmc)
+require(nuclear);library(magrittr);require(runjags)
+library(dplyr);require(ggsci);require(ggmcmc);require(plyr)
 source("jagsresults.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
 load.module("nuclear")
+load.runjagsmodule()
 
 
 
@@ -110,18 +111,37 @@ scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
 # resonance energy, initial reduced width, final reduced
 # width;
 
+
+#gout ~ dnorm(0.05,1)T(0,)
+# gin ~  dnorm(6,1)T(0,)
+#gin ~  dunif(1,10)
+
 tau ~  dunif(0.01,10)
 e1 ~   dunif(0,10)
-gout ~ dnorm(0.1,1)T(0,)
-gin ~  dnorm(6,1)T(0,)
+
+#gout ~ dhalfcauchy(1)
+
+#gin ~ dhalfcauchy(5)
+
+
+gout ~ dbeta(2,2)
+
+ gb ~ dbeta(2,2)
+ gin <- 3*gb + 5
+
+ 
+#gin ~ dnorm(6,0.25)T(0,)
+
+#gin ~  dunif(0,20)
+
+
 
 # Channel radius
-
-ri ~ dunif(3,6)
-rf ~ ddexp(5,100)
-#ri ~ dunif(3,7)
-#lambda_i ~ dunif(5,100)
-#lambda_f ~ dunif(5,100)
+ rb ~ dbeta(2,2)
+ rb2 ~ dbeta(2,2)
+ 
+ri <- 2.5*rb + 3
+rf <- rb2 + 4.5
 
 }"
 
@@ -138,7 +158,10 @@ rf ~ ddexp(5,100)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = 0.38,gin= 6,gout=0.1,ri=4,rf=5) }
+#inits <- function () { list(e1 = 0.38,gin= 6,gout=0.1,ri=4,rf=5) }
+
+inits <- function () { list(e1 = 0.38) }
+
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -192,25 +215,98 @@ gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3
 gobs <- data.frame(obsx,obsy,erry,set)
 gobs$set <- as.factor(gobs$set)
 
-
+pdf("plot/He3dp_syst_5p.pdf",height = 7,width = 8)
 ggplot(gobs,aes(x=obsx,y=obsy))+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.7,fill=c("gray70"),show.legend=FALSE)+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("gray50"),show.legend=FALSE) +
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("gray30"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.7,fill=c("#deebf7"),show.legend=FALSE)+
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("#9ecae1"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("#3182bd"),show.legend=FALSE) +
   geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=set,shape=set),size=2)+
-  geom_errorbar(data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),width=0.005)+
+  geom_errorbar(data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),width=0.025)+
   geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
   scale_colour_futurama(name="Dataset")+
-  scale_shape(name="Dataset")+
+  scale_shape_stata(name="Dataset")+
   theme_wsj() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
   theme(legend.position = "top",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(family = "Trebuchet MS", color="#666666", face="bold", size=15),
+        axis.title = element_text(color="#666666", face="bold", size=15),
         axis.text  = element_text(size=12),
         strip.text = element_text(size=10),
         strip.background = element_rect("gray85")) +
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
+dev.off()
 
+
+S <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","tau","ri","rf")])
+
+S$Parameter <- revalue(S$Parameter, c("e1"="E[r]", "gin"="Gamma['in']",
+                                      "gout"="Gamma['out']","tau"="tau","ri"="r[i]","rf"="r[f]"))
+
+
+
+pdf("plot/He3dp_posterior_syst_5p.pdf",height = 7,width = 8)
+ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
+  geom_density(alpha=0.75) + 
+  theme_wsj() +
+  scale_fill_futurama()+
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=15),
+        strip.background = element_rect("white")) + 
+  facet_wrap(~Parameter,scales="free",ncol=3,nrow=2,labeller=label_parsed) +
+  ylab("Posterior probability") + xlab("Parameter value")+
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+dev.off()
+
+
+pdf("plot/He3dp_trace_syst_5.pdf",height = 7,width = 8)
+ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
+  geom_line(alpha=0.5,size=0.25) + 
+  theme_wsj() +
+  scale_color_futurama()+
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=15),
+        strip.background = element_rect("white")) + 
+  facet_wrap(~Parameter,scales="free",ncol=3,nrow=2,labeller=label_parsed) +
+  ylab("Parameter value") + xlab("Iteration")+
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+dev.off()
+#
+
+
+Sa <- ggs(as.mcmc(Normfit),family="scale")
+
+Sa$Parameter <- revalue(Sa$Parameter, c("scale[1]" = "Gei99","scale[2]" = "Kra87","scale[3]" = "Mol80","scale[4]" = "Zhi77"))
+
+pdf("plot/He3dp_scale_syst_5p.pdf",height = 7,width = 4)
+ggs_caterpillar(Sa) + aes(color=Parameter) +
+  theme_wsj() +
+  scale_color_futurama()+
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=15),
+        strip.background = element_rect("white")) + 
+  #  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
+  #  ylab("Parameter value") + 
+  xlab("Highest Probability Density")+
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) +
+  geom_vline(xintercept = 1,linetype="dashed",color="gray")
+dev.off()
