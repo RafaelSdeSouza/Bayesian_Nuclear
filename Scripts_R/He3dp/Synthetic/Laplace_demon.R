@@ -65,7 +65,7 @@ Model <- function(parm, Data)
   sigma.prior <- dhalfcauchy(1,log=TRUE)
   ### Log-Likelihood
   mu <- sfactor3Hedp(X,Er,gin,gout)
-  LL <- sum(dnorm(Data$y, mu(X,Er,gin,gout), sigma, log=TRUE))
+  LL <- sum(dnorm(Data$y, mu, sigma, log=TRUE))
   ### Log-Posterior
   LP <- LL + Er.prior + gin.prior + gout.prior + sigma.prior
   Modelout <- list(LP=LP, Dev=-2*LL, Monitor=LP,
