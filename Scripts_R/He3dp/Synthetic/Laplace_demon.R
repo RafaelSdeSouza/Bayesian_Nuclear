@@ -34,9 +34,17 @@ pos.gin <- grep("gin", parm.names)
 pos.gout <- grep("gout", parm.names)
 pos.sigma <- grep("sigma", parm.names)
 
+PGF <- function(Data) {
+  Er <- runif(1,0,10)
+  gin <- runif(1,0,10)
+  gout <- runif(1,0,1)
+  sigma <- runif(1,0,10)
+  return(c(Er,gin, gout,sigma))
+}
+
 
 MyData <- list(X=X, mon.names=mon.names,
-               parm.names=parm.names, pos.Er=pos.Er, pos.gin = pos.gin, pos.gout = pos.gout, pos.sigma=pos.sigma, y=y)
+               parm.names=parm.names, PGF=PGF,pos.Er=pos.Er, pos.gin = pos.gin, pos.gout = pos.gout, pos.sigma=pos.sigma, y=y)
 
 
 
@@ -51,12 +59,12 @@ Model <- function(parm, Data)
   sigma <- interval(parm[Data$pos.sigma], 1e-100, Inf)
   parm[Data$pos.sigma] <- sigma
   ### Log-Prior
-  Er.prior <- dhalfcauchy(25)
-  gin.prior <- dhalfcauchy(25)
-  gout.prior <- dhalfcauchy(1)
-  sigma.prior <- dgamma(sigma, 25, log=TRUE)
+  Er.prior <- dunif(Er,1e-5, 10, log=TRUE)
+  gin.prior <- dunif(gin,1e-5, 10, log=TRUE)
+  gout.prior <- dunif(gout,1e-5, 1, log=TRUE)
+  sigma.prior <- dhalfcauchy(1,log=TRUE)
   ### Log-Likelihood
-  mu <- sfactor3Hedp(obsx1 ,Er,gin,gout)
+  mu <- sfactor3Hedp(X,Er,gin,gout)
   LL <- sum(dnorm(Data$y, mu, sigma, log=TRUE))
   ### Log-Posterior
   LP <- LL + Er.prior + gin.prior + gout.prior + sigma.prior
@@ -66,14 +74,16 @@ Model <- function(parm, Data)
 }
 
 
-Initial.Values <- c(rep(1,3), 1)
+Initial.Values <- GIV(Model, MyData, PGF=TRUE)
 
 
 
 Fit <- LaplacesDemon(Model, Data=MyData, Initial.Values,
                      Covar=NULL, Iterations=10000, Status=100, Thinning=1,
-                     Algorithm="RJ")
+                     Algorithm="Slice", Specs=list(B=NULL, Bounds=c(1e-5,Inf), m=100,
+                                                        Type="Continuous", w=1))
 
+Fit
 
 
 
