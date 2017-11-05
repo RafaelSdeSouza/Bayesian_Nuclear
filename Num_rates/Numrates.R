@@ -14,8 +14,17 @@ mpu <-   3.01493216        # mass projectile in u
 mtu <- 2.01355332           # mass target in u
 ns <- 20                    #number of samples from MCMC output
 os <- 0                   # output rate samples (0=no/1=yes) for plotting pdf's 
+y0 <- 0
+xi <- 1e-3
+xf <- 1.2
+eps <- 1e-10
+h1 <- 1e-10
+hmin <- 0
+hmax <- 1e-3
+dx <- 10
+
 numRates.in <- c(cp,ct,mpu,mtu,ns,os)
-mcmcdat <- read.table("numRates.dat",head=T) 
+mcmcdat <- read.table("numRates.dat",header=T) 
 Tgrid <- exp(seq(log(1e-3),log(10),length.out =  100)) 
 
 # 0.0                 ! y_initial [y0]
