@@ -42,7 +42,7 @@ load.module("nuclear")
  # mutate(dat=as.factor(dat))
 
 ensamble <- read.csv("ensamble_final.csv",header = T) %>%
-  mutate(Syst=replace(Syst,Syst==0.06,0.078)) 
+  mutate(Syst=replace(Syst,Syst==0.06,0.078))
 
 re <- as.numeric(ensamble$dat)
 Nre <- length(unique(ensamble$dat))
@@ -161,12 +161,12 @@ gobs$set <- as.factor(gobs$set)
 
 pdf("plot/He3dp_syst.pdf",height = 7,width = 8)
 ggplot(gobs,aes(x=obsx,y=obsy))+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.7,fill=c("#deebf7"),show.legend=FALSE)+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("#9ecae1"),show.legend=FALSE) +
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("#3182bd"),show.legend=FALSE) +
+#  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.7,fill=c("#deebf7"),show.legend=FALSE)+
+#  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("#9ecae1"),show.legend=FALSE) +
+#  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("#3182bd"),show.legend=FALSE) +
   geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=set,shape=set),size=2)+
   geom_errorbar(data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),width=0.025)+
-  geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
+#  geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
   scale_colour_futurama(name="Dataset")+
   scale_shape_stata(name="Dataset")+
   theme_wsj() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
@@ -194,7 +194,7 @@ S$Parameter <- revalue(S$Parameter, c("e1"="E[r]", "gin"="Gamma['in']",
 
 pdf("plot/He3dp_posterior_syst.pdf",height = 7,width = 8)
 ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
-  geom_density(alpha=0.75) + 
+  geom_density(alpha=0.75) +
   theme_wsj() +
   scale_fill_futurama()+
   theme(legend.position = "none",
@@ -205,16 +205,16 @@ ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
         axis.title = element_text(color="#666666", face="bold", size=15),
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
-        strip.background = element_rect("white")) + 
+        strip.background = element_rect("white")) +
   facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
   ylab("Posterior probability") + xlab("Parameter value")+
-  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
 dev.off()
 
 
 pdf("plot/He3dp_trace_syst.pdf",height = 7,width = 8)
 ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
-  geom_line(alpha=0.5,size=0.25) + 
+  geom_line(alpha=0.5,size=0.25) +
   theme_wsj() +
   scale_color_futurama()+
   theme(legend.position = "none",
@@ -225,10 +225,10 @@ ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
         axis.title = element_text(color="#666666", face="bold", size=15),
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
-        strip.background = element_rect("white")) + 
+        strip.background = element_rect("white")) +
   facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
   ylab("Parameter value") + xlab("Iteration")+
-  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
 dev.off()
 #
 
@@ -250,9 +250,9 @@ ggs_caterpillar(Sa) + aes(color=Parameter) +
         axis.title = element_text(color="#666666", face="bold", size=15),
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
-        strip.background = element_rect("white")) + 
+        strip.background = element_rect("white")) +
   #  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
-  #  ylab("Parameter value") + 
+  #  ylab("Parameter value") +
   xlab("Highest Probability Density")+
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) +
   geom_vline(xintercept = 1,linetype="dashed",color="gray")
@@ -260,7 +260,7 @@ dev.off()
 
 pdf("plot/He3dp_trace_scale_syst.pdf",height = 7,width = 8)
 ggplot(data=Sa,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
-  geom_line(alpha=0.5,size=0.25) + 
+  geom_line(alpha=0.5,size=0.25) +
   theme_wsj() +
   scale_color_futurama()+
   theme(legend.position = "none",
@@ -271,8 +271,8 @@ ggplot(data=Sa,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
         axis.title = element_text(color="#666666", face="bold", size=15),
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
-        strip.background = element_rect("white")) + 
+        strip.background = element_rect("white")) +
   facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
   ylab("Parameter value") + xlab("Iteration")+
-  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
 dev.off()
