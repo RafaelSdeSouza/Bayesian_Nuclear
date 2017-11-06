@@ -51,6 +51,9 @@ hbig=h1
 y=y0
 
 #          integrate rates numerically 
+
+integrate(integrand, lower = 0, upper = Inf)
+
 rungekutta(y,xi,xf,eps,h1,hmin,hmax,hsmal,hbig,nok,nbad)
 #          integral returned as y
 nasv(jj,i)=factor1*y*(kt**(-1.5))
