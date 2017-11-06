@@ -245,6 +245,61 @@ ggs_caterpillar(Sa) + aes(color=Parameter) +
         strip.background = element_rect("white")) + 
 #  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
 #  ylab("Parameter value") + 
-  xlab("Highest Probability Density")+
+  xlab("Highest Probability Density") +
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
 dev.off()
+
+
+
+# Reaction rates
+
+Nsamp <- 500
+mcdat <- as.data.frame(rbind(as.mcmc(out)[,2:4][[1]],
+                       as.mcmc(out)[,2:4][[2]],as.mcmc(out)[,2:4][[3]]))
+
+index <- sample(1:nrow(mcdat),size=Nsamp,replace=FALSE)
+mcdat <- mcdat[index,]
+Tgrid <- exp(seq(log(1e-3),log(10),length.out =  100)) 
+
+
+gdat <- list()
+for(i in 1:500){
+x <- Tgrid
+y <- sapply(Tgrid,numrate3Hedp,ER = mcdat[i,1],gi = mcdat[i,2],gf = mcdat[i,3])
+dd <- data.frame(y)
+gdat[[i]] <- dd
+}
+
+gg <-  as.data.frame(gdat)
+gg$x <- Tgrid
+
+gg2<-apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE) 
+
+gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3=y[,"0.5%"],upr1=y[,"75%"],
+                    upr2=y[,"97.5%"],upr3=y[,"99.5%"])
+
+gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
+                      lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
+                      upr2=gg2["97.5%",],upr3=gg2["99.5%",])
+
+
+g1 <- ggplot(gg2data,aes(x=x,y=mean))+
+  theme_bw()  +
+  
+  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr3, ymax=upr3,y=NULL), fill=c("#deebf7"),show.legend=FALSE) +
+  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr2, ymax=upr2,y=NULL), fill=c("#9ecae1"),show.legend=FALSE) +
+  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr1, ymax=upr1,y=NULL), fill=c("#3182bd"),show.legend=FALSE) +
+  geom_line(size=1,colour="#ffffff",linetype="dashed",size=1,show.legend=FALSE) +
+  theme_wsj() + xlab("Temperature (GK)") + ylab(TeX('$N_A\\sigma v$')) + 
+  theme(legend.position = "none",
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=10),
+        strip.background = element_rect("gray85")) +
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+
+
+g1
