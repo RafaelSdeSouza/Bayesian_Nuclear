@@ -335,14 +335,19 @@ cmbhist <- as.numeric(cmb)[1:Nsamp]
 dens <- density(cmbhist)
 df <- data.frame(x=dens$x, y=dens$y)
 probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995)
-quantiles <- quantile(df$y, prob=probs)
-df$quant <- findInterval(df$y,quantiles)
+quantiles <- quantile(df$x, prob=probs)
+df$quant <- findInterval(df$x,quantiles)
 
 p <- ggplot(df, aes(x, y)) + 
-  geom_area(data = subset(df, quant >= 0 & quant < 1), fill = "white") +
-  geom_area(data = subset(df, quant >= 1 & quant < 3), fill = "#deebf7") +
-  geom_area(data = subset(df, quant >= 3 & quant < 5), fill = "#9ecae1") +
-  geom_area(data = subset(df, quant >= 5 & quant < 7), fill = "#3182bd") +
+  geom_area(data = subset(df, quant == 0), fill = "white") +
+  geom_area(data = subset(df, quant == 1), fill = "#deebf7") +
+  geom_area(data = subset(df, quant == 2), fill = "#9ecae1") +
+  geom_area(data = subset(df, quant == 3), fill = "#3182bd") +
+  geom_area(data = subset(df, quant == 4), fill = "#3182bd") +
+  geom_area(data = subset(df, quant == 5), fill = "#9ecae1") +
+  geom_area(data = subset(df, quant == 6), fill = "#deebf7") +
+  geom_area(data = subset(df, quant == 7), fill = "white") +
+  
   geom_line() + theme_wsj() + xlab(expression(N[A]~sigma*v)) + ylab("Density") + 
   theme(legend.position = "top",
         legend.background = element_rect(colour = "white", fill = "white"),
