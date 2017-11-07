@@ -24,7 +24,7 @@ set.seed(123)
 library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr)
-library(dplyr);require(ggsci);require(ggmcmc);require(plyr)
+library(dplyr);require(ggsci);require(ggmcmc);require(plyr);library(latex2exp)
 source("https://raw.githubusercontent.com/johnbaums/jagstools/master/R/jagsresults.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
@@ -161,12 +161,12 @@ gobs$set <- as.factor(gobs$set)
 
 pdf("plot/He3dp_syst.pdf",height = 7,width = 8)
 ggplot(gobs,aes(x=obsx,y=obsy))+
-#  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.7,fill=c("#deebf7"),show.legend=FALSE)+
-#  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("#9ecae1"),show.legend=FALSE) +
-#  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("#3182bd"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.7,fill=c("#deebf7"),show.legend=FALSE)+
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("#9ecae1"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("#3182bd"),show.legend=FALSE) +
   geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=set,shape=set),size=2)+
   geom_errorbar(data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),width=0.025)+
-#  geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
+  geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
   scale_colour_futurama(name="Dataset")+
   scale_shape_stata(name="Dataset")+
   theme_wsj() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
@@ -276,3 +276,96 @@ ggplot(data=Sa,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
   ylab("Parameter value") + xlab("Iteration")+
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
 dev.off()
+
+
+# Reaction rates
+
+Nsamp <- 500
+mcdat <- as.data.frame(do.call(rbind, as.mcmc(Normfit)[,c("e1","gin","gout")]))
+
+index <- sample(1:nrow(mcdat),size=Nsamp,replace=FALSE)
+mcdat <- mcdat[index,]
+Tgrid <- exp(seq(log(1e-3),log(10),length.out =  100)) 
+
+
+gdat <- list()
+for(i in 1:Nsamp){
+  y <- sapply(Tgrid,nuclear_rate3Hedp,ER = mcdat[i,1],gi = mcdat[i,2],gf = mcdat[i,3])
+  dd <- data.frame(y)
+  gdat[[i]] <- dd
+}
+
+gg <-  as.data.frame(gdat)
+gg$x <- Tgrid
+
+gg2<-apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE) 
+
+
+gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
+                      lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
+                      upr2=gg2["97.5%",],upr3=gg2["99.5%",])
+
+
+g1 <- ggplot(gg2data,aes(x=x,y=mean))+
+  theme_bw()  +
+  
+  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr3, ymax=upr3,y=NULL), fill=c("#deebf7"),show.legend=FALSE) +
+  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr2, ymax=upr2,y=NULL), fill=c("#9ecae1"),show.legend=FALSE) +
+  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr1, ymax=upr1,y=NULL), fill=c("#3182bd"),show.legend=FALSE) +
+  geom_line(size=1,colour="#ffffff",linetype="dashed",size=1,show.legend=FALSE) +
+  theme_wsj() + xlab("Temperature (GK)") + ylab(TeX('$N_A\\sigma v$')) + 
+#  scale_y_log10() + scale_x_log10()+
+  theme(legend.position = "none",
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=10),
+        strip.background = element_rect("gray85")) +
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) 
+
+
+g1
+
+
+cmb <- as.data.frame(filter(gg, x <= 0.9 & x >= 0.85))
+
+cmbhist <- as.numeric(cmb)[1:Nsamp]
+dens <- density(cmbhist)
+df <- data.frame(x=dens$x, y=dens$y)
+probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995)
+quantiles <- quantile(df$y, prob=probs)
+df$quant <- findInterval(df$y,quantiles)
+
+p <- ggplot(df, aes(x, y)) + 
+  geom_area(data = subset(df, quant >= 0 & quant < 1), fill = "white") +
+  geom_area(data = subset(df, quant >= 1 & quant < 3), fill = "#deebf7") +
+  geom_area(data = subset(df, quant >= 3 & quant < 5), fill = "#9ecae1") +
+  geom_area(data = subset(df, quant >= 5 & quant < 7), fill = "#3182bd") +
+  geom_line() + theme_wsj() + xlab(expression(N[A]~sigma*v)) + ylab("Density") + 
+  theme(legend.position = "top",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=10),
+        strip.background = element_rect("gray85")) +
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
+
+p 
+
+ggplot(df, aes(x,y)) + geom_line() + geom_ribbon(aes(ymin=0, ymax=y, fill=quant)) + 
+  scale_x_continuous(breaks=quantiles) + scale_fill_brewer(guide="none")
+
+cmbquant <- apply(cmb, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE) 
+quant <- cut(cmbhist,breaks=as.numeric(cmbquant))
+gcmb <- data.frame(cmbhist,quant)
+
+hist(cmbhist)
+
+ggplot(gcmb,aes(x=cmbhist))+
+  geom_density()+
+  theme_bw()
