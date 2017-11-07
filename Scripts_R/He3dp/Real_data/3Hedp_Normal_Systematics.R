@@ -329,7 +329,7 @@ g1 <- ggplot(gg2data,aes(x=x,y=mean))+
 g1
 
 
-cmb <- as.data.frame(filter(gg, x <= 0.9 & x >= 0.85))
+cmb <- as.data.frame(filter(gg, x <= 1.1 & x >= 0.99))
 
 cmbhist <- as.numeric(cmb)[1:Nsamp]
 dens <- density(cmbhist)
