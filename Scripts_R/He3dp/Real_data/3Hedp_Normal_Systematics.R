@@ -305,6 +305,7 @@ gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
                       lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
                       upr2=gg2["97.5%",],upr3=gg2["99.5%",])
 
+write.csv(gg2data,"NV.csv",row.names = F)
 
 g1 <- ggplot(gg2data,aes(x=x,y=mean))+
   theme_bw()  +

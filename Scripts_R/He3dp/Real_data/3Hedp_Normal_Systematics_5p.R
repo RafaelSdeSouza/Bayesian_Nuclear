@@ -24,7 +24,7 @@ set.seed(123)
 library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr);require(runjags)
-library(dplyr);require(ggsci);require(ggmcmc);require(plyr)
+library(dplyr);require(ggsci);require(ggmcmc);require(plyr);require(latex2exp)
 source("jagsresults.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
@@ -310,3 +310,85 @@ ggs_caterpillar(Sa) + aes(color=Parameter) +
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He"))) +
   geom_vline(xintercept = 1,linetype="dashed",color="gray")
 dev.off()
+
+
+
+
+
+# Reaction rates
+
+Nsamp <- 500
+mcdat <- as.data.frame(do.call(rbind, as.mcmc(Normfit)[,c("e1","gin","gout","ri","rf")]))
+
+index <- sample(1:nrow(mcdat),size=Nsamp,replace=FALSE)
+mcdat <- mcdat[index,]
+Tgrid <- exp(seq(log(1e-3),log(10),length.out =  100))
+
+
+gdat <- list()
+for(i in 1:Nsamp){
+  y <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat[i,1],gi = mcdat[i,2],gf = mcdat[i,3],r_i= mcdat[i,4],r_f=mcdat[i,5])
+  dd <- data.frame(y)
+  gdat[[i]] <- dd
+}
+
+gg <-  as.data.frame(gdat)
+gg$x <- Tgrid
+
+gg2<-apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
+
+
+gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
+                      lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
+                      upr2=gg2["97.5%",],upr3=gg2["99.5%",])
+
+write.csv(gg2data,"NV_5.csv",row.names = F)
+
+g1 <- ggplot(gg2data,aes(x=x,y=mean))+
+  theme_bw()  +
+  
+  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr3, ymax=upr3,y=NULL), fill=c("#deebf7"),show.legend=FALSE) +
+  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr2, ymax=upr2,y=NULL), fill=c("#9ecae1"),show.legend=FALSE) +
+  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr1, ymax=upr1,y=NULL), fill=c("#3182bd"),show.legend=FALSE) +
+  geom_line(size=1,colour="#ffffff",linetype="dashed",size=1,show.legend=FALSE) +
+  theme_wsj() + xlab("Temperature (GK)") + ylab(TeX('$N_A\\sigma v$')) +
+  #  scale_y_log10() + scale_x_log10()+
+  theme(legend.position = "none",
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=10),
+        strip.background = element_rect("gray85")) +
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
+
+
+g1
+
+
+cmb <- as.data.frame(filter(gg, x <= 1.1 & x >= 0.99))
+
+cmbhist <- as.numeric(cmb)[1:Nsamp]
+dens <- density(cmbhist)
+df <- data.frame(x=dens$x, y=dens$y)
+probs=c(0.025, 0.25, 0.5, 0.75, 0.975)
+quantiles <- quantile(df$x, prob=probs)
+df$quant <- factor(findInterval(df$x,quantiles))
+
+
+
+ggplot(df, aes(x,y)) +
+  geom_ribbon(aes(ymin=0, ymax=y, fill=quant)) +
+  scale_fill_manual(values=c("#deebf7","#9ecae1","#3182bd","#3182bd","#9ecae1","#deebf7")) +
+  geom_line() + theme_wsj() + xlab(expression(N[A]~sigma*v)) + ylab("Density") +
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=10),
+        strip.background = element_rect("gray85")) +
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
