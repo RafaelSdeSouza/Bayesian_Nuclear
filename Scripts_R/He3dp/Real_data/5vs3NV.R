@@ -7,6 +7,36 @@ NV5$case <- "5p"
 NV_all <- rbind(NV,NV5)
 NV_all$case <- as.factor(NV_all$case)
 
+
+cmb3<- read.csv("df.csv")
+cmb5 <- read.csv("df_5.csv")
+cmb5W <- read.csv("df_5W.csv")
+cmb3$case <- "3p"
+cmb5$case <- "5p"
+cmb5W$case <- "5pW"
+
+cmb_all <- rbind(cmb3,cmb5,cmb5W)
+
+ggplot(cmb_all, aes(x,y,group=case,alpha=0.75)) +
+  geom_ribbon(aes(ymin=0, ymax=y, fill=case)) +
+  scale_fill_tableau()+
+  geom_line() + theme_wsj() + xlab(expression(N[A]~sigma*v)) + ylab("Density") +
+  theme(legend.position = "top",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", face="bold", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=10),
+        strip.background = element_rect("gray85")) +
+  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
+
+
+cmb <- as.data.frame(filter(NV_all, x <= 1.1 & x >= 0.99))
+
+
+
 g1 <- ggplot(NV_all,aes(x=x,y=mean,group=case,fill=case,alpha=0.8,color=case))+
   theme_bw()  +
   

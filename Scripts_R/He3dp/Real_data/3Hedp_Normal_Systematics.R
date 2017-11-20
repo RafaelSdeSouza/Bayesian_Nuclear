@@ -339,7 +339,7 @@ probs=c(0.025, 0.25, 0.5, 0.75, 0.975)
 quantiles <- quantile(df$x, prob=probs)
 df$quant <- factor(findInterval(df$x,quantiles))
 
-
+write.csv(df,"df.csv",row.names = F)
 
 ggplot(df, aes(x,y)) +
   geom_ribbon(aes(ymin=0, ymax=y, fill=quant)) +

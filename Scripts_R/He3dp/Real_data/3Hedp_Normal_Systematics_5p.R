@@ -125,9 +125,8 @@ e1 ~   dunif(0,10)
 
 
 gout ~ dbeta(2,2)
-
- gb ~ dbeta(2,2)
- gin <- 3*gb + 5
+gb ~ dbeta(2,2)
+gin <- 3*gb + 5
 
  
 #gin ~ dnorm(6,0.25)T(0,)
@@ -140,8 +139,11 @@ gout ~ dbeta(2,2)
  rb ~ dbeta(2,2)
  rb2 ~ dbeta(2,2)
  
-ri <- 2.5*rb + 3
-rf <- rb2 + 4.5
+ri <- 6*rb + 2
+rf <- 6*rb + 2
+
+#ri <- 3*rb + 3
+#rf <- rb2 + 4.5
 
 }"
 
@@ -376,7 +378,7 @@ probs=c(0.025, 0.25, 0.5, 0.75, 0.975)
 quantiles <- quantile(df$x, prob=probs)
 df$quant <- factor(findInterval(df$x,quantiles))
 
-
+write.csv(df,"df_5W.csv",row.names = F)
 
 ggplot(df, aes(x,y)) +
   geom_ribbon(aes(ymin=0, ymax=y, fill=quant)) +
