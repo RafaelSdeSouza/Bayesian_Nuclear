@@ -87,8 +87,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = x86_64-apple-darwin16.7.0
-host_triplet = x86_64-apple-darwin16.7.0
+build_triplet = x86_64-apple-darwin17.2.0
+host_triplet = x86_64-apple-darwin17.2.0
 subdir = src/functions
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -107,8 +107,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 nuclear_la_LIBADD =
 am_nuclear_la_OBJECTS = nuclear_la-sfactor3Hedp.lo \
-	nuclear_la-sfactorTdn.lo nuclear_la-sfactor3Hedp_5p.lo \
-	nuclear_la-sfactorTdn_5p.lo
+	nuclear_la-sfactorTdn.lo nuclear_la-sfactorTdn_5p.lo
 nuclear_la_OBJECTS = $(am_nuclear_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -180,22 +179,22 @@ ETAGS = etags
 CTAGS = ctags
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing aclocal-1.15
+ACLOCAL = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
 AS = as
-AUTOCONF = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing autoconf
-AUTOHEADER = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing autoheader
-AUTOMAKE = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing automake-1.15
+AUTOCONF = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing autoconf
+AUTOHEADER = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing autoheader
+AUTOMAKE = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing automake-1.15
 AWK = awk
-CC = clang
+CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
-CPP = clang -E
+CPP = gcc -E
 CPPFLAGS = 
-CXX = clang++
-CXXCPP = clang++ -E
+CXX = g++
+CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
@@ -240,7 +239,7 @@ LT_CONFIG_H = config.h
 LT_DLLOADERS =  dlopen.la
 LT_DLPREOPEN = -dlpreopen dlopen.la 
 LT_SYS_LIBRARY_PATH = 
-MAKEINFO = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing makeinfo
+MAKEINFO = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = ../.././install-sh -c -d
 NM = /usr/bin/nm -B
@@ -263,13 +262,13 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 1.1
-abs_builddir = /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/src/functions
-abs_srcdir = /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/src/functions
-abs_top_builddir = /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening
-abs_top_srcdir = /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening
+abs_builddir = /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/src/functions
+abs_srcdir = /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/src/functions
+abs_top_builddir = /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening
+abs_top_srcdir = /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening
 ac_ct_AR = ar
-ac_ct_CC = clang
-ac_ct_CXX = 
+ac_ct_CC = gcc
+ac_ct_CXX = g++
 ac_ct_DUMPBIN = 
 am__include = include
 am__leading_dot = .
@@ -277,10 +276,10 @@ am__quote =
 am__tar = $${TAR-tar} chof - "$$tardir"
 am__untar = $${TAR-tar} xf -
 bindir = ${exec_prefix}/bin
-build = x86_64-apple-darwin16.7.0
+build = x86_64-apple-darwin17.2.0
 build_alias = 
 build_cpu = x86_64
-build_os = darwin16.7.0
+build_os = darwin17.2.0
 build_vendor = apple
 builddir = .
 datadir = ${datarootdir}
@@ -288,15 +287,15 @@ datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host = x86_64-apple-darwin16.7.0
+host = x86_64-apple-darwin17.2.0
 host_alias = 
 host_cpu = x86_64
-host_os = darwin16.7.0
+host_os = darwin17.2.0
 host_vendor = apple
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/install-sh
+install_sh = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/install-sh
 jagsmoddir = ${exec_prefix}/lib/JAGS/modules-4
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
@@ -325,8 +324,8 @@ nuclear_la_CPPFLAGS = -I$(top_srcdir)/src \
 												 -I$(includedir)/JAGS
 
 nuclear_la_LDFLAGS = -no-undefined -module -avoid-version
-nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc sfactor3Hedp_5p.cc  sfactorTdn_5p.cc
-noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h sfactor3Hedp_5p.h   sfactorTdn_5p.h
+nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc  sfactorTdn_5p.cc
+noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h    sfactorTdn_5p.h
 all: all-am
 
 .SUFFIXES:
@@ -382,7 +381,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/nuclear_la-sfactor3Hedp.Plo
-include ./$(DEPDIR)/nuclear_la-sfactor3Hedp_5p.Plo
 include ./$(DEPDIR)/nuclear_la-sfactorTdn.Plo
 include ./$(DEPDIR)/nuclear_la-sfactorTdn_5p.Plo
 
@@ -423,13 +421,6 @@ nuclear_la-sfactorTdn.lo: sfactorTdn.cc
 #	$(AM_V_CXX)source='sfactorTdn.cc' object='nuclear_la-sfactorTdn.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn.lo `test -f 'sfactorTdn.cc' || echo '$(srcdir)/'`sfactorTdn.cc
-
-nuclear_la-sfactor3Hedp_5p.lo: sfactor3Hedp_5p.cc
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT nuclear_la-sfactor3Hedp_5p.lo -MD -MP -MF $(DEPDIR)/nuclear_la-sfactor3Hedp_5p.Tpo -c -o nuclear_la-sfactor3Hedp_5p.lo `test -f 'sfactor3Hedp_5p.cc' || echo '$(srcdir)/'`sfactor3Hedp_5p.cc
-	$(AM_V_at)$(am__mv) $(DEPDIR)/nuclear_la-sfactor3Hedp_5p.Tpo $(DEPDIR)/nuclear_la-sfactor3Hedp_5p.Plo
-#	$(AM_V_CXX)source='sfactor3Hedp_5p.cc' object='nuclear_la-sfactor3Hedp_5p.lo' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactor3Hedp_5p.lo `test -f 'sfactor3Hedp_5p.cc' || echo '$(srcdir)/'`sfactor3Hedp_5p.cc
 
 nuclear_la-sfactorTdn_5p.lo: sfactorTdn_5p.cc
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT nuclear_la-sfactorTdn_5p.lo -MD -MP -MF $(DEPDIR)/nuclear_la-sfactorTdn_5p.Tpo -c -o nuclear_la-sfactorTdn_5p.lo `test -f 'sfactorTdn_5p.cc' || echo '$(srcdir)/'`sfactorTdn_5p.cc

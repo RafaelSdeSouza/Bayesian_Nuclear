@@ -5,6 +5,6 @@ nuclear_la_CPPFLAGS = -I$(top_srcdir)/src \
 
 nuclear_la_LDFLAGS = -no-undefined -module -avoid-version
 
-nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc sfactor3Hedp_5p.cc  sfactorTdn_5p.cc
+nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc  sfactorTdn_5p.cc
 
-noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h sfactor3Hedp_5p.h   sfactorTdn_5p.h
+noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h    sfactorTdn_5p.h

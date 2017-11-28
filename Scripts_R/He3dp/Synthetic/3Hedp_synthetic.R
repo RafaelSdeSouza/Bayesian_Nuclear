@@ -58,13 +58,13 @@ cat('model {
     # LIKELIHOOD
     for (i in 1:N) {
     obsy[i] ~ dnorm(y1[i], pow(erry[i], -2))
-    y1[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau,-2))
+    y1[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout,6,5,0),pow(tau,-2))
     }
 
     # Predicted values
 
     for (j in 1:M){
-    mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout)
+    mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout,6,5,0)
     yx[j] ~ dnorm(mux[j],pow(tau,-2))
     }
 
@@ -90,8 +90,8 @@ cat('model {
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-n.burnin  <- 10000
-n.iter   <- 20000
+n.burnin  <- 5000
+n.iter   <- 10000
 
 n.chains <- 3
 n.thin   <- 5
