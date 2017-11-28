@@ -1,167 +1,151 @@
 nuclear_la-sfactorTdn_5p.lo: sfactorTdn_5p.cc sfactorTdn_5p.h \
- /usr/local/include/JAGS/function/ArrayFunction.h \
- /usr/local/include/JAGS/function/Function.h \
- /usr/local/include/c++/6.2.0/string \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/c++config.h \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/os_defines.h \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/cpu_defines.h \
- /usr/local/include/c++/6.2.0/bits/stringfwd.h \
- /usr/local/include/c++/6.2.0/bits/memoryfwd.h \
- /usr/local/include/c++/6.2.0/bits/char_traits.h \
- /usr/local/include/c++/6.2.0/bits/stl_algobase.h \
- /usr/local/include/c++/6.2.0/bits/functexcept.h \
- /usr/local/include/c++/6.2.0/bits/exception_defines.h \
- /usr/local/include/c++/6.2.0/bits/cpp_type_traits.h \
- /usr/local/include/c++/6.2.0/ext/type_traits.h \
- /usr/local/include/c++/6.2.0/ext/numeric_traits.h \
- /usr/local/include/c++/6.2.0/bits/stl_pair.h \
- /usr/local/include/c++/6.2.0/bits/move.h \
- /usr/local/include/c++/6.2.0/bits/concept_check.h \
- /usr/local/include/c++/6.2.0/type_traits \
- /usr/local/include/c++/6.2.0/bits/stl_iterator_base_types.h \
- /usr/local/include/c++/6.2.0/bits/stl_iterator_base_funcs.h \
- /usr/local/include/c++/6.2.0/debug/assertions.h \
- /usr/local/include/c++/6.2.0/bits/stl_iterator.h \
- /usr/local/include/c++/6.2.0/bits/ptr_traits.h \
- /usr/local/include/c++/6.2.0/debug/debug.h \
- /usr/local/include/c++/6.2.0/bits/predefined_ops.h \
- /usr/local/include/c++/6.2.0/bits/postypes.h \
- /usr/local/include/c++/6.2.0/cwchar /usr/include/wchar.h \
- /usr/include/_types.h /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
- /usr/include/sys/_symbol_aliasing.h \
- /usr/include/sys/_posix_availability.h /usr/include/machine/_types.h \
- /usr/include/i386/_types.h /usr/include/sys/_pthread/_pthread_types.h \
- /usr/include/Availability.h /usr/include/AvailabilityInternal.h \
- /usr/include/sys/_types/_null.h /usr/include/sys/_types/_size_t.h \
- /usr/include/sys/_types/_mbstate_t.h \
- /usr/include/sys/_types/_ct_rune_t.h /usr/include/sys/_types/_rune_t.h \
- /usr/include/sys/_types/_wchar_t.h \
- /usr/local/lib/gcc/x86_64-apple-darwin15.6.0/6.2.0/include/stdarg.h \
- /usr/include/stdio.h /usr/include/sys/_types/_va_list.h \
- /usr/include/sys/stdio.h /usr/include/sys/_types/_off_t.h \
- /usr/include/sys/_types/_ssize_t.h /usr/include/time.h \
- /usr/include/sys/_types/_clock_t.h /usr/include/sys/_types/_time_t.h \
- /usr/include/sys/_types/_timespec.h /usr/include/_wctype.h \
- /usr/include/sys/_types/_wint_t.h /usr/include/_types/_wctype_t.h \
- /usr/include/ctype.h /usr/include/runetype.h \
- /usr/local/include/c++/6.2.0/cstdint \
- /usr/local/lib/gcc/x86_64-apple-darwin15.6.0/6.2.0/include/stdint.h \
- /usr/local/lib/gcc/x86_64-apple-darwin15.6.0/6.2.0/include-fixed/stdint.h \
- /usr/include/sys/_types/_int8_t.h /usr/include/sys/_types/_int16_t.h \
- /usr/include/sys/_types/_int32_t.h /usr/include/sys/_types/_int64_t.h \
- /usr/include/_types/_uint8_t.h /usr/include/_types/_uint16_t.h \
- /usr/include/_types/_uint32_t.h /usr/include/_types/_uint64_t.h \
- /usr/include/sys/_types/_intptr_t.h /usr/include/sys/_types/_uintptr_t.h \
- /usr/include/_types/_intmax_t.h /usr/include/_types/_uintmax_t.h \
- /usr/local/include/c++/6.2.0/bits/allocator.h \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/c++allocator.h \
- /usr/local/include/c++/6.2.0/ext/new_allocator.h \
- /usr/local/include/c++/6.2.0/new /usr/local/include/c++/6.2.0/exception \
- /usr/local/include/c++/6.2.0/bits/atomic_lockfree_defines.h \
- /usr/local/include/c++/6.2.0/bits/exception_ptr.h \
- /usr/local/include/c++/6.2.0/bits/nested_exception.h \
- /usr/local/include/c++/6.2.0/bits/localefwd.h \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/c++locale.h \
- /usr/local/include/c++/6.2.0/clocale /usr/include/locale.h \
- /usr/include/_locale.h /usr/local/include/c++/6.2.0/iosfwd \
- /usr/local/include/c++/6.2.0/cctype \
- /usr/local/include/c++/6.2.0/bits/ostream_insert.h \
- /usr/local/include/c++/6.2.0/bits/cxxabi_forced.h \
- /usr/local/include/c++/6.2.0/bits/stl_function.h \
- /usr/local/include/c++/6.2.0/backward/binders.h \
- /usr/local/include/c++/6.2.0/bits/range_access.h \
- /usr/local/include/c++/6.2.0/initializer_list \
- /usr/local/include/c++/6.2.0/bits/basic_string.h \
- /usr/local/include/c++/6.2.0/ext/atomicity.h \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/gthr.h \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/gthr-default.h \
- /usr/include/pthread.h /usr/include/pthread/pthread_impl.h \
- /usr/include/pthread/sched.h /usr/include/pthread_impl.h \
- /usr/include/sys/_pthread/_pthread_attr_t.h \
- /usr/include/sys/_pthread/_pthread_cond_t.h \
- /usr/include/sys/_pthread/_pthread_condattr_t.h \
- /usr/include/sys/_pthread/_pthread_key_t.h \
- /usr/include/sys/_pthread/_pthread_mutex_t.h \
- /usr/include/sys/_pthread/_pthread_mutexattr_t.h \
- /usr/include/sys/_pthread/_pthread_once_t.h \
- /usr/include/sys/_pthread/_pthread_rwlock_t.h \
- /usr/include/sys/_pthread/_pthread_rwlockattr_t.h \
- /usr/include/sys/_pthread/_pthread_t.h /usr/include/pthread/qos.h \
- /usr/include/sys/qos.h /usr/include/sys/_types/_mach_port_t.h \
- /usr/include/sys/_types/_sigset_t.h \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/atomic_word.h \
- /usr/local/include/c++/6.2.0/ext/alloc_traits.h \
- /usr/local/include/c++/6.2.0/bits/alloc_traits.h \
- /usr/local/include/c++/6.2.0/ext/string_conversions.h \
- /usr/local/include/c++/6.2.0/cstdlib /usr/include/stdlib.h \
- /usr/include/sys/wait.h /usr/include/sys/_types/_pid_t.h \
- /usr/include/sys/_types/_id_t.h /usr/include/sys/signal.h \
- /usr/include/sys/appleapiopts.h /usr/include/machine/signal.h \
- /usr/include/i386/signal.h /usr/include/machine/_mcontext.h \
- /usr/include/i386/_mcontext.h /usr/include/mach/i386/_structs.h \
- /usr/include/sys/_types/_sigaltstack.h \
- /usr/include/sys/_types/_ucontext.h /usr/include/sys/_types/_uid_t.h \
- /usr/include/sys/resource.h /usr/include/sys/_types/_timeval.h \
- /usr/include/machine/endian.h /usr/include/i386/endian.h \
- /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
- /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
- /usr/include/machine/types.h /usr/include/i386/types.h \
- /usr/include/sys/_types/_u_int8_t.h /usr/include/sys/_types/_u_int16_t.h \
- /usr/include/sys/_types/_u_int32_t.h \
- /usr/include/sys/_types/_u_int64_t.h /usr/include/sys/_types/_dev_t.h \
- /usr/include/sys/_types/_mode_t.h /usr/local/include/c++/6.2.0/cstdio \
- /usr/local/include/c++/6.2.0/cerrno /usr/include/errno.h \
- /usr/include/sys/errno.h /usr/include/sys/_types/_errno_t.h \
- /usr/local/include/c++/6.2.0/bits/functional_hash.h \
- /usr/local/include/c++/6.2.0/bits/hash_bytes.h \
- /usr/local/include/c++/6.2.0/bits/basic_string.tcc \
- /usr/local/include/c++/6.2.0/vector \
- /usr/local/include/c++/6.2.0/bits/stl_construct.h \
- /usr/local/include/c++/6.2.0/bits/stl_uninitialized.h \
- /usr/local/include/c++/6.2.0/bits/stl_vector.h \
- /usr/local/include/c++/6.2.0/bits/stl_bvector.h \
- /usr/local/include/c++/6.2.0/bits/vector.tcc ../../config.h \
- /usr/local/include/c++/6.2.0/cmath \
- /usr/local/lib/gcc/x86_64-apple-darwin15.6.0/6.2.0/include-fixed/math.h \
- /usr/local/include/JAGS/util/dim.h \
- /usr/local/include/c++/6.2.0/algorithm \
- /usr/local/include/c++/6.2.0/utility \
- /usr/local/include/c++/6.2.0/bits/stl_relops.h \
- /usr/local/include/c++/6.2.0/bits/stl_algo.h \
- /usr/local/include/c++/6.2.0/bits/algorithmfwd.h \
- /usr/local/include/c++/6.2.0/bits/stl_heap.h \
- /usr/local/include/c++/6.2.0/bits/stl_tempbuf.h \
- /usr/local/include/c++/6.2.0/bits/uniform_int_dist.h \
- /usr/local/include/c++/6.2.0/limits \
- /usr/local/include/c++/6.2.0/iostream \
- /usr/local/include/c++/6.2.0/ostream /usr/local/include/c++/6.2.0/ios \
- /usr/local/include/c++/6.2.0/bits/ios_base.h \
- /usr/local/include/c++/6.2.0/bits/locale_classes.h \
- /usr/local/include/c++/6.2.0/bits/locale_classes.tcc \
- /usr/local/include/c++/6.2.0/system_error \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/error_constants.h \
- /usr/local/include/c++/6.2.0/stdexcept \
- /usr/local/include/c++/6.2.0/streambuf \
- /usr/local/include/c++/6.2.0/bits/streambuf.tcc \
- /usr/local/include/c++/6.2.0/bits/basic_ios.h \
- /usr/local/include/c++/6.2.0/bits/locale_facets.h \
- /usr/local/include/c++/6.2.0/cwctype /usr/include/wctype.h \
- /usr/include/_types/_wctrans_t.h \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/ctype_base.h \
- /usr/local/include/c++/6.2.0/bits/streambuf_iterator.h \
- /usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/ctype_inline.h \
- /usr/local/include/c++/6.2.0/bits/locale_facets.tcc \
- /usr/local/include/c++/6.2.0/bits/basic_ios.tcc \
- /usr/local/include/c++/6.2.0/bits/ostream.tcc \
- /usr/local/include/c++/6.2.0/istream \
- /usr/local/include/c++/6.2.0/bits/istream.tcc \
- /usr/local/include/gsl/gsl_sf_exp.h \
- /usr/local/include/gsl/gsl_sf_result.h \
- /usr/local/include/gsl/gsl_precision.h \
- /usr/local/include/gsl/gsl_types.h /usr/local/include/gsl/gsl_errno.h \
- /usr/local/include/gsl/gsl_sf_coulomb.h \
- /usr/local/include/gsl/gsl_mode.h /usr/local/include/gsl/gsl_inline.h \
- /usr/local/include/c++/6.2.0/stdlib.h
+  /usr/local/include/JAGS/function/ArrayFunction.h \
+  /usr/local/include/JAGS/function/Function.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/string \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__config \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iosfwd \
+  /usr/include/wchar.h /usr/include/_types.h /usr/include/sys/_types.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/_symbol_aliasing.h \
+  /usr/include/sys/_posix_availability.h /usr/include/machine/_types.h \
+  /usr/include/i386/_types.h /usr/include/sys/_pthread/_pthread_types.h \
+  /usr/include/Availability.h /usr/include/AvailabilityInternal.h \
+  /usr/include/sys/_types/_null.h /usr/include/sys/_types/_size_t.h \
+  /usr/include/sys/_types/_mbstate_t.h \
+  /usr/include/sys/_types/_ct_rune_t.h /usr/include/sys/_types/_rune_t.h \
+  /usr/include/sys/_types/_wchar_t.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.1.0/include/stdarg.h \
+  /usr/include/stdio.h /usr/include/sys/_types/_va_list.h \
+  /usr/include/sys/stdio.h /usr/include/sys/_types/_off_t.h \
+  /usr/include/sys/_types/_ssize_t.h /usr/include/time.h \
+  /usr/include/sys/_types/_clock_t.h /usr/include/sys/_types/_time_t.h \
+  /usr/include/sys/_types/_timespec.h /usr/include/_wctype.h \
+  /usr/include/sys/_types/_wint_t.h /usr/include/_types/_wctype_t.h \
+  /usr/include/ctype.h /usr/include/runetype.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstring \
+  /usr/include/string.h /usr/include/sys/_types/_rsize_t.h \
+  /usr/include/sys/_types/_errno_t.h /usr/include/strings.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstdio \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cwchar \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cwctype \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cctype \
+  /usr/include/wctype.h /usr/include/_types/_wctrans_t.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/algorithm \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/initializer_list \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstddef \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.1.0/include/stddef.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/type_traits \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/utility \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__tuple \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/memory \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/typeinfo \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/exception \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstdint \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.1.0/include/stdint.h \
+  /usr/include/stdint.h /usr/include/sys/_types/_int8_t.h \
+  /usr/include/sys/_types/_int16_t.h /usr/include/sys/_types/_int32_t.h \
+  /usr/include/sys/_types/_int64_t.h /usr/include/_types/_uint8_t.h \
+  /usr/include/_types/_uint16_t.h /usr/include/_types/_uint32_t.h \
+  /usr/include/_types/_uint64_t.h /usr/include/sys/_types/_intptr_t.h \
+  /usr/include/sys/_types/_uintptr_t.h /usr/include/_types/_intmax_t.h \
+  /usr/include/_types/_uintmax_t.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/new \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__undef___deallocate \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/limits \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__undef_min_max \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iterator \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_base \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_base_03 \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__debug \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/tuple \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/stdexcept \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/vector \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__bit_reference \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/climits \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.1.0/include/limits.h \
+  /usr/include/limits.h /usr/include/machine/limits.h \
+  /usr/include/i386/limits.h /usr/include/i386/_limits.h \
+  /usr/include/sys/syslimits.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__split_buffer \
+  ../../config.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cmath \
+  /usr/include/math.h /usr/local/include/JAGS/util/dim.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iostream \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/ios \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__locale \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/mutex \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__mutex_base \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/chrono \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/ctime \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/ratio \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/system_error \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cerrno \
+  /usr/include/errno.h /usr/include/sys/errno.h /usr/include/pthread.h \
+  /usr/include/pthread/pthread_impl.h /usr/include/pthread/sched.h \
+  /usr/include/sys/_pthread/_pthread_attr_t.h \
+  /usr/include/sys/_pthread/_pthread_cond_t.h \
+  /usr/include/sys/_pthread/_pthread_condattr_t.h \
+  /usr/include/sys/_pthread/_pthread_key_t.h \
+  /usr/include/sys/_pthread/_pthread_mutex_t.h \
+  /usr/include/sys/_pthread/_pthread_mutexattr_t.h \
+  /usr/include/sys/_pthread/_pthread_once_t.h \
+  /usr/include/sys/_pthread/_pthread_rwlock_t.h \
+  /usr/include/sys/_pthread/_pthread_rwlockattr_t.h \
+  /usr/include/sys/_pthread/_pthread_t.h /usr/include/pthread/qos.h \
+  /usr/include/sys/qos.h /usr/include/sys/_types/_mach_port_t.h \
+  /usr/include/sys/_types/_sigset_t.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03 \
+  /usr/include/locale.h /usr/include/_locale.h /usr/include/xlocale.h \
+  /usr/include/_xlocale.h /usr/include/xlocale/_ctype.h \
+  /usr/include/xlocale/__wctype.h /usr/include/xlocale/_stdio.h \
+  /usr/include/xlocale/_string.h /usr/include/xlocale/_time.h \
+  /usr/include/xlocale/_wchar.h /usr/include/xlocale/_wctype.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/streambuf \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/istream \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/ostream \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/locale \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstdlib \
+  /usr/include/stdlib.h /usr/include/sys/wait.h \
+  /usr/include/sys/_types/_pid_t.h /usr/include/sys/_types/_id_t.h \
+  /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h \
+  /usr/include/machine/signal.h /usr/include/i386/signal.h \
+  /usr/include/machine/_mcontext.h /usr/include/i386/_mcontext.h \
+  /usr/include/mach/i386/_structs.h \
+  /usr/include/sys/_types/_sigaltstack.h \
+  /usr/include/sys/_types/_ucontext.h /usr/include/sys/_types/_uid_t.h \
+  /usr/include/sys/resource.h /usr/include/sys/_types/_timeval.h \
+  /usr/include/machine/endian.h /usr/include/i386/endian.h \
+  /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
+  /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
+  /usr/include/machine/types.h /usr/include/i386/types.h \
+  /usr/include/sys/_types/_u_int8_t.h \
+  /usr/include/sys/_types/_u_int16_t.h \
+  /usr/include/sys/_types/_u_int32_t.h \
+  /usr/include/sys/_types/_u_int64_t.h /usr/include/sys/_types/_dev_t.h \
+  /usr/include/sys/_types/_mode_t.h /usr/include/xlocale/_stdlib.h \
+  /usr/include/nl_types.h /usr/include/sys/types.h \
+  /usr/include/sys/_types/_blkcnt_t.h \
+  /usr/include/sys/_types/_blksize_t.h /usr/include/sys/_types/_gid_t.h \
+  /usr/include/sys/_types/_in_addr_t.h \
+  /usr/include/sys/_types/_in_port_t.h /usr/include/sys/_types/_ino_t.h \
+  /usr/include/sys/_types/_ino64_t.h /usr/include/sys/_types/_key_t.h \
+  /usr/include/sys/_types/_nlink_t.h \
+  /usr/include/sys/_types/_useconds_t.h \
+  /usr/include/sys/_types/_suseconds_t.h \
+  /usr/include/sys/_types/_fd_def.h \
+  /usr/include/sys/_types/_fd_setsize.h \
+  /usr/include/sys/_types/_fd_set.h /usr/include/sys/_types/_fd_clr.h \
+  /usr/include/sys/_types/_fd_zero.h /usr/include/sys/_types/_fd_isset.h \
+  /usr/include/sys/_types/_fd_copy.h \
+  /usr/include/sys/_types/_fsblkcnt_t.h \
+  /usr/include/sys/_types/_fsfilcnt_t.h /usr/include/_types/_nl_item.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/bitset \
+  /usr/local/include/gsl/gsl_sf_exp.h \
+  /usr/local/include/gsl/gsl_sf_result.h \
+  /usr/local/include/gsl/gsl_precision.h \
+  /usr/local/include/gsl/gsl_types.h /usr/local/include/gsl/gsl_errno.h \
+  /usr/local/include/gsl/gsl_sf_coulomb.h \
+  /usr/local/include/gsl/gsl_mode.h /usr/local/include/gsl/gsl_inline.h
 
 sfactorTdn_5p.h:
 
@@ -169,57 +153,11 @@ sfactorTdn_5p.h:
 
 /usr/local/include/JAGS/function/Function.h:
 
-/usr/local/include/c++/6.2.0/string:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/string:
 
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/c++config.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__config:
 
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/os_defines.h:
-
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/cpu_defines.h:
-
-/usr/local/include/c++/6.2.0/bits/stringfwd.h:
-
-/usr/local/include/c++/6.2.0/bits/memoryfwd.h:
-
-/usr/local/include/c++/6.2.0/bits/char_traits.h:
-
-/usr/local/include/c++/6.2.0/bits/stl_algobase.h:
-
-/usr/local/include/c++/6.2.0/bits/functexcept.h:
-
-/usr/local/include/c++/6.2.0/bits/exception_defines.h:
-
-/usr/local/include/c++/6.2.0/bits/cpp_type_traits.h:
-
-/usr/local/include/c++/6.2.0/ext/type_traits.h:
-
-/usr/local/include/c++/6.2.0/ext/numeric_traits.h:
-
-/usr/local/include/c++/6.2.0/bits/stl_pair.h:
-
-/usr/local/include/c++/6.2.0/bits/move.h:
-
-/usr/local/include/c++/6.2.0/bits/concept_check.h:
-
-/usr/local/include/c++/6.2.0/type_traits:
-
-/usr/local/include/c++/6.2.0/bits/stl_iterator_base_types.h:
-
-/usr/local/include/c++/6.2.0/bits/stl_iterator_base_funcs.h:
-
-/usr/local/include/c++/6.2.0/debug/assertions.h:
-
-/usr/local/include/c++/6.2.0/bits/stl_iterator.h:
-
-/usr/local/include/c++/6.2.0/bits/ptr_traits.h:
-
-/usr/local/include/c++/6.2.0/debug/debug.h:
-
-/usr/local/include/c++/6.2.0/bits/predefined_ops.h:
-
-/usr/local/include/c++/6.2.0/bits/postypes.h:
-
-/usr/local/include/c++/6.2.0/cwchar:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iosfwd:
 
 /usr/include/wchar.h:
 
@@ -255,7 +193,7 @@ sfactorTdn_5p.h:
 
 /usr/include/sys/_types/_wchar_t.h:
 
-/usr/local/lib/gcc/x86_64-apple-darwin15.6.0/6.2.0/include/stdarg.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.1.0/include/stdarg.h:
 
 /usr/include/stdio.h:
 
@@ -285,11 +223,53 @@ sfactorTdn_5p.h:
 
 /usr/include/runetype.h:
 
-/usr/local/include/c++/6.2.0/cstdint:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstring:
 
-/usr/local/lib/gcc/x86_64-apple-darwin15.6.0/6.2.0/include/stdint.h:
+/usr/include/string.h:
 
-/usr/local/lib/gcc/x86_64-apple-darwin15.6.0/6.2.0/include-fixed/stdint.h:
+/usr/include/sys/_types/_rsize_t.h:
+
+/usr/include/sys/_types/_errno_t.h:
+
+/usr/include/strings.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstdio:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cwchar:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cwctype:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cctype:
+
+/usr/include/wctype.h:
+
+/usr/include/_types/_wctrans_t.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/algorithm:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/initializer_list:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstddef:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.1.0/include/stddef.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/type_traits:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/utility:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__tuple:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/memory:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/typeinfo:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/exception:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstdint:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.1.0/include/stdint.h:
+
+/usr/include/stdint.h:
 
 /usr/include/sys/_types/_int8_t.h:
 
@@ -315,63 +295,83 @@ sfactorTdn_5p.h:
 
 /usr/include/_types/_uintmax_t.h:
 
-/usr/local/include/c++/6.2.0/bits/allocator.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/new:
 
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/c++allocator.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__undef___deallocate:
 
-/usr/local/include/c++/6.2.0/ext/new_allocator.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/limits:
 
-/usr/local/include/c++/6.2.0/new:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__undef_min_max:
 
-/usr/local/include/c++/6.2.0/exception:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iterator:
 
-/usr/local/include/c++/6.2.0/bits/atomic_lockfree_defines.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_base:
 
-/usr/local/include/c++/6.2.0/bits/exception_ptr.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_base_03:
 
-/usr/local/include/c++/6.2.0/bits/nested_exception.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__debug:
 
-/usr/local/include/c++/6.2.0/bits/localefwd.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/tuple:
 
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/c++locale.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/stdexcept:
 
-/usr/local/include/c++/6.2.0/clocale:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/vector:
 
-/usr/include/locale.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__bit_reference:
 
-/usr/include/_locale.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/climits:
 
-/usr/local/include/c++/6.2.0/iosfwd:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.1.0/include/limits.h:
 
-/usr/local/include/c++/6.2.0/cctype:
+/usr/include/limits.h:
 
-/usr/local/include/c++/6.2.0/bits/ostream_insert.h:
+/usr/include/machine/limits.h:
 
-/usr/local/include/c++/6.2.0/bits/cxxabi_forced.h:
+/usr/include/i386/limits.h:
 
-/usr/local/include/c++/6.2.0/bits/stl_function.h:
+/usr/include/i386/_limits.h:
 
-/usr/local/include/c++/6.2.0/backward/binders.h:
+/usr/include/sys/syslimits.h:
 
-/usr/local/include/c++/6.2.0/bits/range_access.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__split_buffer:
 
-/usr/local/include/c++/6.2.0/initializer_list:
+../../config.h:
 
-/usr/local/include/c++/6.2.0/bits/basic_string.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cmath:
 
-/usr/local/include/c++/6.2.0/ext/atomicity.h:
+/usr/include/math.h:
 
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/gthr.h:
+/usr/local/include/JAGS/util/dim.h:
 
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/gthr-default.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/iostream:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/ios:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__locale:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/mutex:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__mutex_base:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/chrono:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/ctime:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/ratio:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/system_error:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cerrno:
+
+/usr/include/errno.h:
+
+/usr/include/sys/errno.h:
 
 /usr/include/pthread.h:
 
 /usr/include/pthread/pthread_impl.h:
 
 /usr/include/pthread/sched.h:
-
-/usr/include/pthread_impl.h:
 
 /usr/include/sys/_pthread/_pthread_attr_t.h:
 
@@ -401,15 +401,41 @@ sfactorTdn_5p.h:
 
 /usr/include/sys/_types/_sigset_t.h:
 
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/atomic_word.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/functional:
 
-/usr/local/include/c++/6.2.0/ext/alloc_traits.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/__functional_03:
 
-/usr/local/include/c++/6.2.0/bits/alloc_traits.h:
+/usr/include/locale.h:
 
-/usr/local/include/c++/6.2.0/ext/string_conversions.h:
+/usr/include/_locale.h:
 
-/usr/local/include/c++/6.2.0/cstdlib:
+/usr/include/xlocale.h:
+
+/usr/include/_xlocale.h:
+
+/usr/include/xlocale/_ctype.h:
+
+/usr/include/xlocale/__wctype.h:
+
+/usr/include/xlocale/_stdio.h:
+
+/usr/include/xlocale/_string.h:
+
+/usr/include/xlocale/_time.h:
+
+/usr/include/xlocale/_wchar.h:
+
+/usr/include/xlocale/_wctype.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/streambuf:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/istream:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/ostream:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/locale:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/cstdlib:
 
 /usr/include/stdlib.h:
 
@@ -471,107 +497,55 @@ sfactorTdn_5p.h:
 
 /usr/include/sys/_types/_mode_t.h:
 
-/usr/local/include/c++/6.2.0/cstdio:
+/usr/include/xlocale/_stdlib.h:
 
-/usr/local/include/c++/6.2.0/cerrno:
+/usr/include/nl_types.h:
 
-/usr/include/errno.h:
+/usr/include/sys/types.h:
 
-/usr/include/sys/errno.h:
+/usr/include/sys/_types/_blkcnt_t.h:
 
-/usr/include/sys/_types/_errno_t.h:
+/usr/include/sys/_types/_blksize_t.h:
 
-/usr/local/include/c++/6.2.0/bits/functional_hash.h:
+/usr/include/sys/_types/_gid_t.h:
 
-/usr/local/include/c++/6.2.0/bits/hash_bytes.h:
+/usr/include/sys/_types/_in_addr_t.h:
 
-/usr/local/include/c++/6.2.0/bits/basic_string.tcc:
+/usr/include/sys/_types/_in_port_t.h:
 
-/usr/local/include/c++/6.2.0/vector:
+/usr/include/sys/_types/_ino_t.h:
 
-/usr/local/include/c++/6.2.0/bits/stl_construct.h:
+/usr/include/sys/_types/_ino64_t.h:
 
-/usr/local/include/c++/6.2.0/bits/stl_uninitialized.h:
+/usr/include/sys/_types/_key_t.h:
 
-/usr/local/include/c++/6.2.0/bits/stl_vector.h:
+/usr/include/sys/_types/_nlink_t.h:
 
-/usr/local/include/c++/6.2.0/bits/stl_bvector.h:
+/usr/include/sys/_types/_useconds_t.h:
 
-/usr/local/include/c++/6.2.0/bits/vector.tcc:
+/usr/include/sys/_types/_suseconds_t.h:
 
-../../config.h:
+/usr/include/sys/_types/_fd_def.h:
 
-/usr/local/include/c++/6.2.0/cmath:
+/usr/include/sys/_types/_fd_setsize.h:
 
-/usr/local/lib/gcc/x86_64-apple-darwin15.6.0/6.2.0/include-fixed/math.h:
+/usr/include/sys/_types/_fd_set.h:
 
-/usr/local/include/JAGS/util/dim.h:
+/usr/include/sys/_types/_fd_clr.h:
 
-/usr/local/include/c++/6.2.0/algorithm:
+/usr/include/sys/_types/_fd_zero.h:
 
-/usr/local/include/c++/6.2.0/utility:
+/usr/include/sys/_types/_fd_isset.h:
 
-/usr/local/include/c++/6.2.0/bits/stl_relops.h:
+/usr/include/sys/_types/_fd_copy.h:
 
-/usr/local/include/c++/6.2.0/bits/stl_algo.h:
+/usr/include/sys/_types/_fsblkcnt_t.h:
 
-/usr/local/include/c++/6.2.0/bits/algorithmfwd.h:
+/usr/include/sys/_types/_fsfilcnt_t.h:
 
-/usr/local/include/c++/6.2.0/bits/stl_heap.h:
+/usr/include/_types/_nl_item.h:
 
-/usr/local/include/c++/6.2.0/bits/stl_tempbuf.h:
-
-/usr/local/include/c++/6.2.0/bits/uniform_int_dist.h:
-
-/usr/local/include/c++/6.2.0/limits:
-
-/usr/local/include/c++/6.2.0/iostream:
-
-/usr/local/include/c++/6.2.0/ostream:
-
-/usr/local/include/c++/6.2.0/ios:
-
-/usr/local/include/c++/6.2.0/bits/ios_base.h:
-
-/usr/local/include/c++/6.2.0/bits/locale_classes.h:
-
-/usr/local/include/c++/6.2.0/bits/locale_classes.tcc:
-
-/usr/local/include/c++/6.2.0/system_error:
-
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/error_constants.h:
-
-/usr/local/include/c++/6.2.0/stdexcept:
-
-/usr/local/include/c++/6.2.0/streambuf:
-
-/usr/local/include/c++/6.2.0/bits/streambuf.tcc:
-
-/usr/local/include/c++/6.2.0/bits/basic_ios.h:
-
-/usr/local/include/c++/6.2.0/bits/locale_facets.h:
-
-/usr/local/include/c++/6.2.0/cwctype:
-
-/usr/include/wctype.h:
-
-/usr/include/_types/_wctrans_t.h:
-
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/ctype_base.h:
-
-/usr/local/include/c++/6.2.0/bits/streambuf_iterator.h:
-
-/usr/local/include/c++/6.2.0/x86_64-apple-darwin15.6.0/bits/ctype_inline.h:
-
-/usr/local/include/c++/6.2.0/bits/locale_facets.tcc:
-
-/usr/local/include/c++/6.2.0/bits/basic_ios.tcc:
-
-/usr/local/include/c++/6.2.0/bits/ostream.tcc:
-
-/usr/local/include/c++/6.2.0/istream:
-
-/usr/local/include/c++/6.2.0/bits/istream.tcc:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1/bitset:
 
 /usr/local/include/gsl/gsl_sf_exp.h:
 
@@ -588,5 +562,3 @@ sfactorTdn_5p.h:
 /usr/local/include/gsl/gsl_mode.h:
 
 /usr/local/include/gsl/gsl_inline.h:
-
-/usr/local/include/c++/6.2.0/stdlib.h:

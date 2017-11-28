@@ -41,8 +41,10 @@ load.module("nuclear")
  # filter(.,dat!="Lac05")  %>% droplevels(.) %>%
  # mutate(dat=as.factor(dat))
 
-ensamble <- read.csv("ensamble_final.csv",header = T) %>%
+ensamble <- read.csv("ensamble.csv",header = T) %>%
   mutate(Syst=replace(Syst,Syst==0.06,0.078))
+
+
 
 re <- as.numeric(ensamble$dat)
 Nre <- length(unique(ensamble$dat))
@@ -85,14 +87,14 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout),pow(tau, -2))
+y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout,es),pow(tau, -2))
 #y[i] <- scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout)
 }
 
 # Predicted values
 
 for (j in 1:M){
-mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout)
+mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout,es)
 yx[j] ~ dnorm(mux[j],pow(tau,-2))
 }
 
@@ -112,7 +114,7 @@ tau ~  dgamma(0.01,0.01)
 e1 ~   dunif(0,10)
 gin ~ dunif(0.001,10)
 gout ~ dunif(0.001,10)
-
+es ~   dunif(0,1e-3)
 
 }"
 
@@ -129,7 +131,7 @@ gout ~ dunif(0.001,10)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif(1,0.01,1)) }
+inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif(1,0.01,1),es=runif(1,0,1e-4)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -138,12 +140,12 @@ inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters = c("e1", "gin", "gout","tau","mux","yx","scale"),
+                parameters = c("e1", "gin", "gout","es","tau","mux","yx","scale"),
                 model = textConnection(Model),
                 n.thin = 10,
-                n.chains = 5,
-                n.burnin = 15000,
-                n.iter = 25000)
+                n.chains = 3,
+                n.burnin = 5000,
+                n.iter = 10000)
 
 traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
@@ -165,18 +167,18 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("#9ecae1"),show.legend=FALSE) +
   geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("#3182bd"),show.legend=FALSE) +
   geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=set,shape=set),size=2)+
-  geom_errorbar(data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),width=0.025)+
+  geom_errorbar(show.legend=FALSE,data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),width=0.025)+
   geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
   scale_colour_futurama(name="Dataset")+
   scale_shape_stata(name="Dataset")+
-  theme_wsj() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
+  theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
   theme(legend.position = "top",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="#666666", face="bold", size=15),
-        axis.text  = element_text(size=12),
+        axis.title = element_text(color="#666666", face="bold", size=17.5),
+        axis.text  = element_text(size=10),
         strip.text = element_text(size=10),
         strip.background = element_rect("gray85")) +
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
