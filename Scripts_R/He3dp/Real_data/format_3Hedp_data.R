@@ -2,7 +2,7 @@
 require(ggplot2);require(ggthemes);require(dplyr);require(magrittr)
 
 #--Get File names
-path <- "/Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/data/3Hedp"
+path <- "/Users/Rafael/Documents/GitHub/JAGS_UNC/data/3Hedp"
 files <- list.files(path = path)
 
 # Data of interest
@@ -25,15 +25,15 @@ Cos00 <-  read.table(paste(path,"data_cos00a.dat",sep="/"),header = F) %>%
 
 
 
-Lac05 <-  read.table(paste(path,"hdp_thm05b.dat",sep="/"),header = F) %>%
-  set_colnames(.,c("E","E_rr","S","Stat")) %>%
-  mutate(.,Syst=0.15) %>%  
-  mutate(.,dat="Lac05") %>% 
-  select(.,c(-E_rr))
+#Lac05 <-  read.table(paste(path,"hdp_thm05b.dat",sep="/"),header = F) %>%
+ # set_colnames(.,c("E","E_rr","S","Stat")) %>%
+#  mutate(.,Syst=0.15) %>%  
+#  mutate(.,dat="Lac05") %>% 
+#  select(.,c(-E_rr))
 
 
-Mol80 <- read.table(paste(path,"hdp_mol80b.dat",sep="/"),header = F) %>%
-         set_colnames(.,c("E","Syst","S","Stat")) %>%
+Mol80 <- read.table(paste(path,"data_moeller.dat",sep="/"),header = F) %>%
+         set_colnames(.,c("E","S","Stat")) %>%
          mutate(.,Syst= mean(c(0.28,0.55,0.65,0.72,0.67,0.69,0.58,
                           0.52,0.44,0.4,0.29,0.2,0.15,0.11,
                           0.09,0.08,0.07,0.06)/S)) %>%
@@ -68,7 +68,7 @@ gei99 <- read.table(paste(path,"data_geist.dat",sep="/"),header = F) %>%
   mutate(.,dat="Gei99")
 
 
-ensamble <- rbind(Ali01,Cos00,Lac05,Mol80,Kra87,zhi77b,gei99 )
+ensamble <- rbind(Ali01,Cos00,Mol80,Kra87,zhi77b,gei99 )
 
 write.csv(ensamble,"ensamble.csv",row.names = F)
 
