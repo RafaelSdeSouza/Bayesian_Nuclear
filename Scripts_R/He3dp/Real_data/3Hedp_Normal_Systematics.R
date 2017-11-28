@@ -141,8 +141,8 @@ gout ~ dbeta(2,2)
   rb ~ dbeta(2,2)
   rb2 ~ dbeta(2,2)
 
-  ri <- 4*rb + 3
-  rf <- 4*rb2 + 3
+  ri <- 2*rb + 3
+  rf <- 3*rb2 + 4
 
 
 }"
@@ -173,14 +173,14 @@ Normfit <- jags(data = model.data,
                 model = textConnection(Model),
                 n.thin = 10,
                 n.chains = 3,
-                n.burnin = 15000,
-                n.iter = 30000)
+                n.burnin = 10000,
+                n.iter = 20000)
 
 jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","scale"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 traplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
-denplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
+denplot(Normfit  ,c("e1", "gin", "gout","ri","rf","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
 
