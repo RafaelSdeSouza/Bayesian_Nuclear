@@ -48,7 +48,8 @@ ensamble <- read.csv("ensamble.csv",header = T) %>%
 
 re <- as.numeric(ensamble$dat)
 Nre <- length(unique(ensamble$dat))
-
+ik <- as.numeric(ensamble$invK)
+Nik <- length(unique(ensamble$invK))
 # Radius
 # r_i = 6
 # r_f = 5
@@ -64,7 +65,8 @@ obsy <- ensamble$S    # Response variable
 obsx <-  ensamble$E   # Predictors
 erry <- ensamble$Stat
 set <- ensamble$dat
-syst = unique(ensamble$Syst)
+lab <- ensamble$invK
+syst = c(0.03,unique(ensamble$Syst))
 #syst <- syst[-3]
 
 M <- 500
@@ -77,6 +79,8 @@ model.data <- list(obsy = obsy,    # Response variable
                    syst = syst,
                    Nre = Nre,
                    re = re,
+                   Nik = Nik,
+                   ik  = ik,
                    M = M,
                    xx = xx
 )
@@ -87,21 +91,38 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout,es),pow(tau, -2))
+y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
 #y[i] <- scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout)
 }
 
 # Predicted values
 
 for (j in 1:M){
-mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout,es)
-yx[j] ~ dnorm(mux[j],pow(tau,-2))
+
+# Bare...
+
+mux0[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,0)
+yx0[j] ~ dnorm(mux0[j],pow(tau,-2))
+
+# No inverse Kinematics 
+
+mux1[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,ue[1])
+yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
+
+# With inverse Kinematics 
+mux2[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,ue[2])
+yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
+
 }
 
 
 
 for (k in 1:Nre){
 scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
+}
+
+for (z in 1:Nik){
+ue[z] ~ dunif(0,1e-3)
 }
 
 
@@ -113,8 +134,16 @@ scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
 tau ~  dgamma(0.01,0.01)
 e1 ~   dunif(0,10)
 gin ~ dunif(0.001,10)
-gout ~ dunif(0.001,10)
-es ~   dunif(0,1e-3)
+#gout ~ dunif(0.001,10)
+gout ~ dbeta(2,2)
+
+# Channel radius
+  rb ~ dbeta(2,2)
+  rb2 ~ dbeta(2,2)
+
+  ri <- 2*rb + 3
+  rf <- 3*rb2 + 4
+
 
 }"
 
@@ -131,7 +160,7 @@ es ~   dunif(0,1e-3)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif(1,0.01,1),es=runif(1,0,1e-4)) }
+inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif(1,0.01,1)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -140,36 +169,69 @@ inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters = c("e1", "gin", "gout","es","tau","mux","yx","scale"),
+                parameters = c("e1", "gin", "gout","ue","tau", "ri","rf","mux0","mux1","mux2","scale"),
                 model = textConnection(Model),
                 n.thin = 10,
                 n.chains = 3,
-                n.burnin = 5000,
-                n.iter = 10000)
+                n.burnin = 10000,
+                n.iter = 20000)
 
-traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
-denplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
+jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","scale"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+
+traplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
+denplot(Normfit  ,c("e1", "gin", "gout","ri","rf","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
 
 
 # Plot
-y <- jagsresults(x=Normfit , params=c('mux'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+y <- jagsresults(x=Normfit , params=c('mux1'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 x <- xx
 gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3=y[,"0.5%"],upr1=y[,"75%"],
                     upr2=y[,"97.5%"],upr3=y[,"99.5%"])
-gobs <- data.frame(obsx,obsy,erry,set)
+gobs <- data.frame(obsx,obsy,erry,set,lab)
 gobs$set <- as.factor(gobs$set)
+
+
+
+y2 <- jagsresults(x=Normfit , params=c('mux2'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+gdata2 <- data.frame(x =xx, mean = y2[,"mean"],lwr1=y2[,"25%"],lwr2=y2[,"2.5%"],lwr3=y2[,"0.5%"],upr1=y2[,"75%"],
+                    upr2=y2[,"97.5%"],upr3=y2[,"99.5%"])
+
+
+y0 <- jagsresults(x=Normfit , params=c('mux0'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+gdata0 <- data.frame(x =xx, mean = y0[,"mean"],lwr1=y0[,"25%"],lwr2=y0[,"2.5%"],lwr3=y0[,"0.5%"],upr1=y0[,"75%"],
+                    upr2=y0[,"97.5%"],upr3=y0[,"99.5%"])
+
 
 pdf("plot/He3dp_syst.pdf",height = 7,width = 8)
 ggplot(gobs,aes(x=obsx,y=obsy))+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.7,fill=c("#deebf7"),show.legend=FALSE)+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.6,  fill = c("#9ecae1"),show.legend=FALSE) +
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.4,fill=c("#3182bd"),show.legend=FALSE) +
-  geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=set,shape=set),size=2)+
-  geom_errorbar(show.legend=FALSE,data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),width=0.025)+
+  #  
+  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.8,fill=c("#f0f0f0"),show.legend=FALSE)+
+  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.7,  fill = c("#bdbdbd"),show.legend=FALSE) +
+  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.6,fill=c("#636363"),show.legend=FALSE) +
+#
+  
+  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.8,fill=c("#fee8c8"),show.legend=FALSE)+
+  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.7,  fill = c("#fdbb84"),show.legend=FALSE) +
+  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.6,fill=c("#e34a33"),show.legend=FALSE) +
+  
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.8,fill=c("#deebf7"),show.legend=FALSE)+
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.7,  fill = c("#9ecae1"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.6,fill=c("#3182bd"),show.legend=FALSE) +
+  
+
+  #  
+
+
+  geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=lab,shape=set),size=2)+
+  geom_errorbar(show.legend=FALSE,data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=lab),width=0.025)+
   geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
-  scale_colour_futurama(name="Dataset")+
+  geom_line(data=gdata2,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
+  scale_colour_manual(values=c("#3182bd","#e34a33"),name="Inverse Kinematics")+
   scale_shape_stata(name="Dataset")+
   theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
   theme(legend.position = "top",

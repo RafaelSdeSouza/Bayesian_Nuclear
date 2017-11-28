@@ -8,9 +8,9 @@ namespace nuclear {
 
 /**
  * @short Astrophysical S Factors
- * sfactor3Hedp returns the astrophysical S-factor as a function of energy.
+ * sfactor3Hedp_5p returns the astrophysical S-factor as a function of energy.
  * <pre>
- * obsy1 = sfactor3Hedp(obsx1, e1, gi, gf)
+ * obsy1 = sfactor3Hedp(obsx1, e1, gi, gf, ri, rf, ue)
  * </pre>
  */
 
@@ -24,7 +24,7 @@ class sfactor3Hedp : public ArrayFunction {
     void PenFactor(const double E, const double L, const double R,
    				const double mue,
 				const double qQ,
-				double& P, double& S) const;                
+				double& P, double& S) const;                     
                     
     void coul(int, double, double, double&, double&) const;
                 

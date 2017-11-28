@@ -11,7 +11,6 @@ AC_SUBST(JAGS_MINOR)
 AC_CANONICAL_HOST
 AC_CONFIG_SRCDIR([src/functions/sfactor3Hedp.cc])
 AC_CONFIG_SRCDIR([src/functions/sfactorTdn.cc])
-AC_CONFIG_SRCDIR([src/functions/sfactor3Hedp_5p.cc])
 AC_CONFIG_SRCDIR([src/functions/sfactorTdn_5p.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
