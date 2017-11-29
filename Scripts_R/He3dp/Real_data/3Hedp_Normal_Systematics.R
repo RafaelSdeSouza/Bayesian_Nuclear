@@ -133,16 +133,20 @@ ue[z] ~ dunif(0,1e-3)
 
 tau ~  dgamma(0.01,0.01)
 e1 ~   dunif(0,10)
-gin ~ dunif(0.001,10)
+#gin ~ dunif(0.001,10)
 #gout ~ dunif(0.001,10)
-gout ~ dbeta(2,2)
+
+#gb ~ dbeta(2,2)
+gin ~ dunif(0,20)
+
+gout ~ dbeta(2,5)
 
 # Channel radius
   rb ~ dbeta(2,2)
   rb2 ~ dbeta(2,2)
 
-  ri <- 2*rb + 3
-  rf <- 3*rb2 + 4
+  ri <- 4*rb + 3
+  rf <- 4*rb2 + 3
 
 
 }"
@@ -160,7 +164,7 @@ gout ~ dbeta(2,2)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.15,1),gin=runif(1,0.4,4.1),gout=runif(1,0.01,1)) }
+inits <- function () { list(e1 = runif(1,0.15,1),gout=runif(1,0.01,1)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -172,11 +176,11 @@ Normfit <- jags(data = model.data,
                 parameters = c("e1", "gin", "gout","ue","tau", "ri","rf","mux0","mux1","mux2","scale"),
                 model = textConnection(Model),
                 n.thin = 10,
-                n.chains = 3,
-                n.burnin = 10000,
-                n.iter = 20000)
+                n.chains = 20,
+                n.burnin = 20000,
+                n.iter = 40000)
 
-jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","scale"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","ri","rf"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 traplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
