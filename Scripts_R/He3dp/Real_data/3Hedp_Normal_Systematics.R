@@ -133,20 +133,22 @@ ue[z] ~ dunif(0,1e-3)
 
 tau ~  dgamma(0.01,0.01)
 e1 ~   dunif(0,10)
-#gin ~ dunif(0.001,10)
-#gout ~ dunif(0.001,10)
+gin ~ dunif(0,50)
+gout ~ dbeta(2,5)
+ri ~ dunif(3,6)
+rf ~ dunif(4.5,7)
 
 #gb ~ dbeta(2,2)
-gin ~ dunif(0,20)
+#gin ~ dunif(0,20)
 
-gout ~ dbeta(2,5)
+#gout ~ dbeta(2,5)
 
 # Channel radius
-  rb ~ dbeta(2,2)
-  rb2 ~ dbeta(2,2)
+#  rb ~ dbeta(2,2)
+#  rb2 ~ dbeta(2,2)
 
-  ri <- 4*rb + 3
-  rf <- 4*rb2 + 3
+#  ri <- 4*rb + 3
+#  rf <- 4*rb2 + 3
 
 
 }"
@@ -176,9 +178,9 @@ Normfit <- jags(data = model.data,
                 parameters = c("e1", "gin", "gout","ue","tau", "ri","rf","mux0","mux1","mux2","scale"),
                 model = textConnection(Model),
                 n.thin = 10,
-                n.chains = 20,
-                n.burnin = 20000,
-                n.iter = 40000)
+                n.chains = 4,
+                n.burnin = 6000,
+                n.iter = 12000)
 
 jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","ri","rf"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -213,6 +215,8 @@ gdata0 <- data.frame(x =xx, mean = y0[,"mean"],lwr1=y0[,"25%"],lwr2=y0[,"2.5%"],
 
 pdf("plot/He3dp_syst.pdf",height = 7,width = 8)
 ggplot(gobs,aes(x=obsx,y=obsy))+
+  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=0, ymax=23), fill="snow2", alpha=0.1) +
+
   #  
   geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.8,fill=c("#f0f0f0"),show.legend=FALSE)+
   geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),alpha=0.7,  fill = c("#bdbdbd"),show.legend=FALSE) +
@@ -230,14 +234,15 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
 
   #  
 
-
-  geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=lab,shape=set),size=2)+
+  geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=lab,shape=set),size=1)+
   geom_errorbar(show.legend=FALSE,data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=lab),width=0.025)+
   geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
   geom_line(data=gdata2,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
-  scale_colour_manual(values=c("#3182bd","#e34a33"),name="Inverse Kinematics")+
+  scale_colour_manual(values=c("blue","red"),name="Inverse Kinematics")+
   scale_shape_stata(name="Dataset")+
-  theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + scale_x_log10()  +
+  theme_stata() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
+  scale_x_log10()  +
+  annotation_logticks(sides = "b") +
   theme(legend.position = "top",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
@@ -246,8 +251,9 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
         axis.title = element_text(color="#666666", face="bold", size=17.5),
         axis.text  = element_text(size=10),
         strip.text = element_text(size=10),
-        strip.background = element_rect("gray85")) +
-  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
+        strip.background = element_rect("gray85")) 
+#+
+#  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
 dev.off()
 
 
