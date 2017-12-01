@@ -35,7 +35,7 @@ shouldnotlink=no
 
 # Files to dlopen/dlpreopen
 dlopen=''
-dlpreopen=' /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/libltdl/./.libs/dlopen.a'
+dlpreopen=' /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear_gsl_5p_screening/libltdl/./.libs/dlopen.a'
 
 # Directory that this library needs to be installed in:
 libdir=''

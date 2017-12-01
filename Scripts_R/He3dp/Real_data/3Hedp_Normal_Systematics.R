@@ -215,7 +215,7 @@ gdata0 <- data.frame(x =xx, mean = y0[,"mean"],lwr1=y0[,"25%"],lwr2=y0[,"2.5%"],
 
 pdf("plot/He3dp_syst.pdf",height = 7,width = 8)
 ggplot(gobs,aes(x=obsx,y=obsy))+
-  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=0, ymax=23), fill="snow2", alpha=0.1) +
+  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=0, ymax=20), fill="#ffbf00",alpha=0.2) +
 
   #  
   geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),alpha=0.8,fill=c("#f0f0f0"),show.legend=FALSE)+
@@ -234,15 +234,19 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
 
   #  
 
-  geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=lab,shape=set),size=1)+
-  geom_errorbar(show.legend=FALSE,data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=lab),width=0.025)+
-  geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
-  geom_line(data=gdata2,aes(x=xx,y=mean),colour="white",linetype="dashed",size=1,show.legend=FALSE)+
-  scale_colour_manual(values=c("blue","red"),name="Inverse Kinematics")+
-  scale_shape_stata(name="Dataset")+
-  theme_stata() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
+  geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=lab,shape=set),size=2.5)+
+  geom_errorbar(show.legend=FALSE,data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=lab,color=lab),
+                width=0.01,alpha=0.4)+
+  geom_line(data=gdata,aes(x=xx,y=mean),colour="white",linetype="dashed",size=0.75,show.legend=FALSE)+
+  geom_line(data=gdata2,aes(x=xx,y=mean),colour="white",linetype="dashed",size=0.75,show.legend=FALSE)+
+#  scale_colour_manual(values=c("#0101fd","#ff0101"),name="Inverse Kinematics")+
+  scale_colour_stata(name="Inverse Kinematics")+
+  scale_shape_manual(values=c(0,1,2,5,25,11,13),name="")+
+  coord_cartesian(xlim=c(5e-3,0.85),ylim=c(0,20)) +
+  theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
   scale_x_log10()  +
   annotation_logticks(sides = "b") +
+  annotation_logticks(base=2.5,sides = "l") +
   theme(legend.position = "top",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
