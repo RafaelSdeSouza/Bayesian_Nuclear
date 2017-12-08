@@ -61,9 +61,7 @@ model.data <- list(obsy = obsy1,    # Response variable
                    erry = errobsy1,
                    N = N, # Sample size
                    M = M,
-                   xx = xx,
-                   ri0 = ri0,
-                   rf0 = rf0
+                   xx = xx
 )
 #
 ######################################################################
@@ -72,14 +70,14 @@ cat('model {
     # LIKELIHOOD
     for (i in 1:N) {
     obsy[i] ~ dnorm(y1[i], pow(erry[i], -2))
-#    y1[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout,r_i,r_f),pow(tau,-2))
-    y1[i] <- sfactor3Hedp_5p(obsx[i], e1, gin, gout,ri0 + dr,rf0 + df)
+#    y1[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout,r_i,r_f,0),pow(tau,-2))
+    y1[i] <- sfactor3Hedp(obsx[i], e1, gin, gout,r_i,r_f,0)
     }
 
     # Predicted values
 
     for (j in 1:M){
-    mux[j] <- sfactor3Hedp_5p(xx[j], e1, gin, gout, ri0 + dr,rf0 + df)
+    mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout, r_i,r_f,0)
 #    yx[j] ~ dnorm(mux[j],pow(tau,-2))
     }
 
@@ -92,15 +90,12 @@ cat('model {
     e1 ~ dunif(0,20)
     gin ~ dunif(1e-4,20)
     gout ~ dunif(1e-4,20)
+    r_i ~  dunif(3,8)
+    r_f ~  dunif(3,8)
 
-   dr ~ ddexp(0,lambdar)
-   df ~ ddexp(0,lambdaf)
-   lambdar ~ dunif(1e2,1e3)
-   lambdaf ~ dunif(1e2,1e3)
 
 # Final radii
-r_i <- ri0 + dr
-r_f <- rf0 + df
+
 
     }', file={f <- tempfile()})
 ######################################################################
@@ -114,8 +109,8 @@ r_f <- rf0 + df
 # n.chains: number of mcmc chains
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
-n.burnin  <- 10000
-n.iter   <- 15000
+n.burnin  <- 5000
+n.iter   <- 10000
 n.chains <- 3
 n.thin   <- 10
 inits <- function() { list(e1 = runif(1,0.1,10),gin = runif(1,0.01,20),gout = runif(1,0.01,20)) }
