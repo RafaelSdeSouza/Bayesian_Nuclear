@@ -52,7 +52,7 @@ N <- 100
 #obsx1 <- runif(N,0,0.7)
 obsx1 <- exp(runif(N,log(1e-3),log(1)))
 errobsy1 <- runif(N,0.1,0.5)
-obsy1 <- rnorm(N, sfactor3Hedp_5p(obsx1 ,0.35779,1.0085,0.025425,6,5),errobsy1)
+obsy1 <- rnorm(N, sfactor3Hedp_5p(obsx1 ,0.35779,1.0085,0.025425,4,5),errobsy1)
 
 M <- 150
 xx <- seq(min(obsx1),max(obsx1),length.out = M)
@@ -90,8 +90,8 @@ cat('model {
     e1 ~ dunif(0,20)
     gin ~ dunif(1e-4,20)
     gout ~ dunif(1e-4,20)
-    r_i ~  dunif(3,8)
-    r_f ~  dunif(3,8)
+    r_i ~  dnorm(5,0.5)T(3,7)
+    r_f ~  dnorm(5,0.5)T(3,7)
 
 
 # Final radii
@@ -109,11 +109,12 @@ cat('model {
 # n.chains: number of mcmc chains
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
-n.burnin  <- 5000
-n.iter   <- 10000
+n.burnin  <- 10000
+n.iter   <- 15000
 n.chains <- 3
 n.thin   <- 10
-inits <- function() { list(e1 = runif(1,0.1,10),gin = runif(1,0.01,20),gout = runif(1,0.01,20)) }
+inits <- function() { list(e1 = runif(1,0.1,10),gin = runif(1,0.01,20),gout = runif(1,0.01,20),r_i = runif(1,3,7),
+                           r_f = runif(1,3,7)) }
 # "f": is the model specification from above;
 
 # JAGS model with R2jags;
@@ -131,12 +132,12 @@ out <- jags(data = model.data,
 
 # JAGS model with R2jags;
 
-library(runjags)
-out2 <- autorun.jags(data = model.data,
-            inits = inits,
-            monitor = c("e1", "gin", "gout","r_i","r_f"),
-            model = f,
-            n.chains = 5, thin = 20,  method= "rjags", interactive=TRUE)
+#library(runjags)
+#out2 <- autorun.jags(data = model.data,
+#            inits = inits,
+#            monitor = c("e1", "gin", "gout","r_i","r_f"),
+#            model = f,
+#            n.chains = 5, thin = 20,  method= "rjags", interactive=TRUE)
 
 
 jagsresults(x=out, params=c("e1", "gin", "gout","r_i","r_f"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
