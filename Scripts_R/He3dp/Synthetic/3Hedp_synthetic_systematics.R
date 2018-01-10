@@ -249,7 +249,7 @@ Sa$Parameter <- revalue(Sa$Parameter, c("scale[1]" = "a[1]","scale[2]" = "a[2]",
 vlinea.dat <- data.frame(Parameter=factor(c("a[1]","a[2]","a[3]")), vl=a)
 
 
-pdf("plot/He3dp_synthetic_scale_syst.pdf",height = 6,width = 6)
+pdf("plot/He3dp_synthetic_scale_syst.pdf",height = 7,width = 6)
 ggs_caterpillar(Sa) + aes(color=Parameter) +
   theme_wsj() +
   scale_color_manual(name="",values=c("gray60","gray60","gray60"))+

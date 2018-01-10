@@ -21,6 +21,11 @@ class sfactorTdn : public ArrayFunction {
     void evaluate(double *x, std::vector<double const *> const &args,
                     std::vector<std::vector<unsigned int> > const &dims) const;
                     
+     void PenFactor(const double E, const double L, const double R,
+   				const double mue,
+				const double qQ,
+				double& P, double& S) const;                  
+                    
     void coul(int, double, double, double&, double&) const;
                 
 	bool checkParameterDim(std::vector<std::vector<unsigned int> > const &dims) const;
