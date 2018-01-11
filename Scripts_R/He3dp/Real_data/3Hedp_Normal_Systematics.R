@@ -25,7 +25,7 @@ library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr);library(wesanderson)
 library(dplyr);require(ggsci);require(ggmcmc);require(plyr);library(latex2exp)
-source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/jagsresults.R")
+source("/Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/jagsresults.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
 load.module("nuclear")
@@ -109,11 +109,11 @@ yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 
 for (k in 1:Nre){
-scale[k] ~ dlnorm(log(1.0),pow(log(1+syst[k]),-2))
+scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 }
 
 for (z in 1:Nik){
-ue[z] ~ dunif(0,1e-3)
+ue[z] ~ dnorm(0,1e3)T(0,)
 }
 
 
@@ -122,15 +122,15 @@ ue[z] ~ dunif(0,1e-3)
 # resonance energy, initial reduced width, final reduced
 # width;
 
-tau ~  dgamma(0.01,0.01)
-e1 ~   dnorm(0,0.01)T(0,)
-gin ~ dnorm(0,0.01)T(0,)
-gout ~ dbeta(2,5)
+tau ~  dnorm(0,0.1)T(0,)
+e1 ~   dnorm(0,0.1)T(0,)
+gin ~ dnorm(0,0.1)T(0,)
+gout ~ dnorm(0,10)T(0,)
 #ri ~ ddexp(5,100)
 #rf ~ ddexp(4,100)
 
-rf <- 4
-ri <- 5
+rf ~ dnorm(5,5)T(0,)
+ri ~  dnorm(5,5)T(0,)
 
 #gb ~ dbeta(2,2)
 #gin ~ dunif(0,20)
@@ -171,10 +171,10 @@ Normfit <- jags(data = model.data,
                 inits = inits,
                 parameters = c("e1", "gin", "gout","ue","tau", "ri","rf","mux0","mux1","mux2","scale"),
                 model = textConnection(Model),
-                n.thin = 1,
-                n.chains = 3,
-                n.burnin = 5000,
-                n.iter = 10000)
+                n.thin = 10,
+                n.chains = 5,
+                n.burnin = 10000,
+                n.iter = 20000)
 
 jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","ri","rf"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -258,6 +258,37 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
         axis.text  = element_text(size=13),
         strip.text = element_text(size=10),
         strip.background = element_rect("gray85")) 
+dev.off()
+
+
+
+
+my_hist <- function(data, mapping, ...) {
+  ggplot(data = data, mapping = mapping) +
+    geom_histogram(bins = 15,fill="#4271AE",colour="#1F3552",...) +
+    theme_void() + theme( panel.grid.minor=element_blank(),
+                          panel.grid.major=element_blank())
+}
+
+my_bin <- function(data, mapping, ..., low = "#3698BF", high = "#D97C2B") {
+  ggplot(data = data, mapping = mapping) +
+    geom_bin2d(bins = 50) +
+    scale_fill_gradient(low = low, high = high) +
+    theme_bw()
+}
+
+Sp <- ggs(as.mcmc(Normfit )[,c("e1", "gin", "gout","ri","rf")])
+levels(Sp$Parameter) <- as.factor(c("E[r]","Gamma[d]", "Gamma[p]","a[c]^i","a[c]^f"))
+
+pdf("plot/He3dp_corr.pdf",height = 8,width =8)
+ggs_pairs(Sp, 
+          labeller = "label_parsed",
+          diag=list(continuous = my_hist),
+          upper = "blank",
+          lower = list(continuous = my_bin),
+          switch="both",
+          showStrips=FALSE
+) 
 dev.off()
 
 
