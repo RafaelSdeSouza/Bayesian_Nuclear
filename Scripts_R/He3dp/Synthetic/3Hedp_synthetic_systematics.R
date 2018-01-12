@@ -65,8 +65,7 @@ model.data <- list(obsy = obsy1,    # Response variable
                    M = M,
                    xx = xx,
                    Nre = Nre,
-                   re = re, 
-                   a = a
+                   re = re
 )
 
 
@@ -76,13 +75,13 @@ cat('model {
     # LIKELIHOOD
     for (i in 1:N) {
     obsy[i] ~ dnorm(y1[i], pow(erry[i], -2))
-    y1[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout,6,4,0),pow(tau,-2))
+    y1[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout,ri,rf,0),pow(tau,-2))
     }
     
     # Predicted values
     
     for (j in 1:M){
-    mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout,6,4,0)
+    mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,0)
     yx[j] ~ dnorm(mux[j],pow(tau,-2))
     }
     
@@ -92,13 +91,16 @@ cat('model {
     # width;
     
     for (k in 1:Nre){
-    scale[k] ~ dlnorm(0,pow(log(a[k]),-2))
+    scale[k] ~ dlnorm(0,pow(0.05,-2))
     }
     
-    tau ~ dgamma(0.01,0.01)
-    e1 ~ dgamma(0.01,0.01)
-    gin ~ dgamma(0.01,0.01)
-    gout ~ dgamma(0.01,0.01)
+    tau ~ dnorm(0,0.1)T(0,)
+    e1 ~ dnorm(0,0.1)T(0,)
+    gin ~ dnorm(0,0.1)T(0,)
+    gout ~ dnorm(0,0.1)T(0,)
+
+    rf ~ dnorm(5,5)T(0,)
+    ri ~  dnorm(5,5)T(0,)
     }', file={f <- tempfile()})
 ######################################################################
 # n.adapt:  number of iterations in the chain for adaptation (n.adapt)
@@ -112,10 +114,10 @@ cat('model {
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-n.burnin  <- 10000
-n.iter   <- 20000
+n.burnin  <- 15000
+n.iter   <- 30000
 
-n.chains <- 3
+n.chains <- 5
 n.thin   <- 10
 inits <- function () { list(e1 = runif(1,0.1,0.75),gin=runif(1,2,10),gout=runif(1,0.01,0.03)) }
 # "f": is the model specification from above;
@@ -123,13 +125,14 @@ inits <- function () { list(e1 = runif(1,0.1,0.75),gin=runif(1,2,10),gout=runif(
 # JAGS model with R2Jags;
 out <- jags(data = model.data,
             inits = inits,
-            parameters = c("e1", "gin", "gout","tau","mux","yx","scale"),
+            parameters = c("e1", "gin", "gout","tau","mux","yx","scale","ri","rf"),
             model.file = f,
             n.thin = n.thin,
             n.chains = n.chains,
             n.burnin = n.burnin,
             n.iter = n.iter)
-jagsresults(x=out, params=c("e1", "gin", "gout","tau","scale"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x=out, params=c("e1", "gin", "gout","tau","scale","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
 
 
 jagsresults(x=out, params=c("e1", "gin", "gout","tau","scale"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
@@ -207,32 +210,16 @@ ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
 dev.off()
 
 
-my_hist <- function(data, mapping, ...) {
-  ggplot(data = data, mapping = mapping) +
-    geom_histogram(bins = 10,fill="#4271AE",colour="#1F3552",...) +
-    theme_void() + theme( panel.grid.minor=element_blank(),
-                          panel.grid.major=element_blank())
-}
 
-my_bin <- function(data, mapping, ..., low = "#3698BF", high = "#D97C2B") {
-  ggplot(data = data, mapping = mapping) +
-    geom_bin2d(...) +
-    scale_fill_gradient(low = low, high = high) +
-    theme_bw()
-}
+Sp <- ggs(as.mcmc(out)[,c("e1", "gin", "gout","ri","rf")])
+levels(Sp$Parameter) <- as.factor(c("E[r]","Gamma[d]", "Gamma[p]","a[c]^i","a[c]^f"))
 
-Sp <- ggs(as.mcmc(out)[,c("e1", "gin", "gout")])
-levels(Sp$Parameter) <- as.factor(c("E[r]","Gamma[d]", "Gamma[p]"))
+pair_wise_plot(Sp)
 
-pdf("plot/He3dp_synthetic_corr_syst.pdf",height = 6,width = 6)
-ggs_pairs(Sp, 
-          labeller = "label_parsed",
-          diag=list(continuous = my_hist),
-          upper = "blank",
-          lower = list(continuous = my_bin),
-          switch="y",
-          showStrips=FALSE
-          ) 
+
+
+pdf("plot/He3dp_synthetic_corr_syst.pdf",height = 7,width = 7)
+pair_wise_plot(Sp)
 dev.off()
 
 
