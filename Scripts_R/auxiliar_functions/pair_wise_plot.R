@@ -2,7 +2,7 @@ pair_wise_plot <- function(s){
   
 my_hist <- function(data, mapping, ...) {
     ggplot(data = data, mapping = mapping) +
-      geom_histogram(bins = 10,fill="#2166ac",colour="#1F3552",...) +
+      geom_histogram(bins = 10,fill="#b2182b",colour="#1F3552",...) +
       theme_void() + theme( panel.grid.minor=element_blank(),
                             panel.grid.major=element_blank())
   }
