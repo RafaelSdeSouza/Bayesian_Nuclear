@@ -25,7 +25,9 @@ library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr);library(wesanderson)
 library(dplyr);require(ggsci);require(ggmcmc);require(plyr);library(latex2exp)
-source("/Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/jagsresults.R")
+source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/jagsresults.R")
+source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/theme_rafa.R")
+source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/pair_wise_plot.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
 load.module("nuclear")
@@ -126,24 +128,8 @@ tau ~  dnorm(0,0.1)T(0,)
 e1 ~   dnorm(0,0.1)T(0,)
 gin ~ dnorm(0,0.1)T(0,)
 gout ~ dnorm(0,10)T(0,)
-#ri ~ ddexp(5,100)
-#rf ~ ddexp(4,100)
-
 rf ~ dnorm(5,5)T(0,)
 ri ~  dnorm(5,5)T(0,)
-
-#gb ~ dbeta(2,2)
-#gin ~ dunif(0,20)
-
-#gout ~ dbeta(2,5)
-
-# Channel radius
-#  rb ~ dbeta(2,2)
-#  rb2 ~ dbeta(2,2)
-
-#  ri <- 4*rb + 3
-#  rf <- 4*rb2 + 3
-
 
 }"
 
@@ -160,7 +146,7 @@ ri ~  dnorm(5,5)T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.15,1),gout=runif(1,0.01,1)) }
+inits <- function () { list(e1 = runif(1,0.15,1),gout=runif(1,0.01,1),gin=runif(1,0.01,10)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -171,18 +157,14 @@ Normfit <- jags(data = model.data,
                 inits = inits,
                 parameters = c("e1", "gin", "gout","ue","tau", "ri","rf","mux0","mux1","mux2","scale"),
                 model = textConnection(Model),
-                n.thin = 10,
-                n.chains = 5,
-                n.burnin = 10000,
-                n.iter = 20000)
+                n.thin = 5,
+                n.chains = 3,
+                n.burnin = 20000,
+                n.iter = 40000)
 
 jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","ri","rf"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
-require(emdbook)
 
-s <- as.mcmc(Normfit)
-s1 <- lump.mcmc.list(s)
-HPDinterval(s1, prob = 0.95)[c("e1"),]
 
 traplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout","ri","rf","ue"),style="plain")
@@ -214,33 +196,33 @@ gdata0 <- data.frame(x =xx, mean = y0[,"mean"],lwr1=y0[,"25%"],lwr2=y0[,"2.5%"],
 
 pdf("plot/He3dp_syst.pdf",height = 7,width = 10)
 ggplot(gobs,aes(x=obsx,y=obsy))+
-  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.3) +
+  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
 
   
+  # red
+  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#fdd0a2"),show.legend=FALSE)+
+  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fdae6b"),show.legend=FALSE) +
+  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#d94801"),show.legend=FALSE) +
   
-  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#e5f5e0"),show.legend=FALSE)+
-  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#a1d99b"),show.legend=FALSE) +
-  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#31a354"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("gray95"),show.legend=FALSE)+
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("gray75"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("gray55"),show.legend=FALSE) +
   
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#f0f0f0"),show.legend=FALSE)+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#bdbdbd"),show.legend=FALSE) +
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#636363"),show.legend=FALSE) +
-  
-  #  
-  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#ffeda0"),show.legend=FALSE)+
-  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#feb24c"),show.legend=FALSE) +
-  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#f03b20"),show.legend=FALSE) +
+  #  Bare
+  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
+  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#9e9ac8"),show.legend=FALSE) +
+  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),show.legend=FALSE) +
   #
   #  
 
-  geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=set,shape=set),size=2.75)+
+  geom_point(data=gobs,aes(x=obsx,y=obsy,group=set,color=set,shape=set),size=2.75,alpha=0.75)+
   geom_errorbar(show.legend=FALSE,data=gobs,aes(x=obsx,y=obsy,ymin=obsy-erry,ymax=obsy+erry,group=set,color=set),
                 width=0.01,alpha=0.4)+
 #  geom_line(data=gdata,aes(x=xx,y=mean),linetype="dashed",size=0.75,show.legend=FALSE)+
 #  geom_line(data=gdata2,aes(x=xx,y=mean),linetype="dashed",size=0.75,show.legend=FALSE)+
-  scale_colour_manual(name="",values=c("#636363","#31a354","#31a354","#636363","#636363",
-                                            "#636363","#636363"))+
-  scale_shape_manual(values=c(0,1,2,5,25,11,13),name="")+
+  scale_colour_manual(name="",values=c("gray20","#7f0000","#7f0000","gray20","gray20",
+                                       "gray20","gray20"))+
+  scale_shape_manual(values=c(0,19,8,10,4,17,3),name="")+
   coord_cartesian(xlim=c(5e-3,0.85),ylim=c(0,20)) +
   theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
   scale_x_log10()  +
@@ -254,61 +236,40 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="#666666", face="bold", size=17.5),
+        axis.title = element_text(size=18.5),
         axis.text  = element_text(size=13),
-        strip.text = element_text(size=10),
-        strip.background = element_rect("gray85")) 
+        axis.ticks = element_line(size = 0.75),
+        axis.line = element_line(size = 0.5, linetype = "solid")) 
 dev.off()
 
 
 
 
-my_hist <- function(data, mapping, ...) {
-  ggplot(data = data, mapping = mapping) +
-    geom_histogram(bins = 15,fill="#4271AE",colour="#1F3552",...) +
-    theme_void() + theme( panel.grid.minor=element_blank(),
-                          panel.grid.major=element_blank())
-}
 
-my_bin <- function(data, mapping, ..., low = "#3698BF", high = "#D97C2B") {
-  ggplot(data = data, mapping = mapping) +
-    geom_bin2d(bins = 50) +
-    scale_fill_gradient(low = low, high = high) +
-    theme_bw()
-}
 
 Sp <- ggs(as.mcmc(Normfit )[,c("e1", "gin", "gout","ri","rf")])
 levels(Sp$Parameter) <- as.factor(c("E[r]","Gamma[d]", "Gamma[p]","a[c]^i","a[c]^f"))
 
 pdf("plot/He3dp_corr.pdf",height = 8,width =8)
-ggs_pairs(Sp, 
-          labeller = "label_parsed",
-          diag=list(continuous = my_hist),
-          upper = "blank",
-          lower = list(continuous = my_bin),
-          switch="both",
-          showStrips=FALSE
-) 
+pair_wise_plot(Sp)
 dev.off()
 
 
 
 
-S <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout")])
 
-S$Parameter <- revalue(S$Parameter, c("e1"="E[r]", "gin"="Gamma['d']",
-                                      "gout"="Gamma['p']"))
+S <- ggs(as.mcmc(Normfit),family="ue")
+S$value <- 1e6*S$value
+levels(S$Parameter) <- c("U[e1]","U[e2]")
 
-
-
-pdf("plot/He3dp_posterior_syst.pdf",height = 7,width = 8)
+pdf("plot/He3dp_posterior_screen.pdf",height = 7,width = 8)
 ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
   geom_histogram(aes(y=..count../sum(..count..)),bins = 10,color="black") +
   theme_bw() +
   scale_x_continuous(breaks = scales::pretty_breaks(n = 3)) +
   geom_rug(sides = "b", aes(y = 0,colour = Parameter),size=0.1,alpha=0.1 )+
-  scale_fill_manual(values = c("#66c2a5","#fc8d62","#8da0cb"))+
-  scale_color_manual(values = c("#66c2a5","#fc8d62","#8da0cb"))+
+  scale_fill_manual(values = c("gray70","#d7301f"))+
+  scale_color_manual(values = c("gray70","#d7301f"))+
   theme(legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
@@ -317,10 +278,10 @@ ggplot(data=S,aes(x=value,group=Parameter,fill=Parameter)) +
         axis.title = element_text(color="#666666", face="bold", size=15),
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
-        strip.background = element_rect("#F0B27A"),panel.grid.major = element_blank(),
+        strip.background = element_rect("gray80"),panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) +
   facet_wrap(~Parameter,scales="free_x",ncol=2,nrow=2,labeller=label_parsed) +
-  ylab("Posterior probability") + xlab("Parameter")
+  ylab("Posterior probability") + xlab("eV")
 dev.off()
 
 
@@ -336,11 +297,12 @@ c("scale[1]" = "Ali01a","scale[2]" = "Ali01b","scale[3]" = "Cos00",
 "scale[7]" = "Zhi77"))
 
 pdf("plot/He3dp_scale_syst.pdf",height = 5,width = 4.5)
-ggs_caterpillar(Sa) + aes(size=5,color = Parameter,shape=Parameter) +
+ggs_caterpillar(Sa) + aes(size=0.1,color = Parameter,shape=Parameter) +
   theme_economist_white() +
   geom_vline(xintercept = 1,linetype="dashed",color="gray35") +
-  scale_shape_manual(values=c(0,1,2,5,25,11,13),name="")+
-  scale_color_manual(values=c(rep("gray25",7))) +
+  scale_shape_manual(values=c(0,19,8,10,4,17,3),name="")+
+  scale_color_manual(values=c(rep("gray55",7))) +
+  geom_point(size=3,color="red") +
   theme(legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),

@@ -27,6 +27,8 @@ require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);require(ggmcmc);require(plyr)
 source("https://raw.githubusercontent.com/johnbaums/jagstools/master/R/jagsresults.R")
 source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/theme_rafa.R")
+source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/pair_wise_plot.R")
+
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
 load.module("nuclear")
@@ -114,10 +116,10 @@ cat('model {
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-n.burnin  <- 15000
-n.iter   <- 30000
+n.burnin  <- 10000
+n.iter   <- 20000
 
-n.chains <- 5
+n.chains <- 3
 n.thin   <- 10
 inits <- function () { list(e1 = runif(1,0.1,0.75),gin=runif(1,2,10),gout=runif(1,0.01,0.03)) }
 # "f": is the model specification from above;
@@ -213,8 +215,6 @@ dev.off()
 
 Sp <- ggs(as.mcmc(out)[,c("e1", "gin", "gout","ri","rf")])
 levels(Sp$Parameter) <- as.factor(c("E[r]","Gamma[d]", "Gamma[p]","a[c]^i","a[c]^f"))
-
-pair_wise_plot(Sp)
 
 
 
