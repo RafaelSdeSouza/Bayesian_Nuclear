@@ -2,6 +2,9 @@
 require(reshape2)
 require(dplyr)
 library(htmltab)
+require(ggplot2)
+require(ggthemes)
+source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/theme_rafa.R")
 
 #X(4He):               0.2484+-0.0002               0.2449+-0.0040
 #D/H(x10^-5):       2.45+-0.05                       2.53+-0.04
@@ -29,21 +32,24 @@ df1 <- data.frame(
 labels <- c("4He" = "4He", "D" = "D/H", "3He" = "3He/H","7Li" = "7Li/H")
 
 
-ann_line <-data.frame(xmid="3He",xmin="3He",xmax="3He",y0=2,y2=0,y=1,
-                     group=factor("obs",levels=c("pred","obs")))
 
-df1$seg <- c(0,0,0,0,0,0,1,0)
+df1$seg <- as.factor(c(0,0,0,0,0,0,1,0))
 dodge <- position_dodge(width=0.35)
 
-pdf("plot/abunda.pdf",height = 5,width = 7)
+df1$group <- factor(df1$group, levels = c("pred", "obs"))
+
+
+pdf("abunda.pdf",height = 5,width = 7)
  ggplot(df1, aes(x=iso,y=resp,group=group, colour = group)) +
   geom_errorbar(aes(ymin = resp-lower, ymax = resp+upper), width = 0.35,
                 position = dodge,size=1.25) +
-  geom_point(position = dodge,size=3) +
+  geom_point(position = dodge,aes(size=seg)) +
+   scale_size_manual(values=c(3,0))+
+   scale_color_manual(name="",values=c("#e41a1c","#377eb8")) +
   facet_wrap(~iso,scales = "free",labeller=labeller(iso = labels,label_parsed)) +
-  xlab("") + scale_color_tableau(name="") + theme_rafa() +
+  xlab("")  + theme_rafa() +
   ylab("") +  
-  theme(axis.text.x = element_blank(),legend.position = "none")
+  theme(axis.text.x = element_blank(),legend.position = "none")  
 dev.off()
 
 
