@@ -25,9 +25,10 @@ library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr);library(wesanderson)
 library(dplyr);require(ggsci);require(ggmcmc);require(plyr);library(latex2exp)
-source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/jagsresults.R")
-source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/theme_rafa.R")
-source("/Users/Rafael/Documents/GitHub/JAGS_UNC/Scripts_R/auxiliar_functions/pair_wise_plot.R")
+source("..//..//auxiliar_functions/jagsresults.R")
+source("..//..//auxiliar_functions/theme_rafa.R")
+source("..//..//auxiliar_functions/pair_wise_plot.R")
+source("..//..//auxiliar_functions/Gamma3Hedp.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
 load.module("nuclear")
@@ -245,13 +246,44 @@ dev.off()
 
 
 
+dummy <- as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]
+
+#dummy  <- as.matrix(dummy)
 
 
-Sp <- ggs(as.mcmc(Normfit )[,c("e1", "gin", "gout","ri","rf")])
-levels(Sp$Parameter) <- as.factor(c("E[r]","Gamma[d]", "Gamma[p]","a[c]^i","a[c]^f"))
+
+for(i in 1:3){
+dummy[[i]][,2] <- Gamma3Hedp(dummy[[1]][,1],dummy[[1]][,2],dummy[[1]][,3],dummy[[1]][,4],dummy[[1]][,5])$Ga
+}
+
+
+
+for(i in 1:3){
+  dummy[[i]][,3] <- Gamma3Hedp(dummy[[1]][,1],dummy[[1]][,2],dummy[[1]][,3],dummy[[1]][,4],dummy[[1]][,5])$Gb
+}
+
+
+
+
+ss <- ggs(dummy)
+pair_wise_plot(ggs(dummy))
+
+ggs_traceplot(ss)
+
+Sp <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]) 
+
+Sp0 <- Sp %>% as_tibble()  %>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
+
+
+
+
+
+
+
+levels(Sp0$Parameter) <- as.factor(c("E[r]","Gamma[d]", "Gamma[p]","a[c]^i","a[c]^f"))
 
 pdf("plot/He3dp_corr.pdf",height = 8,width =8)
-pair_wise_plot(Sp)
+pair_wise_plot(Sp0)
 dev.off()
 
 
@@ -318,12 +350,16 @@ dev.off()
 
 
 
+SS <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")])
 
+ss$Chain <- as.factor(ss$Chain)
+
+ggs_density(ss)
 pdf("plot/He3dp_trace_syst.pdf",height = 7,width = 8)
-ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
-  geom_line(alpha=0.5,size=0.25) +
+ggplot(data=ss,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
+  geom_density(alpha=0.5,size=0.25) +
   theme_wsj() +
-  scale_color_economist()+
+#  scale_color_economist()+
   theme(legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
@@ -333,7 +369,7 @@ ggplot(data=S,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
         axis.text  = element_text(size=12),
         strip.text = element_text(size=15),
         strip.background = element_rect("white")) +
-  facet_wrap(~Parameter,scales="free",ncol=2,nrow=2,labeller=label_parsed) +
+  facet_wrap(~Parameter,scales="free",labeller=label_parsed) +
   ylab("Parameter value") + xlab("Iteration")+
   ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
 dev.off()
