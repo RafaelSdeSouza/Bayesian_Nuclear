@@ -76,7 +76,9 @@ model.data <- list(obsy = obsy,    # Response variable
                    Nik = Nik,
                    ik  = ik,
                    M = M,
-                   xx = xx
+                   xx = xx,
+                   b0 =  c(0.5,0.5,5,5),
+                   B0 = diag(1, 4)
 )
 
 
@@ -85,8 +87,8 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-#y[i] <- scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout)
+y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, theta[1], theta[2],theta[3],theta[4],ue[ik[i]]),pow(tau, -2))
+#y[i] <- scale[re[i]]*sfactor3Hedp(obsx[i], e1, g[1], g[2])
 }
 
 # Predicted values
@@ -95,16 +97,16 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,0)
+mux0[j] <- sfactor3Hedp(xx[j], e1, theta[1], theta[2],theta[3],theta[4],0)
 yx0[j] ~ dnorm(mux0[j],pow(tau,-2))
 
 # No inverse Kinematics 
 
-mux1[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,ue[1])
+mux1[j] <- sfactor3Hedp(xx[j], e1, theta[1], theta[2],theta[3],theta[4],ue[1])
 yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 # With inverse Kinematics 
-mux2[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,ue[2])
+mux2[j] <- sfactor3Hedp(xx[j], e1, theta[1], theta[2],theta[3],theta[4],ue[2])
 yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 }
@@ -128,14 +130,13 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 tau ~  dnorm(0,0.1)T(0,)
 e1 ~   dnorm(0,0.1)T(0,)
 
+theta ~ dmnorm(b0[],B0[,])I(c(0,0,0,0),)
+#gin ~ dnorm(0,1)
+#gout ~ dnorm(0,0.1)T(0,)
 
-gout ~ dnorm(0.5,0.1)T(0,)
-gin ~ dnorm(1,1)T(0,)
 
-
-
-rf ~ dnorm(5,5)T(3,7)
-ri ~  dnorm(5,5)T(3,7)
+#rf ~ dnorm(5,5)T(0,)
+#ri ~  dnorm(5,5)T(0,)
 
 }"
 
@@ -152,7 +153,7 @@ ri ~  dnorm(5,5)T(3,7)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.15,1),gout=runif(1,0.01,10),gin=runif(1,0.01,10)) }
+inits <- function () { list(e1 = runif(1,0.15,1),theta=c(runif(4,0.01,10))) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -161,23 +162,18 @@ inits <- function () { list(e1 = runif(1,0.15,1),gout=runif(1,0.01,10),gin=runif
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters = c("e1", "gin", "gout","ue","tau", "ri","rf","mux0","mux1","mux2","scale"),
+                parameters = c("e1", "theta","ue","tau","mux0","mux1","mux2","scale"),
                 model = textConnection(Model),
                 n.thin = 5,
                 n.chains = 3,
-<<<<<<< HEAD
-                n.burnin = 200,
-                n.iter = 400)
-=======
                 n.burnin = 2500,
                 n.iter = 5000)
->>>>>>> 960fb6bcc47aed26131b514d0077ed8a66199b2e
 
-jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","ri","rf"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
-
+jagsresults(x=Normfit , params=c("e1", "theta","ue","tau"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
-traplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
+
+traplot(Normfit  ,c("e1", "g", "ri","rf"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout","ri","rf","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
@@ -258,15 +254,13 @@ dev.off()
 
 dummy <- as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]
 
-as.matrix(dummy)
-
 #dummy  <- as.matrix(dummy)
 
 for(i in 1:3){
-dummy[[i]][,2] <- Gamma3Hedp(dummy[[i]][,1],dummy[[i]][,2],dummy[[i]][,3],dummy[[i]][,4],dummy[[i]][,5])$Ga
+dummy[[i]][,2] <- Gamma3Hedp(dummy[[1]][,1],dummy[[1]][,2],dummy[[1]][,3],dummy[[1]][,4],dummy[[1]][,5])$Ga
 }
 for(i in 1:3){
-  dummy[[i]][,3] <- Gamma3Hedp(dummy[[i]][,1],dummy[[i]][,2],dummy[[i]][,3],dummy[[i]][,4],dummy[[i]][,5])$Gb
+  dummy[[i]][,3] <- Gamma3Hedp(dummy[[1]][,1],dummy[[1]][,2],dummy[[1]][,3],dummy[[1]][,4],dummy[[1]][,5])$Gb
 }
 
 
