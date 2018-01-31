@@ -1,4 +1,4 @@
-Gamma3Hedp <- function(ER,gi,gf, r_i = 6, r_f =5){
+Gamma3Hedp <- function(ER,gi,gf, r_i, r_f){
 require(gsl)  
   # Constants
   m1_i = 3.01493; m2_i = 2.01355;		# masses (amu) of t and d

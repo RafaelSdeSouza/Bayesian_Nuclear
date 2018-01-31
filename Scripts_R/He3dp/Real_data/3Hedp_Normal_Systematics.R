@@ -129,8 +129,8 @@ tau ~  dnorm(0,0.1)T(0,)
 e1 ~   dnorm(0,0.1)T(0,)
 gin ~ dnorm(0,0.1)T(0,)
 gout ~ dnorm(0,0.1)T(0,)
-rf ~ dnorm(4,5)T(0,)
-ri ~  dnorm(5,5)T(0,)
+rf ~ dnorm(5,7.5)T(0,)
+ri ~  dnorm(4,7.5)T(0,)
 
 }"
 
