@@ -87,13 +87,13 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactorTdn_5p(obsx[i], e1, gin, gout, ri, rf),pow(tau, -2))
+y[i] ~ dnorm(scale[re[i]]*sfactorTdn(obsx[i], e1, gin, gout, ri, rf,0),pow(tau, -2))
 }
 
 # Predicted values
 
 for (j in 1:M){
-mux[j] <- sfactorTdn_5p(xx[j], e1, gin, gout, ri, rf)
+mux[j] <- sfactorTdn(xx[j], e1, gin, gout, ri, rf,0)
 yx[j] ~ dnorm(mux[j],pow(tau,-2))
 }
 
@@ -146,8 +146,8 @@ Normfit <- jags(data = model.data,
                 model = textConnection(Model),
                 n.thin = 10,
                 n.chains = 10,
-                n.burnin = 20000,
-                n.iter = 40000)
+                n.burnin = 2000,
+                n.iter = 4000)
 
 
 jagsresults(x=Normfit , params=c("e1", "gin", "gout","tau","ri","rf"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
