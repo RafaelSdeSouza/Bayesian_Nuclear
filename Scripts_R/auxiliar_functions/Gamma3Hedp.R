@@ -1,4 +1,5 @@
 Gamma3Hedp <- function(ER,gi,gf, r_i = 6, r_f =5){
+require(gsl)  
   # Constants
   m1_i = 3.01493; m2_i = 2.01355;		# masses (amu) of t and d
   m1_f = 4.00151; m2_f = 1.007277;	# masses (amu) of n and 4He

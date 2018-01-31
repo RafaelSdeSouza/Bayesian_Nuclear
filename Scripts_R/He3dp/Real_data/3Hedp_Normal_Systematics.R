@@ -128,8 +128,8 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 tau ~  dnorm(0,0.1)T(0,)
 e1 ~   dnorm(0,0.1)T(0,)
 gin ~ dnorm(0,0.1)T(0,)
-gout ~ dnorm(0,10)T(0,)
-rf ~ dnorm(5,5)T(0,)
+gout ~ dnorm(0,0.1)T(0,)
+rf ~ dnorm(4,5)T(0,)
 ri ~  dnorm(5,5)T(0,)
 
 }"
@@ -160,8 +160,8 @@ Normfit <- jags(data = model.data,
                 model = textConnection(Model),
                 n.thin = 5,
                 n.chains = 3,
-                n.burnin = 20000,
-                n.iter = 40000)
+                n.burnin = 5000,
+                n.iter = 10000)
 
 jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","ri","rf"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -250,14 +250,9 @@ dummy <- as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]
 
 #dummy  <- as.matrix(dummy)
 
-
-
 for(i in 1:3){
 dummy[[i]][,2] <- Gamma3Hedp(dummy[[1]][,1],dummy[[1]][,2],dummy[[1]][,3],dummy[[1]][,4],dummy[[1]][,5])$Ga
 }
-
-
-
 for(i in 1:3){
   dummy[[i]][,3] <- Gamma3Hedp(dummy[[1]][,1],dummy[[1]][,2],dummy[[1]][,3],dummy[[1]][,4],dummy[[1]][,5])$Gb
 }
