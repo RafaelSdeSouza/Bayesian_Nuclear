@@ -290,7 +290,7 @@ for (i in 1:length(obsx4)) {
   wl_d <- 34.6224*pow(rin, -2)
   wl_n <- 51.8889*pow(rout, -2)
 #
-#  e1 ~ dunif(0, 10)                 # postive since we see sigma peak 
+#  e1 ~ dunif(0, 10)                 # positive since we see sigma peak 
   e1 ~ dnorm(0.0, pow(0.1, -2))T(0,)
   
   gin ~ dunif(0.0, 10*wl_d)          # x times Wigner limit

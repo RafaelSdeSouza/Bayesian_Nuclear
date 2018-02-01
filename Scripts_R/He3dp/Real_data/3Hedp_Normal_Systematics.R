@@ -76,7 +76,9 @@ model.data <- list(obsy = obsy,    # Response variable
                    Nik = Nik,
                    ik  = ik,
                    M = M,
-                   xx = xx
+                   xx = xx,
+                   ri = 5,
+                   rf = 5
 )
 
 
@@ -86,8 +88,10 @@ Model <- "model{
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
 y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-#y[i] <- scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout)
+res[i] <- obsy[i]-sfactor3Hedp(obsx[i], e1, gin, gout,ri,rf,0)
 }
+
+RSS <- sum(res^2)
 
 # Predicted values
 
@@ -121,6 +125,10 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 
 
 # PRIORS
+# Wigner limit: wl = hbar^2/(m_red a_c^2) = 41.80159/(M_red a_c^2)
+#
+# deuteron channel: wl_d = 41.80159/(1.207357 a_c^2) = 34.6224/a_c^2
+# neutron channel:  wl_n = 41.80159/(0.805597 a_c^2) = 51.8889/a_c^2
 # e1, gin, gout are defined as in tdn.f (by Alain Coc):
 # resonance energy, initial reduced width, final reduced
 # width;
@@ -128,14 +136,16 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 tau ~  dnorm(0,0.1)T(0,)
 e1 ~   dnorm(0,0.1)T(0,)
 
-
-gout ~ dnorm(0.5,0.1)T(0,)
-gin ~ dnorm(1,1)T(0,)
-
+#rf ~  dnorm(5,5)T(0,)
+#ri ~  dnorm(5,5)T(0,)
 
 
-rf ~ dnorm(5,5)T(3,7)
-ri ~  dnorm(5,5)T(3,7)
+
+gin ~ dnorm(0,0.1)T(0,)
+gout ~ dnorm(0,0.1)T(0,)
+
+
+
 
 }"
 
@@ -161,20 +171,24 @@ inits <- function () { list(e1 = runif(1,0.15,1),gout=runif(1,0.01,10),gin=runif
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters = c("e1", "gin", "gout","ue","tau", "ri","rf","mux0","mux1","mux2","scale"),
-                model = textConnection(Model),
+                parameters.to.save  = c("e1", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+                model.file  = textConnection(Model),
                 n.thin = 5,
                 n.chains = 3,
-<<<<<<< HEAD
-                n.burnin = 200,
-                n.iter = 400)
-=======
-                n.burnin = 2500,
-                n.iter = 5000)
->>>>>>> 960fb6bcc47aed26131b514d0077ed8a66199b2e
+                n.burnin = 5000,
+                n.iter = 10000)
 
-jagsresults(x=Normfit , params=c("e1", "gin", "gout","ue","tau","ri","rf"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
+jagsresults(x = Normfit , params = c("e1", "gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+RSS <- as.matrix(as.mcmc(Normfit)[,c("RSS")])
+rss0 <- function(x) crossprod(x-mean(x))[1]
+hist(1-RSS/rss0(obsy))
+
+
+color_scheme_set("darkgray")
+div_style <- parcoord_style_np(div_color = "green", div_size = 0.05, div_alpha = 0.4)
+mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout","ri","rf"))
 
 
 traplot(Normfit  ,c("e1", "gin", "gout","ri","rf"),style="plain")
