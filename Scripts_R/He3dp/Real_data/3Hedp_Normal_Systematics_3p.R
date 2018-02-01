@@ -174,8 +174,8 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 5,
                 n.chains = 3,
-                n.burnin = 5000,
-                n.iter = 10000)
+                n.burnin = 3000,
+                n.iter = 6000)
 
 
 jagsresults(x = Normfit , params = c("e1", "gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
