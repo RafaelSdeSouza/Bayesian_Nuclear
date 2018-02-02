@@ -140,7 +140,7 @@ ri ~  dnorm(5,5)T(0,)
 
 
 gin ~  dnorm(1,pow(0.25,-2))T(0,)
-gout ~ dnorm(0,pow(0.1,-2))T(0,)
+gout ~ dnorm(0,pow(0.05,-2))T(0,)
 
 
 
@@ -173,8 +173,8 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 5,
                 n.chains = 3,
-                n.burnin = 3000,
-                n.iter = 6000)
+                n.burnin = 20000,
+                n.iter = 30000)
 
 
 jagsresults(x = Normfit , params = c("e1", "gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
