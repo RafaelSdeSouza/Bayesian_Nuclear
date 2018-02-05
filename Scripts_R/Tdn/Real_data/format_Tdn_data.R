@@ -6,31 +6,31 @@ require(ggplot2);require(ggthemes);require(dplyr);require(magrittr)
 
 # Data of interest
 
-Bame57 <-  read.table("data_bame.dat") %>%
+Arn53  <-  read.table("data_arnold.dat") %>%
   set_colnames(.,c("E","S","Stat")) %>%
   mutate(.,Syst=mean(0.02*S)) %>%  
-  mutate(.,dat="Bam57") 
+  mutate(.,dat="Arn53") 
 
 
-Brown87 <- read.table("data_brown.dat") %>%
-         set_colnames(.,c("E","S","Stat")) %>%
-         mutate(.,Syst= mean(0.014*S)) %>%
+Bro87 <- read.table("data_brown.dat") %>%
+  set_colnames(.,c("E","S","Stat")) %>%
+         mutate(.,Syst= mean(0.013*S)) %>%
         mutate(.,dat="Bro87")
 
-Jarmie86 <- read.table("data_jarmie.dat") %>%
+Jar84 <- read.table("data_jarmie.dat") %>%
   set_colnames(.,c("E","S","Stat")) %>%
   mutate(.,Syst= mean(0.0126*S)) %>%
-  mutate(.,dat="Jar86 ")
+  mutate(.,dat="Jar84")
 
 
-Con52 <- read.table("data_conner.dat") %>%
+Kob66 <- read.table("data_kobzev.dat") %>%
   set_colnames(.,c("E","S","Stat")) %>%
-  mutate(.,Syst= mean(0.02*S)) %>%
-  mutate(.,dat="Con52 ")
+  mutate(.,Syst = mean(0.025*S)) %>%
+  mutate(.,dat="Kob66")
 
 # Remove bad points
 
-ensamble <- rbind(Bame57, Brown87,Jarmie86,Con52)
+ensamble <- rbind(Arn53, Bro87,Jar84,Kob66)
 
 #ensamble <- rbind(Bame57, Brown87,Jarmie86)
 

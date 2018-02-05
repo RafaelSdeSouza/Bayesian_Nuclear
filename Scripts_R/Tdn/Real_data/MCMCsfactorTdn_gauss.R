@@ -241,7 +241,7 @@ for (i in 1:length(obsx1)) {
   # actual number of decays subject to stat fluctuations
   ya1[i] ~ dnorm(yt1[i], pow(intrscat, -2))    
   # true number of decays 
-  yt1[i] <- sfactorTdn(obsx1[i], e1, gin, gout, rin, rout, ue)    
+  yt1[i] <- sfactorTdn3(obsx1[i], e1,ex, gin, gout, rin, rout, ue)    
 }    
 
 for (i in 1:length(obsx2)) {
@@ -252,7 +252,7 @@ for (i in 1:length(obsx2)) {
   # actual number of decays subject to stat fluctuations
   ya2[i] ~ dnorm(yt2[i], pow(intrscat, -2))    
   # true number of decays 
-  yt2[i] <- sfactorTdn(obsx2[i], e1, gin, gout, rin, rout, ue)    
+  yt2[i] <- sfactorTdn3(obsx2[i], e1,ex, gin, gout, rin, rout, ue)    
 }    
 
 for (i in 1:length(obsx3)) {
@@ -263,7 +263,7 @@ for (i in 1:length(obsx3)) {
   # actual number of decays subject to stat fluctuations
   ya3[i] ~ dnorm(yt3[i], pow(intrscat, -2))    
   # true number of decays 
-  yt3[i] <- sfactorTdn(obsx3[i], e1, gin, gout, rin, rout, ue)    
+  yt3[i] <- sfactorTdn3(obsx3[i], e1,ex, gin, gout, rin, rout, ue)    
 }    
 
 for (i in 1:length(obsx4)) {
@@ -274,7 +274,7 @@ for (i in 1:length(obsx4)) {
   # actual number of decays subject to stat fluctuations
   ya4[i] ~ dnorm(yt4[i], pow(intrscat, -2))    
   # true number of decays 
-  yt4[i] <- sfactorTdn(obsx4[i], e1, gin, gout, rin, rout, ue)    
+  yt4[i] <- sfactorTdn3(obsx4[i], e1,ex, gin, gout, rin, rout, ue)    
 }    
 
 # PRIORS
@@ -292,14 +292,15 @@ for (i in 1:length(obsx4)) {
 #
 #  e1 ~ dunif(0, 10)                 # positive since we see sigma peak 
   e1 ~ dnorm(0.0, pow(0.1, -2))T(0,)
+  ex ~ dnorm(0.5, pow(0.5, -2))T(0,)
   
   gin ~ dunif(0.0, 10*wl_d)          # x times Wigner limit
   gout ~ dunif(0.0, 10*wl_n)         # x times Wigner limit
 
   intrscat ~ dunif(0, 5)             # certainly less than 5 MeVb
 
-  rin <- 6.0
-  rout <- 5.0
+  rin ~ dunif(3,10)
+  rout ~  dunif(3,10)
 
 #  ue ~ dunif(0, 0.01)               # certainly less than 10 keV
 
@@ -384,7 +385,7 @@ n.adapt  <- 500
 n.update <- 1000 
 n.iter   <- 5000
 n.chains <- 3
-n.thin   <- 1
+n.thin   <- 10
 
 # "f": is the model specification from above; 
 # data = list(...): define all data elements that are referenced in the 
@@ -410,7 +411,7 @@ update(ourmodel, n.update, progress.bar="none")
 
 # variable.names are variables to be recorded in output file of samples
 mcmcChain <- coda.samples(ourmodel, 
-                    variable.names=c('e1', 'gin', 'gout', 'intrscat', 
+                    variable.names=c('e1',"ex", 'gin', 'gout', 'intrscat', 
                     'n.norm1', 'n.norm2', 'n.norm3', 'n.norm4',
                     'rin', 'rout','ue'), 
                     n.iter=n.iter, n.thin=n.thin)

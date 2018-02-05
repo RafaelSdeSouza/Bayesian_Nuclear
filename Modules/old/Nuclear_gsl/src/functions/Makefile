@@ -107,7 +107,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 nuclear_la_LIBADD =
 am_nuclear_la_OBJECTS = nuclear_la-sfactor3Hedp.lo \
-	nuclear_la-sfactorTdn.lo nuclear_la-sfactorBW.lo
+	nuclear_la-sfactorTdn.lo
 nuclear_la_OBJECTS = $(am_nuclear_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -324,8 +324,8 @@ nuclear_la_CPPFLAGS = -I$(top_srcdir)/src \
 												 -I$(includedir)/JAGS
 
 nuclear_la_LDFLAGS = -no-undefined -module -avoid-version
-nuclear_la_SOURCES = sfactor3Hedp.cc sfactorTdn.cc sfactorBW.cc
-noinst_HEADERS = sfactor3Hedp.h  sfactorTdn.h sfactorBW.h
+nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc
+noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h
 all: all-am
 
 .SUFFIXES:
@@ -381,7 +381,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/nuclear_la-sfactor3Hedp.Plo
-include ./$(DEPDIR)/nuclear_la-sfactorBW.Plo
 include ./$(DEPDIR)/nuclear_la-sfactorTdn.Plo
 
 .cc.o:
@@ -421,13 +420,6 @@ nuclear_la-sfactorTdn.lo: sfactorTdn.cc
 #	$(AM_V_CXX)source='sfactorTdn.cc' object='nuclear_la-sfactorTdn.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn.lo `test -f 'sfactorTdn.cc' || echo '$(srcdir)/'`sfactorTdn.cc
-
-nuclear_la-sfactorBW.lo: sfactorBW.cc
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT nuclear_la-sfactorBW.lo -MD -MP -MF $(DEPDIR)/nuclear_la-sfactorBW.Tpo -c -o nuclear_la-sfactorBW.lo `test -f 'sfactorBW.cc' || echo '$(srcdir)/'`sfactorBW.cc
-	$(AM_V_at)$(am__mv) $(DEPDIR)/nuclear_la-sfactorBW.Tpo $(DEPDIR)/nuclear_la-sfactorBW.Plo
-#	$(AM_V_CXX)source='sfactorBW.cc' object='nuclear_la-sfactorBW.lo' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorBW.lo `test -f 'sfactorBW.cc' || echo '$(srcdir)/'`sfactorBW.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

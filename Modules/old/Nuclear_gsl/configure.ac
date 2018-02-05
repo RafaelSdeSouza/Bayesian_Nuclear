@@ -9,9 +9,8 @@ AC_SUBST(JAGS_MAJOR)
 AC_SUBST(JAGS_MINOR)
 
 AC_CANONICAL_HOST
-AC_CONFIG_SRCDIR([src/functions/sfactorTdn.cc])
 AC_CONFIG_SRCDIR([src/functions/sfactor3Hedp.cc])
-AC_CONFIG_SRCDIR([src/functions/sfactorBW.cc])
+AC_CONFIG_SRCDIR([src/functions/sfactorTdn.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
