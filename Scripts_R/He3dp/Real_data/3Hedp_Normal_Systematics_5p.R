@@ -177,7 +177,26 @@ Normfit <- jags(data = model.data,
                 n.iter = 30000)
 
 
+
+
 jagsresults(x = Normfit , params = c("e1", "gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+
+PR_gin <- rtruncnorm(6000, a=0, b=Inf, mean = 1, sd = 0.25)
+MCMCtrace(Normfit, params = 'gin', priors = PR_gin, pdf = FALSE)
+
+PR_out <- rtruncnorm(6000, a=0, b=Inf, mean = 0, sd = 0.05)
+MCMCtrace(Normfit, params = 'gout', priors = PR_out, pdf = FALSE)
+
+PR_ri <- rtruncnorm(6000, a=0, b=Inf, mean = 5, sd = 0.447)
+MCMCtrace(Normfit, params = 'ri', priors = PR_ri, pdf = FALSE)
+
+PR_rf <- rtruncnorm(6000, a=0, b=Inf, mean = 5, sd = 0.447)
+MCMCtrace(Normfit, params = 'rf', priors = PR_rf, pdf = FALSE)
+
+PR_ue <- rtruncnorm(6000, a=0, b=Inf, mean = 0, sd = 0.031)
+MCMCtrace(Normfit, params = 'ue', priors = PR_ue, pdf = FALSE)
+
 
 RSS <- as.matrix(as.mcmc(Normfit)[,c("RSS")])
 rss0 <- function(x) crossprod(x-mean(x))[1]
