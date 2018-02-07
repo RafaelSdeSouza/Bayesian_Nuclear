@@ -14,10 +14,10 @@ library_names='nuclear.so nuclear.so'
 old_library=''
 
 # Linker flags that cannot go in dependency_libs.
-inherited_linker_flags=' '
+inherited_linker_flags='  -framework Accelerate'
 
 # Libraries that this one depends upon.
-dependency_libs=' -ljags -ljrmath'
+dependency_libs=' /usr/local/lib/libjags.la /usr/local/lib/libjrmath.la -lm'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''

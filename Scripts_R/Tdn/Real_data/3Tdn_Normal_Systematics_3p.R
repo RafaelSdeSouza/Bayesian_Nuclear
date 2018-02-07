@@ -84,9 +84,9 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-#y[i] ~ dnorm(scale[re[i]]*sfactorTdn(obsx[i], e1, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-y[i] ~ dnorm(scale[re[i]]*sfactorTdn(obsx[i], e1, gin, gout,ri,rf,0),pow(tau, -2))
-res[i] <- obsy[i]-sfactorTdn(obsx[i], e1, gin, gout,ri,rf,0)
+#y[i] ~ dnorm(scale[re[i]]*sfactorTdn3(obsx[i], e1, ex,gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
+y[i] ~ dnorm(scale[re[i]]*sfactorTdn3(obsx[i], e1,ex, gin, gout,ri,rf,0),pow(tau, -2))
+res[i] <- obsy[i]-sfactorTdn3(obsx[i], e1,ex, gin, gout,ri,rf,0)
 }
 
 RSS <- sum(res^2)
@@ -97,7 +97,7 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactorTdn(xx[j], e1, gin, gout,ri,rf,0)
+mux0[j] <- sfactorTdn3(xx[j], e1,ex, gin, gout,ri,rf,0)
 yx0[j] ~ dnorm(mux0[j],pow(tau,-2))
 
 # No inverse Kinematics 
@@ -132,10 +132,11 @@ scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 # width;
 
 tau ~  dt(0, pow(5,-2), 1)T(0,)
-e1 ~  dnorm(0,1)T(0,)
+e1 ~  dnorm(0,0.1)T(0,)
+ex ~  dnorm(0,0.1)T(0,)
 
-rf ~  dnorm(5,pow(0.2,-2))T(0,)
-ri ~  dnorm(6,pow(0.2,-2))T(0,)
+rf ~  dnorm(5,pow(0.1,-2))T(0,)
+ri ~  dnorm(6,pow(0.1,-2))T(0,)
 
 
 gin ~  dnorm(0,pow(0.5,-2))T(0,)
@@ -168,15 +169,15 @@ inits <- function () { list(e1 = runif(1,0.01,1),gout=runif(1,0.01,10),gin=runif
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("e1", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+                parameters.to.save  = c("e1","ex", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
                 model.file  = textConnection(Model),
-                n.thin = 5,
+                n.thin = 4,
                 n.chains = 10,
                 n.burnin = 15000,
                 n.iter = 30000)
 
 
-jagsresults(x = Normfit , params = c("e1", "gin", "gout","scale","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit , params = c("e1","ex", "gin", "gout","scale","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 RSS <- as.matrix(as.mcmc(Normfit)[,c("RSS")])
 rss0 <- function(x) crossprod(x-mean(x))[1]
@@ -188,7 +189,7 @@ div_style <- parcoord_style_np(div_color = "green", div_size = 0.05, div_alpha =
 mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout","ri","rf"))
 
 
-traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
+traplot(Normfit  ,c("e1","ex", "gin", "gout"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
