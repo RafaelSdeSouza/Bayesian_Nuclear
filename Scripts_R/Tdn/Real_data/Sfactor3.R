@@ -1,3 +1,4 @@
+require(gsl)
 Sfactor3 <- function(ECM, E1, EX, gi, gf, ri, rf, ue){
   # input masses, charges, angular momenta
   m1_i = 3.01550 
