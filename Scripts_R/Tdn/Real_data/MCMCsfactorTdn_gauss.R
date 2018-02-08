@@ -292,15 +292,15 @@ for (i in 1:length(obsx4)) {
 #
 #  e1 ~ dunif(0, 10)                 # positive since we see sigma peak 
   e1 ~ dnorm(0.0, pow(0.1, -2))T(0,)
-  ex ~ dnorm(0.5, pow(0.5, -2))T(0,)
+  ex ~ dnorm(0.0, pow(0.1, -2))T(0,)
   
   gin ~ dunif(0.0, 10*wl_d)          # x times Wigner limit
   gout ~ dunif(0.0, 10*wl_n)         # x times Wigner limit
 
   intrscat ~ dunif(0, 5)             # certainly less than 5 MeVb
 
-  rin ~ dunif(3,10)
-  rout ~  dunif(3,10)
+  rin <- 6 
+  rout <- 5  
 
 #  ue ~ dunif(0, 0.01)               # certainly less than 10 keV
 
