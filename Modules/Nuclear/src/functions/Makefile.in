@@ -107,8 +107,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 nuclear_la_LIBADD =
 am_nuclear_la_OBJECTS = nuclear_la-sfactor3Hedp.lo \
-	nuclear_la-sfactorTdn.lo nuclear_la-sfactorTdn2.lo \
-	nuclear_la-sfactorTdn3.lo
+	nuclear_la-sfactorTdn.lo
 nuclear_la_OBJECTS = $(am_nuclear_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -325,8 +324,8 @@ nuclear_la_CPPFLAGS = -I$(top_srcdir)/src \
 												 -I$(includedir)/JAGS
 
 nuclear_la_LDFLAGS = -no-undefined -module -avoid-version
-nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc  sfactorTdn2.cc sfactorTdn3.cc 
-noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h    sfactorTdn2.h sfactorTdn3.h
+nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc  
+noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h    
 all: all-am
 
 .SUFFIXES:
@@ -383,8 +382,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nuclear_la-sfactor3Hedp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nuclear_la-sfactorTdn.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nuclear_la-sfactorTdn2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nuclear_la-sfactorTdn3.Plo@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -423,20 +420,6 @@ nuclear_la-sfactorTdn.lo: sfactorTdn.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sfactorTdn.cc' object='nuclear_la-sfactorTdn.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn.lo `test -f 'sfactorTdn.cc' || echo '$(srcdir)/'`sfactorTdn.cc
-
-nuclear_la-sfactorTdn2.lo: sfactorTdn2.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT nuclear_la-sfactorTdn2.lo -MD -MP -MF $(DEPDIR)/nuclear_la-sfactorTdn2.Tpo -c -o nuclear_la-sfactorTdn2.lo `test -f 'sfactorTdn2.cc' || echo '$(srcdir)/'`sfactorTdn2.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/nuclear_la-sfactorTdn2.Tpo $(DEPDIR)/nuclear_la-sfactorTdn2.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sfactorTdn2.cc' object='nuclear_la-sfactorTdn2.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn2.lo `test -f 'sfactorTdn2.cc' || echo '$(srcdir)/'`sfactorTdn2.cc
-
-nuclear_la-sfactorTdn3.lo: sfactorTdn3.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT nuclear_la-sfactorTdn3.lo -MD -MP -MF $(DEPDIR)/nuclear_la-sfactorTdn3.Tpo -c -o nuclear_la-sfactorTdn3.lo `test -f 'sfactorTdn3.cc' || echo '$(srcdir)/'`sfactorTdn3.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/nuclear_la-sfactorTdn3.Tpo $(DEPDIR)/nuclear_la-sfactorTdn3.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sfactorTdn3.cc' object='nuclear_la-sfactorTdn3.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn3.lo `test -f 'sfactorTdn3.cc' || echo '$(srcdir)/'`sfactorTdn3.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

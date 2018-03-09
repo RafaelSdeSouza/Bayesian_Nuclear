@@ -107,8 +107,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 nuclear_la_LIBADD =
 am_nuclear_la_OBJECTS = nuclear_la-sfactor3Hedp.lo \
-	nuclear_la-sfactorTdn.lo nuclear_la-sfactorTdn2.lo \
-	nuclear_la-sfactorTdn3.lo
+	nuclear_la-sfactorTdn.lo
 nuclear_la_OBJECTS = $(am_nuclear_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -180,14 +179,14 @@ ETAGS = etags
 CTAGS = ctags
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing aclocal-1.15
+ACLOCAL = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
 AS = as
-AUTOCONF = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing autoconf
-AUTOHEADER = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing autoheader
-AUTOMAKE = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing automake-1.15
+AUTOCONF = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing autoconf
+AUTOHEADER = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing autoheader
+AUTOMAKE = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing automake-1.15
 AWK = awk
 CC = clang
 CCDEPMODE = depmode=gcc3
@@ -240,7 +239,7 @@ LT_CONFIG_H = config.h
 LT_DLLOADERS =  dlopen.la
 LT_DLPREOPEN = -dlpreopen dlopen.la 
 LT_SYS_LIBRARY_PATH = 
-MAKEINFO = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing makeinfo
+MAKEINFO = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = ../.././install-sh -c -d
 NM = /usr/bin/nm -B
@@ -263,10 +262,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 1.1
-abs_builddir = /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear/src/functions
-abs_srcdir = /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear/src/functions
-abs_top_builddir = /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear
-abs_top_srcdir = /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear
+abs_builddir = /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear/src/functions
+abs_srcdir = /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear/src/functions
+abs_top_builddir = /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear
+abs_top_srcdir = /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear
 ac_ct_AR = ar
 ac_ct_CC = clang
 ac_ct_CXX = 
@@ -296,7 +295,7 @@ host_vendor = apple
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /Users/Rafael/Documents/GitHub/JAGS_UNC/Modules/Nuclear/install-sh
+install_sh = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/JAGS_UNC/Modules/Nuclear/install-sh
 jagsmoddir = ${exec_prefix}/lib/JAGS/modules-4
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
@@ -325,8 +324,8 @@ nuclear_la_CPPFLAGS = -I$(top_srcdir)/src \
 												 -I$(includedir)/JAGS
 
 nuclear_la_LDFLAGS = -no-undefined -module -avoid-version
-nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc  sfactorTdn2.cc sfactorTdn3.cc 
-noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h    sfactorTdn2.h sfactorTdn3.h
+nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc  
+noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h    
 all: all-am
 
 .SUFFIXES:
@@ -383,8 +382,6 @@ distclean-compile:
 
 include ./$(DEPDIR)/nuclear_la-sfactor3Hedp.Plo
 include ./$(DEPDIR)/nuclear_la-sfactorTdn.Plo
-include ./$(DEPDIR)/nuclear_la-sfactorTdn2.Plo
-include ./$(DEPDIR)/nuclear_la-sfactorTdn3.Plo
 
 .cc.o:
 	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -423,20 +420,6 @@ nuclear_la-sfactorTdn.lo: sfactorTdn.cc
 #	$(AM_V_CXX)source='sfactorTdn.cc' object='nuclear_la-sfactorTdn.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn.lo `test -f 'sfactorTdn.cc' || echo '$(srcdir)/'`sfactorTdn.cc
-
-nuclear_la-sfactorTdn2.lo: sfactorTdn2.cc
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT nuclear_la-sfactorTdn2.lo -MD -MP -MF $(DEPDIR)/nuclear_la-sfactorTdn2.Tpo -c -o nuclear_la-sfactorTdn2.lo `test -f 'sfactorTdn2.cc' || echo '$(srcdir)/'`sfactorTdn2.cc
-	$(AM_V_at)$(am__mv) $(DEPDIR)/nuclear_la-sfactorTdn2.Tpo $(DEPDIR)/nuclear_la-sfactorTdn2.Plo
-#	$(AM_V_CXX)source='sfactorTdn2.cc' object='nuclear_la-sfactorTdn2.lo' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn2.lo `test -f 'sfactorTdn2.cc' || echo '$(srcdir)/'`sfactorTdn2.cc
-
-nuclear_la-sfactorTdn3.lo: sfactorTdn3.cc
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT nuclear_la-sfactorTdn3.lo -MD -MP -MF $(DEPDIR)/nuclear_la-sfactorTdn3.Tpo -c -o nuclear_la-sfactorTdn3.lo `test -f 'sfactorTdn3.cc' || echo '$(srcdir)/'`sfactorTdn3.cc
-	$(AM_V_at)$(am__mv) $(DEPDIR)/nuclear_la-sfactorTdn3.Tpo $(DEPDIR)/nuclear_la-sfactorTdn3.Plo
-#	$(AM_V_CXX)source='sfactorTdn3.cc' object='nuclear_la-sfactorTdn3.lo' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn3.lo `test -f 'sfactorTdn3.cc' || echo '$(srcdir)/'`sfactorTdn3.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

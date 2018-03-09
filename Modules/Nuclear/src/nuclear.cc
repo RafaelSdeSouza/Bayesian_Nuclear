@@ -9,8 +9,7 @@
 #include <module/Module.h>
 #include <functions/sfactor3Hedp.h>
 #include <functions/sfactorTdn.h>
-#include <functions/sfactorTdn2.h>
-#include <functions/sfactorTdn3.h>
+
 
 using std::vector;
 
@@ -27,8 +26,6 @@ NUCLEARModule::NUCLEARModule() : Module("nuclear"){
   //load functions
   insert(new sfactor3Hedp);
   insert(new sfactorTdn);
-  insert(new sfactorTdn2);
-  insert(new sfactorTdn3);
 }
 
 

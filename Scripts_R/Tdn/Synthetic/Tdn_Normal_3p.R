@@ -62,8 +62,8 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 #obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-obsy[i] ~ dnorm(sfactorTdn3(obsx[i], e1,0.0912, gin, gout,6,5,0),pow(tau, -2))
-res[i] <- obsy[i]-sfactorTdn3(obsx[i], e1,0.0912, gin, gout,6,5,0)
+obsy[i] ~ dnorm(sfactorTdn(obsx[i], e1,0.0912, gin, gout,6,5,0),pow(tau, -2))
+res[i] <- obsy[i]-sfactorTdn(obsx[i], e1,0.0912, gin, gout,6,5,0)
 }
 
 RSS <- sum(res^2)
@@ -74,7 +74,7 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactorTdn3(xx[j], e1,0.0912, gin, gout,6,5,0)
+mux0[j] <- sfactorTdn(xx[j], e1,0.0912, gin, gout,6,5,0)
 
 
 }
@@ -112,14 +112,14 @@ inits <- function () { list(e1 = runif(1,0.01,10),gout=runif(1,0.01,10),gin=runi
 
 # JAGS model with R2Jags;
 Normfit <- run.jags(data = model.data,
-                adapt = 50000,
+                adapt = 1000,
                 inits = inits,
                 method ="rjags",
                 monitor = c("e1", "gin", "gout","tau"),
                 model  = Model,
                 thin = 1,
-                burnin = 3000,
-                sample = 3000,
+                burnin = 2000,
+                sample = 5000,
                 n.chains = 3)
 plot(Normfit, layout=c(3,4))
 

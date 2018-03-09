@@ -8,9 +8,9 @@ namespace nuclear {
 
 /**
  * @short Astrophysical S Factors
- * sfactorTdn returns the astrophysical S-factor as a function of energy.
+ * sfactorTdn3 returns the astrophysical S-factor as a function of energy.
  * <pre>
- * obsy1 = sfactorTdn(obsx1, e1, gi, gf, ri, rf, ue)
+ * obsy1 = sfactorTdn3(obsx1, e1, ex, gi, gf, ri, rf, ue)
  * </pre>
  */
 
@@ -21,12 +21,12 @@ class sfactorTdn : public ArrayFunction {
     void evaluate(double *x, std::vector<double const *> const &args,
                     std::vector<std::vector<unsigned int> > const &dims) const;
                     
+    void coul(int, double, double, double&, double&) const;
+    
      void PenFactor(const double E, const double L, const double R,
    				const double mue,
 				const double qQ,
-				double& P, double& S) const;                  
-                    
-    void coul(int, double, double, double&, double&) const;
+				double& P, double& S) const;     
                 
 	bool checkParameterDim(std::vector<std::vector<unsigned int> > const &dims) const;
 	

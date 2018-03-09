@@ -218,8 +218,8 @@ nuclear_la-sfactor3Hedp.lo: sfactor3Hedp.cc sfactor3Hedp.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/usr/include/_types/_nl_item.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/__bsd_locale_defaults.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/bitset \
-  /usr/local/include/gsl/gsl_sf_result.h \
   /usr/local/include/gsl/gsl_sf_exp.h \
+  /usr/local/include/gsl/gsl_sf_result.h \
   /usr/local/include/gsl/gsl_precision.h \
   /usr/local/include/gsl/gsl_types.h /usr/local/include/gsl/gsl_errno.h \
   /usr/local/include/gsl/gsl_sf_coulomb.h \
@@ -665,9 +665,9 @@ sfactor3Hedp.h:
 
 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/bitset:
 
-/usr/local/include/gsl/gsl_sf_result.h:
-
 /usr/local/include/gsl/gsl_sf_exp.h:
+
+/usr/local/include/gsl/gsl_sf_result.h:
 
 /usr/local/include/gsl/gsl_precision.h:
 
