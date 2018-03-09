@@ -112,14 +112,14 @@ inits <- function () { list(e1 = runif(1,0.01,10),gout=runif(1,0.01,10),gin=runi
 
 # JAGS model with R2Jags;
 Normfit <- run.jags(data = model.data,
-                adapt = 1000,
+                adapt = 15000,
                 inits = inits,
                 method ="rjags",
                 monitor = c("e1", "gin", "gout","tau"),
                 model  = Model,
-                thin = 1,
-                burnin = 2000,
-                sample = 5000,
+                thin = 5,
+                burnin = 5000,
+                sample = 10000,
                 n.chains = 3)
 plot(Normfit, layout=c(3,4))
 
