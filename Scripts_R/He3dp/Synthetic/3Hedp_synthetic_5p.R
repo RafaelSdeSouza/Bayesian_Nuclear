@@ -52,7 +52,7 @@ N <- 100
 #obsx1 <- runif(N,0,0.7)
 obsx1 <- exp(runif(N,log(1e-3),log(1)))
 errobsy1 <- runif(N,0.1,0.5)
-obsy1 <- rnorm(N, sfactor3Hedp_5p(obsx1 ,0.35779,1.0085,0.025425,4,5),errobsy1)
+obsy1 <- rnorm(N, sfactor3Hedp_5p(obsx1 ,0.35779,1.0085,0.025425,5,6),errobsy1)
 
 M <- 150
 xx <- seq(min(obsx1),max(obsx1),length.out = M)
@@ -69,15 +69,17 @@ cat('model {
 
     # LIKELIHOOD
     for (i in 1:N) {
-    obsy[i] ~ dnorm(y1[i], pow(erry[i], -2))
-#    y1[i] ~ dnorm(sfactor3Hedp(obsx[i], e1, gin, gout,r_i,r_f,0),pow(tau,-2))
-    y1[i] <- sfactor3Hedp(obsx[i], e1, gin, gout,r_i,r_f,0)
+    obsy[i] ~ dt(y1[i], pow(erry[i], -2),nu)
+
+
+#    y1[i] ~ dt(sfactor3Hedp(obsx[i], e1, gin, gout,r_i,r_f,0),pow(tau,-2),6)
+    y1[i] <- sfactor3Hedp(obsx[i], e1, gin, gout,5,6,0)
     }
 
     # Predicted values
 
     for (j in 1:M){
-    mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout, r_i,r_f,0)
+    mux[j] <- sfactor3Hedp(xx[j], e1, gin, gout, 5,6,0)
 #    yx[j] ~ dnorm(mux[j],pow(tau,-2))
     }
 
@@ -90,9 +92,11 @@ cat('model {
     e1 ~ dunif(0,20)
     gin ~ dunif(1e-4,20)
     gout ~ dunif(1e-4,20)
-    r_i ~  dnorm(5,0.5)T(3,7)
-    r_f ~  dnorm(5,0.5)T(3,7)
+#    r_i ~  dnorm(5,0.5)T(3,7)
+#    r_f ~  dnorm(5,0.5)T(3,7)
 
+   nu <- nuMinusOne + 1
+   nuMinusOne ~ dexp( 1/29 )
 
 # Final radii
 

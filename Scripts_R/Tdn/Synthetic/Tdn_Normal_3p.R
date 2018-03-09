@@ -10,7 +10,7 @@
 #
 ######################################################################
 # preparation: remove all variables from the work space
-rm(list=ls())
+#rm(list=ls())
 set.seed(123)
 ######################################################################
 # data input
@@ -24,7 +24,8 @@ set.seed(123)
 library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr);library(wesanderson)
-library(dplyr);require(ggsci);require(ggmcmc);require(plyr);library(latex2exp)
+library(dplyr);require(ggsci);require(ggmcmc);require(gsl);library(latex2exp)
+require(runjags)
 source("..//..//auxiliar_functions/jagsresults.R")
 source("..//..//auxiliar_functions/theme_rafa.R")
 source("..//..//auxiliar_functions/pair_wise_plot.R")
@@ -35,58 +36,34 @@ load.module("nuclear")
 
 
 ######################################################################
-## Read DATA 
-ensamble <- read.csv("ensamble_Tdn.csv",header = T)
+## ARTIFICIAL DATA GENERATION
 
 
-re <- as.numeric(ensamble$dat)
-Nre <- length(unique(ensamble$dat))
-ik <- as.numeric(ensamble$invK)
-Nik <- length(unique(ensamble$invK))
-# Radius
-# r_i = 6
-# r_f = 5
+N <- 150
 
-# Literature
-#  0.35779   # resonance energy
-#  1.0085    # reduced width incoming
-#  0.025425   # reduced width outgoing
+#obsx1 <- runif(N,0,0.7)
+obsx1 <- exp(runif(N,log(1e-3),log(1)))
+sd <- 0.1
+obsy1 <- rnorm(N, Sfactor3(obsx1,0.0912,0.0912,2.93,0.0794,6,5,0),sd=sd)
 
-
-N <- nrow(ensamble)
-obsy <- ensamble$S    # Response variable
-obsx <-  ensamble$E   # Predictors
-erry <- ensamble$Stat
-set <- ensamble$dat
-lab <- ensamble$invK
-syst = c(unique(ensamble$Syst))
-#syst <- syst[-3]
-
-M <- 500
-xx <- seq(min(obsx),max(obsx),length.out = M)
-
-model.data <- list(obsy = obsy,    # Response variable
-                   obsx =  obsx,   # Predictors
-                   erry = erry,
-                   N = nrow(ensamble), # Sample size
-                   syst = syst,
-                   Nre = Nre,
-                   re = re,
-                   Nik = Nik,
-                   ik  = ik,
+M <- 150
+xx <- seq(min(obsx1),max(obsx1),length.out = M)
+model.data <- list(obsy = obsy1,    # Response variable
+                   obsx =  obsx1,   # Predictors
+#                   erry = errobsy1,
+                   N = N, # Sample size
                    M = M,
                    xx = xx
 )
-
+#
 
 ######################################################################
 Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
-obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-#y[i] ~ dnorm(scale[re[i]]*sfactorTdn3(obsx[i], e1, ex,gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-y[i] ~ dnorm(scale[re[i]]*sfactorTdn3(obsx[i], e1,ex, gin, gout,ri,rf,0),pow(tau, -2))
-res[i] <- obsy[i]-sfactorTdn3(obsx[i], e1,ex, gin, gout,ri,rf,0)
+#obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
+obsy[i] ~ dnorm(sfactorTdn3(obsx[i], e1,0.0912, gin, gout,6,5,0),pow(tau, -2))
+res[i] <- obsy[i]-sfactorTdn3(obsx[i], e1,0.0912, gin, gout,6,5,0)
 }
 
 RSS <- sum(res^2)
@@ -97,53 +74,20 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactorTdn3(xx[j], e1,ex, gin, gout,ri,rf,0)
-yx0[j] ~ dnorm(mux0[j],pow(tau,-2))
+mux0[j] <- sfactorTdn3(xx[j], e1,0.0912, gin, gout,6,5,0)
 
-# No inverse Kinematics 
-
-#mux1[j] <- sfactorTdn(xx[j], e1, gin, gout,ri,rf,ue[1])
-#yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
-
-# With inverse Kinematics 
-#mux2[j] <- sfactorTdn(xx[j], e1, gin, gout,ri,rf,ue[2])
-#yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 }
 
 
 
-for (k in 1:Nre){
-scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
-}
-
-#for (z in 1:Nik){
-#ue[z] ~ dnorm(0,1e3)T(0,)
-#}
 
 
 # PRIORS
-# Wigner limit: wl = hbar^2/(m_red a_c^2) = 41.80159/(M_red a_c^2)
-#
-# deuteron channel: wl_d = 41.80159/(1.207357 a_c^2) = 34.6224/a_c^2
-# neutron channel:  wl_n = 41.80159/(0.805597 a_c^2) = 51.8889/a_c^2
-# e1, gin, gout are defined as in tdn.f (by Alain Coc):
-# resonance energy, initial reduced width, final reduced
-# width;
-
-tau ~  dt(0, pow(5,-2), 1)T(0,)
+tau ~  dgamma(0.1,0.1)
 e1 ~  dnorm(0,0.1)T(0,)
-ex ~  dnorm(0,0.1)T(0,)
-
-rf ~  dnorm(5,pow(0.1,-2))T(0,)
-ri ~  dnorm(6,pow(0.1,-2))T(0,)
-
-
 gin ~  dnorm(0,pow(0.5,-2))T(0,)
 gout ~ dnorm(0,pow(0.5,-2))T(0,)
-
-
-
 
 }"
 
@@ -168,18 +112,18 @@ inits <- function () { list(e1 = runif(1,0.01,10),gout=runif(1,0.01,10),gin=runi
 
 # JAGS model with R2Jags;
 Normfit <- run.jags(data = model.data,
+                adapt = 30000,
                 inits = inits,
-                adapt = 5000,
-                method="rjags",
-                monitor = c("e1","ex", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+                method ="rjags",
+                monitor = c("e1", "gin", "gout","tau"),
                 model  = Model,
                 thin = 50,
-                n.chains = 4,
-                burnin = 15000,
-                sample = 30000)
+                burnin = 1000,
+                sample = 2000,
+                n.chains = 3)
+plot(Normfit, layout=c(3,4))
 
-
-jagsresults(x = Normfit , params = c("e1","ex", "gin", "gout","scale","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit , params = c("e1", "gin", "gout","tau"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 RSS <- as.matrix(as.mcmc(Normfit)[,c("RSS")])
 rss0 <- function(x) crossprod(x-mean(x))[1]
