@@ -78,7 +78,7 @@ inits <- list(e1 = runif(1,0.01,1),gout=runif(1,0.01,1),gin=runif(1,0.01,1))
 Rmodel <- nimbleModel(model,data = model.data, inits = inits)
 mcmcConf <- configureMCMC(Rmodel, monitors = c("e1", "gin", "gout","sd"))
 mcmc_CL <- buildMCMC(mcmcConf)
-samplesList <- runMCMC(mcmc_CL, niter = 1000, nchains = 3, inits = inits)
+samplesList <- runMCMC(mcmc_CL, niter = 5000, nchains = 3, inits = inits)
 
 
 Rmcmc <- buildMCMC(model)
