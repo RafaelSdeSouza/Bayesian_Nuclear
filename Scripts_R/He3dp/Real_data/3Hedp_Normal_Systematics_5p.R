@@ -86,8 +86,8 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-res[i] <- obsy[i]-sfactor3Hedp(obsx[i], e1, gin, gout,ri,rf,0)
+y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, ex, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
+res[i] <- obsy[i]-sfactor3Hedp(obsx[i], e1,ex, gin, gout,ri,rf,0)
 }
 
 RSS <- sum(res^2)
@@ -98,16 +98,16 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,0)
+mux0[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,0)
 yx0[j] ~ dnorm(mux0[j],pow(tau,-2))
 
 # No inverse Kinematics 
 
-mux1[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,ue[1])
+mux1[j] <- sfactor3Hedp(xx[j], e1, ex,gin, gout,ri,rf,ue[1])
 yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 # With inverse Kinematics 
-mux2[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,ue[2])
+mux2[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,ue[2])
 yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 }
@@ -133,7 +133,8 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 # width;
 
 tau ~  dt(0, pow(5,-2), 1)T(0,)
-e1 ~  dnorm(0,2)T(0,)
+e1 ~  dnorm(0,0.1)T(0,)
+ex ~  dnorm(0,0.1)T(0,)
 
 rf ~  dnorm(5,5)T(0,)
 ri ~  dnorm(5,5)T(0,)
@@ -172,11 +173,22 @@ Normfit <- jags(data = model.data,
                 parameters.to.save  = c("e1", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
                 model.file  = textConnection(Model),
                 n.thin = 5,
+                adapt=10000,
                 n.chains = 3,
-                n.burnin = 20000,
+                n.burnin = 10000,
                 n.iter = 30000)
 
-
+# JAGS model with R2Jags;
+require(runjags)
+Normfit <- run.jags(data = model.data,
+                inits = inits,
+                monitor  = c("e1", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+                model  = Model,
+                thin = 5,
+                adapt=10000,
+                n.chains = 3,
+                burnin = 10000,
+                sample = 30000)
 
 
 jagsresults(x = Normfit , params = c("e1", "gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
