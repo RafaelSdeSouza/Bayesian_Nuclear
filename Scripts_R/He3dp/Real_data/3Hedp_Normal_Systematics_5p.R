@@ -170,10 +170,9 @@ inits <- function () { list(e1 = runif(1,0.15,1),gout=runif(1,0.01,10),gin=runif
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("e1", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+                parameters.to.save  = c("e1", "ex","gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
                 model.file  = textConnection(Model),
                 n.thin = 5,
-                adapt=10000,
                 n.chains = 3,
                 n.burnin = 10000,
                 n.iter = 30000)
