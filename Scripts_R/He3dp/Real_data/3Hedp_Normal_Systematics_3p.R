@@ -87,8 +87,8 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-res[i] <- obsy[i]-sfactor3Hedp(obsx[i], e1, gin, gout,ri,rf,0)
+y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1,ex, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
+res[i] <- obsy[i]-sfactor3Hedp(obsx[i], e1,ex,  gin, gout,ri,rf,0)
 }
 
 RSS <- sum(res^2)
@@ -99,16 +99,16 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,0)
+mux0[j] <- sfactor3Hedp(xx[j], e1,ex,  gin, gout,ri,rf,0)
 yx0[j] ~ dnorm(mux0[j],pow(tau,-2))
 
 # No inverse Kinematics 
 
-mux1[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,ue[1])
+mux1[j] <- sfactor3Hedp(xx[j], e1, ex, gin, gout,ri,rf,ue[1])
 yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 # With inverse Kinematics 
-mux2[j] <- sfactor3Hedp(xx[j], e1, gin, gout,ri,rf,ue[2])
+mux2[j] <- sfactor3Hedp(xx[j], e1,ex,  gin, gout,ri,rf,ue[2])
 yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 }
@@ -134,17 +134,14 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 # width;
 
 tau ~  dt(0, pow(5,-2), 1)T(0,)
-e1 ~  dnorm(0,2)T(0,)
-
+e1 ~  dnorm(0,0.1)T(0,)
+ex ~  dnorm(0,0.1)T(0,)
 #rf ~  dnorm(5,5)T(0,)
 #ri ~  dnorm(5,5)T(0,)
 
-
+#
 gin ~  dnorm(2,2.5)T(0,)
 gout ~ dnorm(0,2.5)T(0,)
-
-
-
 
 }"
 
@@ -161,24 +158,41 @@ gout ~ dnorm(0,2.5)T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.15,1),gout=runif(1,0.01,10),gin=runif(1,0.01,10)) }
+inits <- function () { list(e1 = runif(1,0.1,1),ex = runif(1,0.1,5),gout=runif(1,0.01,10),gin=runif(1,0.01,10)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
 
 
 # JAGS model with R2Jags;
+
+
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("e1", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+                parameters.to.save  = c("e1","ex", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
                 model.file  = textConnection(Model),
-                n.thin = 5,
-                n.chains = 3,
-                n.burnin = 3000,
-                n.iter = 6000)
+                n.thin = 1,
+                n.chains = 4,
+                n.burnin = 5000,
+                n.iter = 10000)
 
 
-jagsresults(x = Normfit , params = c("e1", "gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+
+#Normfit <- run.jags(data = model.data,
+#                inits = inits,
+#                monitor  = c("e1","ex", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+#                model  = Model,
+#                thin = 1,
+#                n.chains = 4,
+#                adapt = 10000,
+#                burnin = 5000,
+#                sample = 10000)
+
+
+
+
+jagsresults(x = Normfit , params = c("e1","ex", "gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 RSS <- as.matrix(as.mcmc(Normfit)[,c("RSS")])
 rss0 <- function(x) crossprod(x-mean(x))[1]
@@ -190,7 +204,7 @@ div_style <- parcoord_style_np(div_color = "green", div_size = 0.05, div_alpha =
 mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout","ri","rf"))
 
 
-traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
+traplot(Normfit  ,c("e1","ex", "gin", "gout"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
