@@ -133,8 +133,8 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 # width;
 
 tau ~  dt(0, pow(5,-2), 1)T(0,)
-e1 ~  dnorm(0,0.1)T(0,)
-ex ~  dnorm(0,0.1)T(0,)
+e1 ~  dt(0, pow(5,-2), 1)T(0,)
+ex ~  dt(0, pow(5,-2), 1)T(0,)
 
 rf ~  dnorm(5,5)T(0,)
 ri ~  dnorm(5,5)T(0,)
@@ -190,7 +190,7 @@ Normfit <- run.jags(data = model.data,
                 sample = 30000)
 
 
-jagsresults(x = Normfit , params = c("e1", "gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 PR_gin <- rtruncnorm(6000, a=0, b=Inf, mean = 1, sd = 0.25)
@@ -219,7 +219,7 @@ div_style <- parcoord_style_np(div_color = "green", div_size = 0.05, div_alpha =
 mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout","ri","rf"))
 
 
-traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
+traplot(Normfit  ,c("e1", "ex","gin", "gout","ue","tau","ri","rf"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
