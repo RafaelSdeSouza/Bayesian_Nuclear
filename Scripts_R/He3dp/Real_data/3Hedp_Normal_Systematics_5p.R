@@ -132,9 +132,9 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 # resonance energy, initial reduced width, final reduced
 # width;
 
-tau ~  dt(0, pow(5,-2), 1)T(0,)
-e1 ~  dt(0, pow(5,-2), 1)T(0,)
-ex ~  dt(0, pow(5,-2), 1)T(0,)
+tau ~  dt(0, pow(2.5,-2), 1)T(0,)
+e1 ~  dt(0, pow(2.5,-2), 1)T(0,)
+ex ~  dt(0, pow(2.5,-2), 1)T(0,)
 
 rf ~  dnorm(5,5)T(0,)
 ri ~  dnorm(5,5)T(0,)
@@ -161,7 +161,7 @@ gout ~ dnorm(0,pow(0.05,-2))T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.15,1),gout=runif(1,0.01,10),gin=runif(1,0.01,10)) }
+inits <- function () { list(ex = runif(1,0.1,5),e1 = runif(1,0.1,5),gout=runif(1,0.01,10),gin=runif(1,0.01,10)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -172,22 +172,22 @@ Normfit <- jags(data = model.data,
                 inits = inits,
                 parameters.to.save  = c("e1", "ex","gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
                 model.file  = textConnection(Model),
-                n.thin = 5,
+                n.thin = 1,
                 n.chains = 3,
-                n.burnin = 10000,
-                n.iter = 30000)
+                n.burnin = 15000,
+                n.iter = 20000)
 
 # JAGS model with R2Jags;
 require(runjags)
 Normfit <- run.jags(data = model.data,
                 inits = inits,
-                monitor  = c("e1", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+                monitor  = c("e1","ex", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
                 model  = Model,
-                thin = 5,
-                adapt=10000,
+                thin = 1,
+                adapt=15000,
                 n.chains = 3,
-                burnin = 10000,
-                sample = 30000)
+                burnin = 5000,
+                sample = 20000)
 
 
 jagsresults(x = Normfit , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
