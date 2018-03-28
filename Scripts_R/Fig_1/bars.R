@@ -29,7 +29,8 @@ df1 <- data.frame(
   lower = c(0.0002, 0.05, 0.03, 0.26,0.0040,0.04,0,0.28)
 )
 
-labels <- c("4He" = "4He", "D" = "D/H", "3He" = "3He/H","7Li" = "7Li/H")
+#labels <- c("4He" = "4He", "D" = "D/H", "3He" = "3He/H","7Li" = "7Li/H")
+labels <- c("4He" = "", "D" = "", "3He" = "","7Li" = "")
 
 
 
@@ -38,18 +39,27 @@ dodge <- position_dodge(width=0.35)
 
 df1$group <- factor(df1$group, levels = c("pred", "obs"))
 
+require(ggthemr)
+ggthemr_reset()
+ggthemr('fresh', type = 'inner')
+darken_swatch(amount = 0.3)
+
+
 
 pdf("abunda.pdf",height = 5,width = 7)
- ggplot(df1, aes(x=iso,y=resp,group=group, colour = group)) +
-  geom_errorbar(aes(ymin = resp-lower, ymax = resp+upper), width = 0.35,
-                position = dodge,size=1.25) +
+ ggplot(df1, aes(x=iso,y=resp,group=group, colour = group,fill=group)) +
+#   geom_bar(stat="identity", position="dodge") +  
+   geom_errorbar(aes(ymin = resp-lower, ymax = resp+upper), width = 0.35,
+                 position = dodge,size=1.25) +
   geom_point(position = dodge,aes(size=seg)) +
    scale_size_manual(values=c(3,0))+
-   scale_color_manual(name="",values=c("#e41a1c","#377eb8")) +
-  facet_wrap(~iso,scales = "free",labeller=labeller(iso = labels,label_parsed)) +
-  xlab("")  + theme_rafa() +
+   scale_color_manual(name="",values=c("#143054","#805715")) +
+   scale_fill_manual(name="",values=c("#143054","#805715")) +
+  facet_wrap(~iso,scales = "free",labeller = labeller(iso = labels,label_parsed)) +
+  xlab("")  + 
+ # theme_rafa() +
   ylab("") +  
-  theme(axis.text.x = element_blank(),legend.position = "none")  
+  theme(axis.text.x = element_blank(),legend.position = "none") 
 dev.off()
 
 
