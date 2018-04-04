@@ -493,7 +493,7 @@ dev.off()
 
 cmb <- as.data.frame(filter(gg, x <= 1.05 & x >= 0.95))
 cmbhist <- data.frame(x=as.numeric(cmb[1:Nsamp]))
-pdf("plot/He3dp_hist_cmb.pdf",height = 7,width = 10)
+pdf("plot/He3dp_hist_cmb.pdf",height = 7,width = 8)
 ggplot(cmbhist, aes(x)) +
   geom_histogram(aes(y=..count../sum(..count..)),bins = 15,fill="#4357a3",color="#d84951") +
   theme_bw() +
@@ -507,7 +507,7 @@ ggplot(cmbhist, aes(x)) +
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
         axis.title = element_text(color="#666666", face="bold", size=15),
-        axis.text  = element_text(size=12),
+        axis.text  = element_text(size=15),
         strip.text = element_text(size=15),
         strip.background = element_rect("#F0B27A"),panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())+
