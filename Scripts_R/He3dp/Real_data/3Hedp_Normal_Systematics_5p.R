@@ -133,16 +133,26 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 # width;
 
 tau ~  dt(0, pow(2.5,-2), 1)T(0,)
-e1 ~  dt(0, pow(2.5,-2), 1)T(0,)
-ex ~  dt(0, pow(2.5,-2), 1)T(0,)
+#e1 ~  dt(0, pow(2.5,-2), 1)T(0,)
+#ex ~  dt(0, pow(2.5,-2), 1)T(0,)
 
-rf ~  dnorm(5,5)T(0,)
-ri ~  dnorm(5,5)T(0,)
+e1 ~  dnorm(0.25,pow(0.25,-2))T(0,)
+deltaE ~ dnorm(0,pow(0.05,-2))
+ex <-  e1 
+#+ deltaE
 
 
-gin ~  dnorm(1,pow(0.25,-2))T(0,)
-gout ~ dnorm(0,pow(0.05,-2))T(0,)
+#rf ~  dnorm(4, pow(2.5,-2))T(0,)
+#ri ~  dnorm(4, pow(2.5,-2))T(0,)
 
+#rf ~  dnorm(5, pow(0.5,-2))T(3,)
+#ri ~  dnorm(5, pow(0.5,-2))T(3,)
+
+rf ~  dnorm(5, pow(0.01,-2))T(3,)
+ri ~  dnorm(5, pow(0.01,-2))T(3,)
+
+gout ~ dnorm(0,pow(0.5,-2))T(0,5)
+gin ~ dnorm(0,pow(0.5,-2))T(0,5)
 
 
 
@@ -161,7 +171,7 @@ gout ~ dnorm(0,pow(0.05,-2))T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(ex = runif(1,0.1,5),e1 = runif(1,0.1,5),gout=runif(1,0.01,10),gin=runif(1,0.01,10)) }
+inits <- function () { list(deltaE = runif(1,0.1,0.9),e1 = runif(1,0.1,0.9),gout=runif(1,0.01,0.5),gin=runif(1,0.01,0.5)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -174,20 +184,10 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 1,
                 n.chains = 3,
-                n.burnin = 15000,
-                n.iter = 20000)
+                n.burnin = 10000,
+                n.iter = 15000)
 
-# JAGS model with R2Jags;
-require(runjags)
-Normfit <- run.jags(data = model.data,
-                inits = inits,
-                monitor  = c("e1","ex", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
-                model  = Model,
-                thin = 1,
-                adapt=15000,
-                n.chains = 3,
-                burnin = 5000,
-                sample = 20000)
+
 
 
 jagsresults(x = Normfit , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
@@ -298,43 +298,31 @@ dev.off()
 
 
 
-dummy <- as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]
-
-as.matrix(dummy)
-
+#dummy <- as.mcmc(Normfit)[,c("e1","gin", "gout","ri","rf")]
 #dummy  <- as.matrix(dummy)
 
-for(i in 1:3){
-dummy[[i]][,2] <- Gamma3Hedp(dummy[[i]][,1],dummy[[i]][,2],dummy[[i]][,3],dummy[[i]][,4],dummy[[i]][,5])$Ga
-}
-for(i in 1:3){
-  dummy[[i]][,3] <- Gamma3Hedp(dummy[[i]][,1],dummy[[i]][,2],dummy[[i]][,3],dummy[[i]][,4],dummy[[i]][,5])$Gb
-}
+#for(i in 1:3){
+#dummy[[i]][,2] <- Gamma3Hedp(dummy[[i]][,1],dummy[[i]][,2],dummy[[i]][,3],dummy[[i]][,4],dummy[[i]][,5])$Ga
+##}
+#for(i in 1:3){
+#  dummy[[i]][,3] <- Gamma3Hedp(dummy[[i]][,1],dummy[[i]][,2],dummy[[i]][,3],dummy[[i]][,4],dummy[[i]][,5])$Gb
+#}
 
 
-traplot(dummy)
+#traplot(dummy)
 
-ss <- ggs(dummy)
-pair_wise_plot(ggs(dummy))
+#ss <- ggs(dummy)
+#pair_wise_plot(ggs(dummy))
 
-ggs_traceplot(ss)
+#ggs_traceplot(ss)
 
 Sp <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]) 
 
 DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")])
 
-
-
-
-Sp0 <- Sp %>% as_tibble()  %>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-
-
-
-
-
-
-
-levels(Sp0$Parameter) <- as.factor(c("E[r]","Gamma[d]", "Gamma[p]","a[c]^i","a[c]^f"))
+Sp0 <- Sp %>% as_tibble()  
+#%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
+levels(Sp0$Parameter) <- as.factor(c("E[r]","gamma[d]^2", "gamma[p]^2","a[c]^i","a[c]^f"))
 
 pdf("plot/He3dp_corr.pdf",height = 8,width =8)
 pair_wise_plot(Sp0)
@@ -470,7 +458,7 @@ for(i in 1:Nsamp){
 gg <-  as.data.frame(gdat)
 gg$x <- Tgrid
 
-gg2<-apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
+gg2 <- apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
 
 
 gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
@@ -503,16 +491,16 @@ dev.off()
 
 
 
-cmb <- as.data.frame(filter(gg, x <= 1.1 & x >= 0.9))
-
-cmbhist <- data.frame(x=as.numeric(cmb)[1:Nsamp])
+cmb <- as.data.frame(filter(gg, x <= 1.05 & x >= 0.95))
+cmbhist <- data.frame(x=as.numeric(cmb[1:Nsamp]))
+pdf("plot/He3dp_hist_cmb.pdf",height = 7,width = 10)
 ggplot(cmbhist, aes(x)) +
-  geom_histogram(aes(y=..count../sum(..count..)),bins = 10,fill="#f03b20",color="#feb24c") +
+  geom_histogram(aes(y=..count../sum(..count..)),bins = 15,fill="#4357a3",color="#d84951") +
   theme_bw() +
-#  scale_x_continuous(breaks = scales::pretty_breaks(n = 3)) +
-  scale_x_continuous(breaks=c(1.15e8,1.2e8,1.25e8),labels=c(expression(1.15%*%10^8),
-                              expression(1.20%*%10^8),expression(1.25%*%10^8))) +
-  geom_rug(sides = "b", aes(y = 0),colour = "#feb24c") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) +
+#  scale_x_continuous(breaks=c(1.15e8,1.2e8,1.25e8),labels=c(expression(1.15%*%10^8),
+ #                             expression(1.20%*%10^8),expression(1.25%*%10^8))) +
+  geom_rug(sides = "b", aes(y = 0),colour = "#d84951") +
   theme(legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
@@ -524,7 +512,7 @@ ggplot(cmbhist, aes(x)) +
         strip.background = element_rect("#F0B27A"),panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())+
   ylab("Posterior probability") + xlab(expression(N[A]~symbol("\341")*sigma*nu*symbol("\361")))
-
+dev.off()
 
 
 dens <- density(cmbhist)
