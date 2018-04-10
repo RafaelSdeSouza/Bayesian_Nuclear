@@ -68,7 +68,7 @@ M <- 500
 xx <- seq(min(obsx),max(obsx),length.out = M)
 
 model.data <- list(obsy = obsy,    # Response variable
-                   obsy2 = obsy2,    # Response variable
+                   obsy2 = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
                    erry = erry,
                    N = nrow(ensamble), # Sample size
@@ -111,7 +111,7 @@ mux0[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,0)
 
 mux0_2[j] <- sfactor3Hedp(xx[j], e1_2,ex_2, gin_2, gout_2,ri_2,rf_2,0)
 
-DeltaM[j] <- sqrt((mux0[j] - mux0_2[j])^2)
+DeltaM[j] <- (mux0[j] - mux0_2[j])/mux0[j]
 
 # No inverse Kinematics 
 
@@ -281,14 +281,15 @@ gdata02 <- data.frame(x =xx, mean = Delta_y[,"mean"],lwr1=Delta_y[,"25%"],lwr2=D
 
 
 
+pdf("plot/Delta_models.pdf",height = 7,width = 10)
 ggplot(gdata02,aes(x=x,y=mean))+
   geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
   
   
   # Delta  Bare
- geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#fdd0a2"),show.legend=FALSE)+
-  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fdae6b"),show.legend=FALSE) +
-  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#d94801"),show.legend=FALSE) +
+ geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
+  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#9e9ac8"),show.legend=FALSE) +
+  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),show.legend=FALSE) +
   
   #  Bare
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
@@ -296,8 +297,8 @@ ggplot(gdata02,aes(x=x,y=mean))+
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),alpha=0.5,show.legend=FALSE) +
   #
   #  
-  coord_cartesian(xlim=c(5e-3,0.6),ylim=c(0,1)) +
-  theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
+  coord_cartesian(xlim=c(5e-3,0.5),ylim=c(-0.075,0.075)) +
+  theme_bw() + xlab("Energy (MeV)") + ylab(expression(delta["S"])) + 
   scale_x_log10()  +
   annotation_logticks(sides = "b") +
   annotation_logticks(base=2.875,sides = "l") +
@@ -313,7 +314,7 @@ ggplot(gdata02,aes(x=x,y=mean))+
         axis.text  = element_text(size=13),
         axis.ticks = element_line(size = 0.75),
         axis.line = element_line(size = 0.5, linetype = "solid")) 
-
+dev.off()
 
 # Diagnostics overleap between prior and posterior 
 
