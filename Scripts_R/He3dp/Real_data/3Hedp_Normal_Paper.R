@@ -10,8 +10,8 @@
 #
 ######################################################################
 # preparation: remove all variables from the work space
-rm(list=ls())
-set.seed(123)
+#rm(list=ls())
+set.seed(42)
 ######################################################################
 # data input
 # format: obsx, obsy, errobsy; the latter are the individual statistical
@@ -68,6 +68,7 @@ M <- 500
 xx <- seq(min(obsx),max(obsx),length.out = M)
 
 model.data <- list(obsy = obsy,    # Response variable
+                   obsy2 = obsy2,    # Response variable
                    obsx =  obsx,   # Predictors
                    erry = erry,
                    N = nrow(ensamble), # Sample size
@@ -85,23 +86,32 @@ model.data <- list(obsy = obsy,    # Response variable
 # Conversative case
 ######################################################################
 Model <- "model{
-# LIKELIHOOD
+# LIKELIHOOD informative
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
 y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, ex, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
 res[i] <- obsy[i]-sfactor3Hedp(obsx[i], e1,ex, gin, gout,ri,rf,0)
 }
 
+
+# LIKELIHOOD broad 
+for (i in 1:N) {
+obsy2[i] ~ dnorm(y_2[i], pow(erry[i], -2))
+y_2[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1_2, ex_2, gin_2, gout_2,ri_2,rf_2,ue[ik[i]]),pow(tau_2, -2))
+}
 RSS <- sum(res^2)
 
 # Predicted values
-
 for (j in 1:M){
 
 # Bare...
 
 mux0[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,0)
-yx0[j] ~ dnorm(mux0[j],pow(tau,-2))
+
+
+mux0_2[j] <- sfactor3Hedp(xx[j], e1_2,ex_2, gin_2, gout_2,ri_2,rf_2,0)
+
+DeltaM[j] <- sqrt((mux0[j] - mux0_2[j])^2)
 
 # No inverse Kinematics 
 
@@ -116,6 +126,9 @@ yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 
 
+
+
+
 for (k in 1:Nre){
 scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 }
@@ -125,47 +138,25 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 }
 
 
-# PRIORS
-# Wigner limit: wl = hbar^2/(m_red a_c^2) = 41.80159/(M_red a_c^2)
-#
-# deuteron channel: wl_d = 41.80159/(1.207357 a_c^2) = 34.6224/a_c^2
-# neutron channel:  wl_n = 41.80159/(0.805597 a_c^2) = 51.8889/a_c^2
-# e1, gin, gout are defined as in tdn.f (by Alain Coc):
-# resonance energy, initial reduced width, final reduced
-# width;
+# PRIORS 1
 
-tau ~  dt(0, pow(2.5,-2), 1)T(0,)
-#e1 ~  dt(0, pow(2.5,-2), 1)T(0,)
-#ex ~  dt(0, pow(2.5,-2), 1)T(0,)
-
-#e1 ~  dnorm(0.25,pow(0.25,-2))T(0,)
-#gin ~  dnorm(2.5,pow(0.25,-2))T(0,5)
-#gout ~ dnorm(0.5,pow(0.25,-2))T(0,5)
-
-
+tau ~  dunif(0.01,5)
 e1 ~  dunif(0,5)
+ex <-  e1 
 gin ~  dunif(0,5)
 gout ~ dunif(0,5)
-
-
-#deltaE ~ dnorm(0,pow(0.05,-2))
-ex <-  e1 
-#+ deltaE
-
-
-#rf ~  dnorm(4, pow(2.5,-2))T(0,)
-#ri ~  dnorm(4, pow(2.5,-2))T(0,)
-
-#rf ~  dnorm(5, pow(0.5,-2))T(3,)
-#ri ~  dnorm(5, pow(0.5,-2))T(3,)
-
 rf ~  dnorm(5, pow(0.1,-2))T(0,)
 ri ~  dnorm(5, pow(0.1,-2))T(0,)
 
+tau_2 ~ dunif(0.01,5)
+e1_2  ~  dunif(0,5)
+ex_2  ~   dunif(0,5)
+gin_2 ~  dunif(0,20)
+gout_2 ~ dunif(0,20)
+rf_2 ~  dunif(0,50)
+ri_2 ~  dunif(0,50)
 
-#gin ~ dnorm(gout,pow(1,-2))T(0,5)
 
-#gout ~ dbeta(0.5,0.5)
 
 }"
 
@@ -182,7 +173,7 @@ ri ~  dnorm(5, pow(0.1,-2))T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(deltaE = runif(1,0.1,0.9),e1 = runif(1,0.35,2),gout=runif(1,0.01,0.5),gin=runif(1,0.5,3)) }
+inits <- function () { list(e1 = runif(1,0.35,2),gout=runif(1,0.01,0.5),gin=runif(1,0.5,3)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -191,15 +182,19 @@ inits <- function () { list(deltaE = runif(1,0.1,0.9),e1 = runif(1,0.35,2),gout=
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("e1", "ex","gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+                parameters.to.save  = c("e1","gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale","DeltaM",
+                                        "e1_2","gin_2", "gout_2","tau_2","ri_2","rf_2" ),
                 model.file  = textConnection(Model),
                 n.thin = 1,
                 n.chains = 3,
-                n.burnin = 25000,
-                n.iter = 50000)
+                n.burnin = 10000,
+                n.iter = 20000)
 
 
 jagsresults(x = Normfit , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+jagsresults(x = Normfit , params = c("e1_2","gin_2", "gout_2","tau_2","ri_2","rf_2"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
 
 # Plot
 
@@ -279,148 +274,29 @@ dev.off()
 
 
 
+Delta_y <- jagsresults(x=Normfit , params=c('DeltaM'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+gdata02 <- data.frame(x =xx, mean = Delta_y[,"mean"],lwr1=Delta_y[,"25%"],lwr2=Delta_y[,"2.5%"],
+                      lwr3=Delta_y[,"0.5%"],upr1=Delta_y[,"75%"],
+                     upr2=Delta_y[,"97.5%"],upr3=Delta_y[,"99.5%"])
 
 
 
-# Conversative case
-######################################################################
-Model2 <- "model{
-# LIKELIHOOD
-for (i in 1:N) {
-obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, ex, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-res[i] <- obsy[i]-sfactor3Hedp(obsx[i], e1,ex, gin, gout,ri,rf,0)
-}
-
-RSS <- sum(res^2)
-
-# Predicted values
-
-for (j in 1:M){
-
-# Bare...
-
-mux0[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,0)
-yx0[j] ~ dnorm(mux0[j],pow(tau,-2))
-
-# No inverse Kinematics 
-
-mux1[j] <- sfactor3Hedp(xx[j], e1, ex,gin, gout,ri,rf,ue[1])
-yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
-
-# With inverse Kinematics 
-mux2[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,ue[2])
-yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
-
-}
-
-
-
-for (k in 1:Nre){
-scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
-}
-
-for (z in 1:Nik){
-ue[z] ~ dnorm(0,1e3)T(0,)
-}
-
-
-# PRIORS
-# Wigner limit: wl = hbar^2/(m_red a_c^2) = 41.80159/(M_red a_c^2)
-#
-# deuteron channel: wl_d = 41.80159/(1.207357 a_c^2) = 34.6224/a_c^2
-# neutron channel:  wl_n = 41.80159/(0.805597 a_c^2) = 51.8889/a_c^2
-# e1, gin, gout are defined as in tdn.f (by Alain Coc):
-# resonance energy, initial reduced width, final reduced
-# width;
-
-tau ~  dt(0, pow(2.5,-2), 1)T(0,)
-e1 ~  dunif(0,5)
-ex <- e1
-gin ~  dunif(0,10)
-gout ~ dunif(0,10)
-rf ~  dunif(0,50)
-ri ~  dunif(0,50)
-
-}"
-
-
-######################################################################
-# n.adapt:  number of iterations in the chain for adaptation (n.adapt)
-#           [JAGS will use to choose the sampler and to assure optimum
-#           mixing of the MCMC chain; will be discarded]
-# n.udpate: number of iterations for burnin; these will be discarded to
-#           allow the chain to converge before iterations are stored
-# n.iter:   number of iterations to store in the final chain as samples
-#           from the posterior distribution
-# n.chains: number of mcmc chains
-# n.thin:   store every n.thin element [=1 keeps all samples]
-
-
-inits <- function () { list(ex = runif(1,0.1,2),e1 = runif(1,0.35,2),gout=runif(1,0.01,0.5),gin=runif(1,0.5,3)) }
-# "f": is the model specification from above;
-# data = list(...): define all data elements that are referenced in the
-
-
-
-# JAGS model with R2Jags;
-Normfit2 <- jags(data = model.data,
-                inits = inits,
-                parameters.to.save  = c("e1", "ex","gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
-                model.file  = textConnection(Model2),
-                n.thin = 1,
-                n.chains = 3,
-                n.burnin = 10000,
-                n.iter = 20000)
-
-
-jagsresults(x = Normfit2 , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
-
-# Plot
-
-y02 <- jagsresults(x=Normfit2 , params=c('mux0'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
-gdata02 <- data.frame(x =xx, mean = y02[,"mean"],lwr1=y0[,"25%"],lwr2=y02[,"2.5%"],lwr3=y02[,"0.5%"],upr1=y02[,"75%"],
-                     upr2=y02[,"97.5%"],upr3=y02[,"99.5%"])
-
-
-
- gdata0$case <- "Case 1"
- gdata02$case <- "Case 2"
- N1 <- filter(gdata0,x>=0.1998 & x<=0.201)
- N2 <- filter(gdata02,x>=0.1998 & x<=0.201)
- 
- ROPE0 <- rbind(N1,N2)
-
- 
-  d1 <-  density(ROPE0[,2])
- d2 <-    density(ROPE0[,3])
- plot(range(d1$x, d2$x), range(d1$y, d2$y), type = "n", xlab = "x",
-      ylab = "Density")
- lines(d1, col = "red")
- lines(d2, col = "blue")
- 
-ROPE <- data.frame(x=gdata0$x, delta=(gdata0$mean-gdata02$mean)/(gdata0$mean))
-#%>% filter(.,x>=0.1998 & x<=0.201)
-
-
-
-
-ggplot(gobs,aes(x=obsx,y=obsy))+
+ggplot(gdata02,aes(x=x,y=mean))+
   geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
   
   
-  #  Bare
- # geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#fdd0a2"),show.legend=FALSE)+
-#  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fdae6b"),show.legend=FALSE) +
+  # Delta  Bare
+ geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#fdd0a2"),show.legend=FALSE)+
+  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fdae6b"),show.legend=FALSE) +
   geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#d94801"),show.legend=FALSE) +
   
   #  Bare
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#9e9ac8"),show.legend=FALSE) +
-  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),alpha=0.5,show.legend=FALSE) +
+#  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),alpha=0.5,show.legend=FALSE) +
   #
   #  
-  coord_cartesian(xlim=c(5e-3,0.6),ylim=c(0.5,19)) +
+  coord_cartesian(xlim=c(5e-3,0.6),ylim=c(0,1)) +
   theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
   scale_x_log10()  +
   annotation_logticks(sides = "b") +
@@ -494,6 +370,8 @@ traplot(Normfit  ,c("e1","gin", "gout","ue"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
+
+denplot(Normfit  ,c("e1_2","gin_2", "gout_2"),style="plain")
 
 
 
