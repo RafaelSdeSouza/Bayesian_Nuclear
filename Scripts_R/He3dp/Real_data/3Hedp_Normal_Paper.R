@@ -187,8 +187,8 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 1,
                 n.chains = 3,
-                n.burnin = 10000,
-                n.iter = 20000)
+                n.burnin = 20000,
+                n.iter = 40000)
 
 
 jagsresults(x = Normfit , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
@@ -297,7 +297,7 @@ ggplot(gdata02,aes(x=x,y=mean))+
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),alpha=0.5,show.legend=FALSE) +
   #
   #  
-  coord_cartesian(xlim=c(5e-3,0.5),ylim=c(-0.075,0.075)) +
+  coord_cartesian(xlim=c(5e-3,0.35),ylim=c(-0.075,0.075)) +
   theme_bw() + xlab("Energy (MeV)") + ylab(expression(delta["S"])) + 
   scale_x_log10()  +
   annotation_logticks(sides = "b") +
@@ -315,6 +315,14 @@ ggplot(gdata02,aes(x=x,y=mean))+
         axis.ticks = element_line(size = 0.75),
         axis.line = element_line(size = 0.5, linetype = "solid")) 
 dev.off()
+
+
+
+
+
+
+
+
 
 # Diagnostics overleap between prior and posterior 
 
@@ -538,12 +546,19 @@ for(i in 1:Nsamp){
 gg <-  as.data.frame(gdat)
 gg$x <- Tgrid
 
+
+
+
+
 gg2 <- apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
 
 
 gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
                       lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
                       upr2=gg2["97.5%",],upr3=gg2["99.5%",])
+
+
+xtable(gg2data[,c(1,2,3,6)] , type = "latex",display= "E")
 
 write.csv(gg2data,"NV.csv",row.names = F)
 
@@ -571,11 +586,12 @@ dev.off()
 
 
 
-cmb <- as.data.frame(filter(gg, x <= 1.05 & x >= 0.95))
+cmb <- as.data.frame(filter(gg, x <= 0.105 & x >= 0.095))
 cmbhist <- data.frame(x=as.numeric(cmb[1:Nsamp]))
 pdf("plot/He3dp_hist_cmb.pdf",height = 7,width = 8)
 ggplot(cmbhist, aes(x)) +
-  geom_histogram(aes(y=..count../sum(..count..)),bins = 15,fill="#4357a3",color="#d84951") +
+#  geom_histogram(aes(y=..count../sum(..count..)),bins = 15,fill="#4357a3",color="#d84951") +
+  geom_density(fill="#4357a3",color="#d84951") +
   theme_bw() +
   scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) +
 #  scale_x_continuous(breaks=c(1.15e8,1.2e8,1.25e8),labels=c(expression(1.15%*%10^8),
