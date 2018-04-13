@@ -14,7 +14,7 @@ likelihood <- function(param){
   er = param[1]
   gi = param[2]
   gf = param[3]
-  LL = -sum(dnorm(y, mean=sfactorTdn(x,er,gi,gf),sd=sigma,log=T)) 
+  LL = -sum(dnorm(y, mean=sfactorTdn(x,er,gi,gf),sd=1,log=T)) 
   return(-LL)
 }
 
@@ -24,8 +24,8 @@ LK2 <- function(x1,x2) {return(
 
 
 
-x1 <-  seq(0.001, 3.5, by = 0.01)
-x2 <-  seq(0.001, 0.2, by = 0.01)
+x1 <-  seq(0.001, 5, length.out = 100)
+x2 <-  seq(0.001, 2, length.out = 100)
 
 slopevalues <- function(x1,x2){return(likelihood(c(0.0912,x1,x2)))}
 slopevalues <- Vectorize(slopevalues)
