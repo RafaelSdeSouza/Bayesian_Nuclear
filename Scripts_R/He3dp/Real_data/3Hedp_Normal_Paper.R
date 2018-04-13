@@ -558,7 +558,7 @@ gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
                       upr2=gg2["97.5%",],upr3=gg2["99.5%",])
 
 
-xtable(gg2data[,c(1,2,3,6)] , type = "latex",display= "E")
+#xtable(gg2data[,c(1,2,3,6)] , type = "latex",display= "E")
 
 write.csv(gg2data,"NV.csv",row.names = F)
 
