@@ -35,9 +35,9 @@ Model <- function(parm, Data)
   sigma <- interval(parm[Data$pos.sigma], 1e-100, Inf)
   parm[Data$pos.sigma] <- sigma 
   ### Log(Prior Densities)
-  Er.prior <- dgamma(sigma, 5, log=TRUE)
-  gi.prior <- dgamma(sigma, 5, log=TRUE)
-  gf.prior <- dgamma(sigma, 5, log=TRUE)
+  Er.prior <- dunif(Er,0, 10, log=TRUE)
+  gi.prior <- dunif(gi,0, 10, log=TRUE)
+  gf.prior <- dunif(gf,0, 5, log=TRUE)
   sigma.prior <- dhalfcauchy(sigma, 5, log=TRUE)
   ### Log-Likelihood
   mu <- Sfactor3(obsx1,Er,0.0912,gi,gf,6,5,0)
@@ -59,3 +59,11 @@ Fit <- LaplaceApproximation(Model, Initial.Values, Data=MyData,
 print(Fit)
 
 
+Fit <- LaplacesDemon(Model, Data=MyData, Initial.Values,
+                     Iterations=5000, Status=100, Thinning=1,
+                     Algorithm="HMC", Specs=list(epsilon=0.001, L=2, m=NULL))
+
+Fit <- LaplacesDemon(Model, Data=MyData, Initial.Values,
+     Covar=NULL, Iterations=3000, Status=100, Thinning=1,
+     Algorithm="RAM", Specs=list(alpha.star=0.234, B=NULL, Dist="N",
+     gamma=0.66, n=0))
