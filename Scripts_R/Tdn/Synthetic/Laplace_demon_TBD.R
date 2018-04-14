@@ -57,7 +57,7 @@ Fit <- LaplaceApproximation(Model, Initial.Values, Data=MyData,
                             Iterations=10000, Method="NM", CPUs=1)
 
 print(Fit)
-
+plot(BMK.Diagnostic(Fit))
 
 Fit <- LaplacesDemon(Model, Data=MyData, Initial.Values,
                      Iterations=5000, Status=100, Thinning=1,
