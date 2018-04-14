@@ -1,6 +1,6 @@
 library(LaplacesDemon)
 require(gsl)
-
+source("Sfactor3.R")
 N <- 150
 
 #obsx1 <- runif(N,0,0.7)
@@ -50,11 +50,12 @@ Model <- function(parm, Data)
 }
 
 
-Initial.Values <- rep(1,4)
+Initial.Values <- rep(0.5,4)
 ########################  Laplace Approximation  ##########################
 
 Fit <- LaplaceApproximation(Model, Initial.Values, Data=MyData,
-                            Iterations=5000, Method="NM", CPUs=1)
-Fit
+                            Iterations=10000, Method="NM", CPUs=1)
+
+print(Fit)
 
 
