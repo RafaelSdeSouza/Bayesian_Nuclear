@@ -37,7 +37,7 @@ Model <- function(parm, Data)
   ### Log(Prior Densities)
   Er.prior <- dunif(Er,0, 10, log=TRUE)
   gi.prior <- dunif(gi,0, 10, log=TRUE)
-  gf.prior <- dunif(gf,0, 5, log=TRUE)
+  gf.prior <- dunif(gf,0, 10, log=TRUE)
   sigma.prior <- dhalfcauchy(sigma, 5, log=TRUE)
   ### Log-Likelihood
   mu <- Sfactor3(obsx1,Er,0.0912,gi,gf,6,5,0)
@@ -50,13 +50,17 @@ Model <- function(parm, Data)
 }
 
 
-Initial.Values <- rep(0.5,4)
+Initial.Values <- rep(runif(4,0,1))
 ########################  Laplace Approximation  ##########################
 
 Fit <- LaplaceApproximation(Model, Initial.Values, Data=MyData,
                             Iterations=10000, Method="NM", CPUs=1)
 
 print(Fit)
+
+
+
+
 plot(BMK.Diagnostic(Fit))
 
 Fit <- LaplacesDemon(Model, Data=MyData, Initial.Values,
