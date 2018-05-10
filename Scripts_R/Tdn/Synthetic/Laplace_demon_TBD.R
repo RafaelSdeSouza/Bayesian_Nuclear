@@ -1,13 +1,13 @@
 library(LaplacesDemon)
+require(nuclear)
 require(gsl)
-source("Sfactor3.R")
-N <- 150
+N <- 200
 
 #obsx1 <- runif(N,0,0.7)
 obsx1 <- exp(runif(N,log(1e-3),log(1)))
 sd <- 1
 # Artificial values, here we will just fit 3 parameters Er, gi, gf
-y <- rnorm(N, Sfactor3(obsx1,0.0912,0.0912,2.93,0.0794,6,5,0),sd = sd)
+y <- rnorm(N, sfactorTdn_5p(obsx1,0.0912,2.93,0.0794,6,5),sd = sd)
 
 mon.names <- c("LP","Er","gi","gf")
 parm.names <- c("Er","gi","gf","sigma")
@@ -29,18 +29,18 @@ MyData <- list(J=4, PGF=PGF, X=obsx1, mon.names=mon.names,
 Model <- function(parm, Data)
 {
   ### Parameters
-  Er <- parm[Data$pos.Er]
+  Er <- interval(parm[Data$pos.Er], 1e-100, Inf)
   gi <- parm[Data$pos.gi]
   gf <- parm[Data$pos.gf]
   sigma <- interval(parm[Data$pos.sigma], 1e-100, Inf)
   parm[Data$pos.sigma] <- sigma 
   ### Log(Prior Densities)
-  Er.prior <- dunif(Er,0, 10, log=TRUE)
-  gi.prior <- dunif(gi,0, 10, log=TRUE)
-  gf.prior <- dunif(gf,0, 10, log=TRUE)
+  Er.prior <- dhalfcauchy(sigma, 5, log=TRUE)
+  gi.prior <- dhalfcauchy(sigma, 5, log=TRUE)
+  gf.prior <- dhalfcauchy(sigma, 5, log=TRUE)
   sigma.prior <- dhalfcauchy(sigma, 5, log=TRUE)
   ### Log-Likelihood
-  mu <- Sfactor3(obsx1,Er,0.0912,gi,gf,6,5,0)
+  mu <- sfactorTdn_5p(obsx1,Er,gi,gf,6,5)
   LL <- sum(dnorm(y, mu, sigma, log=TRUE))
   LP <- LL + Er.prior + gi.prior + gf.prior + sigma.prior
   Modelout <- list(LP=LP, Dev=-2*LL, Monitor = c(LP, Er,gi,gf),
@@ -49,25 +49,37 @@ Model <- function(parm, Data)
   return(Modelout)
 }
 
+library(compiler)
+Model <- cmpfun(Model) 
 
-Initial.Values <- rep(runif(4,0,1))
+Initial.Values <- rep(runif(4,0.001,1))
 ########################  Laplace Approximation  ##########################
 
-Fit <- LaplaceApproximation(Model, Initial.Values, Data=MyData,
-                            Iterations=10000, Method="NM", CPUs=1)
 
-print(Fit)
+FitLA <- LaplaceApproximation(Model, Data=MyData, Initial.Values, 
+                         Iterations=20000)
+
+plot(FitLA, MyData, PDF=FALSE)
+caterpillar.plot(FitLA, Parms=c("Er","gi","gf"))
+
+FitAFSS <- LaplacesDemon(Model, Data=MyData, Initial.Values,Chains=2, 
+                    Iterations=20000, Status=100, Thinning=10,
+                     Algorithm="AFSS", Specs=list(A=Inf, B=NULL, m=100, n=0, w=1))
+
+plot(FitAFSS, BurnIn=10000, MyData,  Parms=c("Er","gi","gf","sigma"))
 
 
+FitMWG <- LaplacesDemon(Model, Data=MyData, Initial.Values,
+                          Covar=NULL, Iterations=20000, Status=100, Thinning=1,
+                          Algorithm="MWG", Specs=list(B=NULL))
+                     
+plot(FitMWG, BurnIn=1000, MyData, PDF=FALSE, Parms=c("Er","gi","gf","sigma"))
 
 
-plot(BMK.Diagnostic(Fit))
+FitHARM <- LaplacesDemon(Model, Data=MyData, Initial.Values,
+                        Covar=NULL, Iterations=20000, Status=100, Thinning=1,
+                        Algorithm="HARM")
 
-Fit <- LaplacesDemon(Model, Data=MyData, Initial.Values,
-                     Iterations=5000, Status=100, Thinning=1,
-                     Algorithm="HMC", Specs=list(epsilon=0.001, L=2, m=NULL))
+plot(FitHARM, BurnIn=1000, MyData, PDF=FALSE, Parms=c("Er","gi","gf","sigma"))
 
-Fit <- LaplacesDemon(Model, Data=MyData, Initial.Values,
-     Covar=NULL, Iterations=3000, Status=100, Thinning=1,
-     Algorithm="RAM", Specs=list(alpha.star=0.234, B=NULL, Dist="N",
-     gamma=0.66, n=0))
+
