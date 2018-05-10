@@ -29,15 +29,15 @@ MyData <- list(J=4, PGF=PGF, X=obsx1, mon.names=mon.names,
 Model <- function(parm, Data)
 {
   ### Parameters
-  Er <- parm[Data$pos.Er]
+  Er <- interval(parm[Data$pos.Er], 1e-100, Inf)
   gi <- parm[Data$pos.gi]
   gf <- parm[Data$pos.gf]
   sigma <- interval(parm[Data$pos.sigma], 1e-100, Inf)
   parm[Data$pos.sigma] <- sigma 
   ### Log(Prior Densities)
-  Er.prior <- dhalfnorm(Er, scale=1, log=TRUE)
-  gi.prior <- dhalfnorm(gi, scale=1, log=TRUE)
-  gf.prior <- dhalfnorm(gf, scale=1, log=TRUE)
+  Er.prior <- dhalfcauchy(sigma, 5, log=TRUE)
+  gi.prior <- dhalfcauchy(sigma, 5, log=TRUE)
+  gf.prior <- dhalfcauchy(sigma, 5, log=TRUE)
   sigma.prior <- dhalfcauchy(sigma, 5, log=TRUE)
   ### Log-Likelihood
   mu <- sfactorTdn_5p(obsx1,Er,gi,gf,6,5)
@@ -49,16 +49,24 @@ Model <- function(parm, Data)
   return(Modelout)
 }
 
+library(compiler)
+Model <- cmpfun(Model) 
 
 Initial.Values <- rep(runif(4,0.001,1))
 ########################  Laplace Approximation  ##########################
 
 
+FitLA <- LaplaceApproximation(Model, Data=MyData, Initial.Values, 
+                         Iterations=20000)
+
+plot(FitLA, MyData, PDF=FALSE)
+caterpillar.plot(FitLA, Parms=c("Er","gi","gf"))
+
 FitAFSS <- LaplacesDemon(Model, Data=MyData, Initial.Values,Chains=2, 
-                    Iterations=50000, Status=100, Thinning=10,
+                    Iterations=20000, Status=100, Thinning=10,
                      Algorithm="AFSS", Specs=list(A=Inf, B=NULL, m=100, n=0, w=1))
 
-plot(FitAFSS, BurnIn=25000, MyData, PDF=FALSE, Parms=c("Er","gi","gf","sigma"))
+plot(FitAFSS, BurnIn=10000, MyData,  Parms=c("Er","gi","gf","sigma"))
 
 
 FitMWG <- LaplacesDemon(Model, Data=MyData, Initial.Values,
@@ -66,4 +74,12 @@ FitMWG <- LaplacesDemon(Model, Data=MyData, Initial.Values,
                           Algorithm="MWG", Specs=list(B=NULL))
                      
 plot(FitMWG, BurnIn=1000, MyData, PDF=FALSE, Parms=c("Er","gi","gf","sigma"))
+
+
+FitHARM <- LaplacesDemon(Model, Data=MyData, Initial.Values,
+                        Covar=NULL, Iterations=20000, Status=100, Thinning=1,
+                        Algorithm="HARM")
+
+plot(FitHARM, BurnIn=1000, MyData, PDF=FALSE, Parms=c("Er","gi","gf","sigma"))
+
 
