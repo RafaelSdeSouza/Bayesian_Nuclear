@@ -570,12 +570,12 @@ apply(gg, 1, sln)
 #                      lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
 #                      upr2=gg2["97.5%",],upr3=gg2["99.5%",])
 
-gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],sigma = (gg2["84%",]-gg2["50%",] + gg2["50%",]-gg2["16%",] )/2)
+gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lower = gg2["16%",], upper = gg2["84%",] )
 
 
 #xtable(gg2data[,c(1,2,3,6)] , type = "latex",display= "E")
 
-write.csv(gg2data,"NV.csv",row.names = F)
+write.csv(gg2data,"NV_case_I.csv",row.names = F)
 
  
 
