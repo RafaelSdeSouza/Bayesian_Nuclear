@@ -560,20 +560,20 @@ gg$x <- Tgrid
 
 #gg2 <- apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
 
-gg2 <- apply(gg, 1, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
+gg2 <- apply(gg[,1:5000], 1, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
 
-sln <- function(x){sqrt(log(1+var(x)/mean(x)^2))}       
+fu <- function(x){exp(sqrt(log(1+var(x)/mean(x)^2)))}       
 
-apply(gg, 1, sln)
+fu_I<-apply(gg[,1:5000], 1, fu)
 
 #gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
 #                      lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
 #                      upr2=gg2["97.5%",],upr3=gg2["99.5%",])
 
 gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lower = gg2["16%",], upper = gg2["84%",] )
+gg2data$fu <- fu_I
 
-
-#xtable(gg2data[,c(1,2,3,6)] , type = "latex",display= "E")
+xtable(gg2data, type = "latex",display=c("g","g","g","g","g","f"),digits=4,caption= "Case I")
 
 write.csv(gg2data,"NV_case_I.csv",row.names = F)
 
