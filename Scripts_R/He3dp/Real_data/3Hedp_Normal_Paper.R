@@ -187,13 +187,13 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 1,
                 n.chains = 3,
-                n.burnin = 20000,
-                n.iter = 40000)
+                n.burnin = 5000,
+                n.iter = 20000)
 
 
 jagsresults(x = Normfit , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
-jagsresults(x = Normfit , params = c("e1_2","gin_2", "gout_2","tau_2","ri_2","rf_2"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit , params = c("e1_2","gin_2", "gout_2","ue","tau_2","ri_2","rf_2"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 # Plot
@@ -220,7 +220,7 @@ gdata0 <- data.frame(x =xx, mean = y0[,"mean"],lwr1=y0[,"25%"],lwr2=y0[,"2.5%"],
                      upr2=y0[,"97.5%"],upr3=y0[,"99.5%"])
 
 
-pdf("plot/He3dp_syst.pdf",height = 7,width = 10)
+pdf("plot/He3dp_syst_l.pdf",height = 7,width = 10)
 ggplot(gobs,aes(x=obsx,y=obsy))+
   geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
   
@@ -251,9 +251,9 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
   scale_shape_manual(values=c(0,19,8,10,4,17,3),name="")+
   coord_cartesian(xlim=c(5e-3,0.6),ylim=c(0.5,19)) +
   theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
-  scale_x_log10()  +
-  annotation_logticks(sides = "b") +
-  annotation_logticks(base=2.875,sides = "l") +
+ # scale_x_log10()  +
+#  annotation_logticks(sides = "b") +
+ # annotation_logticks(base=2.875,sides = "l") +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = c(0.925,0.7),
@@ -333,7 +333,7 @@ PR_out <- runif( 15000, 0, 5)
 MCMCtrace(Normfit, params = 'gout', priors = PR_out, pdf = FALSE,type = "density")
 
 PR_er <- runif( 15000, 0, 5)
-MCMCplot(Normfit, params = 'e1', priors = PR_er, pdf = FALSE)
+MCMCtrace(Normfit, params = 'e1', priors = PR_er, pdf = FALSE)
 
 
 PR_ri <- rtruncnorm(6000, a=0, b=Inf, mean = 5, sd = 0.447)
