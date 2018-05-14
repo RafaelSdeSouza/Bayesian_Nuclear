@@ -173,7 +173,7 @@ ri_2 ~  dunif(0,50)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.35,2),gout=runif(1,0.01,0.5),gin=runif(1,0.5,3)) }
+inits <- function () { list(e1 = runif(1,0.3,2),gout=runif(1,0.01,1),gin=runif(1,0.5,5)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -187,8 +187,8 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 1,
                 n.chains = 3,
-                n.burnin = 20000,
-                n.iter = 40000)
+                n.burnin = 10000,
+                n.iter = 25000)
 
 
 jagsresults(x = Normfit , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
@@ -528,17 +528,23 @@ dev.off()
 
 # Reaction rates
 
-Nsamp <- 500
-mcdat <- as.data.frame(do.call(rbind, as.mcmc(Normfit)[,c("e1","gin","gout")]))
+Nsamp <- 5000
+mcdat_I <- as.data.frame(do.call(rbind, as.mcmc(Normfit)[,c("e1","gin","gout","ri","rf")]))
 
-index <- sample(1:nrow(mcdat),size=Nsamp,replace=FALSE)
-mcdat <- mcdat[index,]
-Tgrid <- exp(seq(log(1e-3),log(10),length.out =  100))
+index <- sample(1:nrow(mcdat_I ),size=Nsamp,replace=FALSE)
+mcdat <- mcdat_I [index,]
+
+Tgrid <- c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.012,
+           0.013,0.014,0.015,0.016,0.018,0.020,0.025,0.030,0.040,0.050,0.060,0.070,
+           0.080,0.090,0.100,0.110,0.120,0.130,0.140,0.150,0.160,0.180,0.200,0.250,0.300,
+           0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000,1.250,1.500,1.750,2.000,2.500,3.000,3.500,4.000,5.000,
+           6.000,7.000,8.000,9.000,10.000)
+#Tgrid <- 10^(seq(log(1e-3,10),log(10,10),length.out =  60))
 
 
 gdat <- list()
 for(i in 1:Nsamp){
-  y <- sapply(Tgrid,nuclear_rate3Hedp,ER = mcdat[i,1],gi = mcdat[i,2],gf = mcdat[i,3])
+  y <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat_I[i,1],gi = mcdat_I[i,2],gf = mcdat_I[i,3],r_i=mcdat_I[i,4],r_f=mcdat_I[i,5] )
   dd <- data.frame(y)
   gdat[[i]] <- dd
 }
@@ -550,12 +556,19 @@ gg$x <- Tgrid
 
 
 
-gg2 <- apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
+#gg2 <- apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
 
+gg2 <- apply(gg, 1, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
 
-gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
-                      lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
-                      upr2=gg2["97.5%",],upr3=gg2["99.5%",])
+sln <- function(x){sqrt(log(1+var(x)/mean(x)^2))}       
+
+apply(gg, 1, sln)
+
+#gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
+#                      lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
+#                      upr2=gg2["97.5%",],upr3=gg2["99.5%",])
+
+gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],sigma = (gg2["84%",]-gg2["50%",] + gg2["50%",]-gg2["16%",] )/2)
 
 
 #xtable(gg2data[,c(1,2,3,6)] , type = "latex",display= "E")
@@ -572,8 +585,9 @@ ggplot(gg2data,aes(x=x,y=mean))+
   geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr2, ymax=upr2,y=NULL), fill=c("#feb24c"),show.legend=FALSE) +
   geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr1, ymax=upr1,y=NULL), fill=c("#f03b20"),show.legend=FALSE) +
    xlab("Temperature (GK)") + ylab(expression(N[A]~symbol("\341")*sigma*nu*symbol("\361"))) +
- scale_y_continuous(breaks=c(0,5e7,1e8,1.5e8),labels=c(0,expression(5%*%10^7),
-                              expression(10^8),expression(1.5%*%10^8))) +
+ #scale_y_continuous(breaks=c(0,5e7,1e8,1.5e8),labels=c(0,expression(5%*%10^7),
+ #                             expression(10^8),expression(1.5%*%10^8))) +
+  scale_y_log10()+
   theme(legend.position = "none",
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "gray95"),
