@@ -187,13 +187,10 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 1,
                 n.chains = 3,
-<<<<<<< HEAD
                 n.burnin = 10000,
                 n.iter = 25000)
-=======
-                n.burnin = 5000,
-                n.iter = 20000)
->>>>>>> 395bdffbb0bc8e1b8ebb12c0d7011bf0fa37332a
+
+
 
 
 jagsresults(x = Normfit , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
@@ -256,9 +253,9 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
   scale_shape_manual(values=c(0,19,8,10,4,17,3),name="")+
   coord_cartesian(xlim=c(5e-3,0.6),ylim=c(0.5,19)) +
   theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
- # scale_x_log10()  +
-#  annotation_logticks(sides = "b") +
- # annotation_logticks(base=2.875,sides = "l") +
+ scale_x_log10()  +
+  annotation_logticks(sides = "b") +
+ annotation_logticks(base=2.875,sides = "l") +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = c(0.925,0.7),
