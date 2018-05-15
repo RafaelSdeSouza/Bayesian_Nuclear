@@ -30,6 +30,7 @@ source("..//..//auxiliar_functions/jagsresults.R")
 source("..//..//auxiliar_functions/theme_rafa.R")
 source("..//..//auxiliar_functions/pair_wise_plot.R")
 source("..//..//auxiliar_functions/Gamma3Hedp.R")
+source("..//..//auxiliar_functions/table_reaction.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
 load.module("nuclear")
@@ -150,7 +151,7 @@ ri ~  dnorm(5, pow(0.1,-2))T(0,)
 
 tau_2 ~ dunif(0.01,5)
 e1_2  ~  dunif(0,5)
-ex_2  ~   dunif(0,5)
+ex_2  <-   e1_2
 gin_2 ~  dunif(0,20)
 gout_2 ~ dunif(0,20)
 rf_2 ~  dunif(0,50)
@@ -173,7 +174,7 @@ ri_2 ~  dunif(0,50)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.3,2),gout=runif(1,0.01,1),gin=runif(1,0.5,5)) }
+inits <- function () { list(e1 = 0.36,gout=2.5,gin=0.05) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -187,15 +188,15 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 1,
                 n.chains = 3,
-                n.burnin = 10000,
-                n.iter = 25000)
+                n.burnin = 200,
+                n.iter = 350)
 
+Normfit<- update(Normfit, n.burnin = 1000,n.iter=3000)
+Normfit<- update(Normfit, n.burnin = 2000,n.iter=4000)
 
+jagsresults(x = Normfit, params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
-
-jagsresults(x = Normfit , params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
-
-jagsresults(x = Normfit , params = c("e1_2","gin_2", "gout_2","ue","tau_2","ri_2","rf_2"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit , params = c("e1_2","ex_2", "gin_2", "gout_2","ue","tau_2","ri_2","rf_2"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 # Plot
@@ -415,7 +416,7 @@ Sp0 <- Sp %>% as_tibble()
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
 levels(Sp0$Parameter) <- as.factor(c("E[r]","gamma[d]^2", "gamma[p]^2","a[c]^i","a[c]^f"))
 
-pdf("plot/He3dp_corr.pdf",height = 8.5,width =8.5)
+pdf("plot/He3dp_corr.pdf",height = 6,width =7)
 pair_wise_plot(Sp0)
 dev.off()
 
@@ -530,12 +531,7 @@ dev.off()
 
 # Reaction rates
 
-Nsamp <- 5000
-mcdat_I <- as.data.frame(do.call(rbind, as.mcmc(Normfit)[,c("e1","gin","gout","ri","rf")]))
-
-index <- sample(1:nrow(mcdat_I ),size=Nsamp,replace=FALSE)
-mcdat <- mcdat_I [index,]
-
+Nsamp <- 2500
 Tgrid <- c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.012,
            0.013,0.014,0.015,0.016,0.018,0.020,0.025,0.030,0.040,0.050,0.060,0.070,
            0.080,0.090,0.100,0.110,0.120,0.130,0.140,0.150,0.160,0.180,0.200,0.250,0.300,
@@ -544,38 +540,39 @@ Tgrid <- c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.0
 #Tgrid <- 10^(seq(log(1e-3,10),log(10,10),length.out =  60))
 
 
-gdat <- list()
-for(i in 1:Nsamp){
-  y <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat_I[i,1],gi = mcdat_I[i,2],gf = mcdat_I[i,3],r_i=mcdat_I[i,4],r_f=mcdat_I[i,5] )
-  dd <- data.frame(y)
-  gdat[[i]] <- dd
-}
-
-gg <-  as.data.frame(gdat)
-gg$x <- Tgrid
 
 
+
+
+
+
+NA_I <-  table_reaction(Normfit,vars=c("e1", "gin", "gout","ri","rf"),N=1000)
+NA_II <- table_reaction(Normfit,vars=c("e1_2", "gin_2", "gout_2","ri_2","rf_2"),N=1000)
+
+NA_I$Case <- "Case I"
+NA_II$Case <- "Case II"
+NA_total <-rbind(NA_I,NA_II)
+
+
+
+ggplot(NA_total, aes(x=x,y=mean,group=case,fill=Case)) +
+  geom_line() + 
+  geom_ribbon(data=NA_total,aes(ymin= lower, ymax=upper,fill=case,alpha=0.1)) +
+#  coord_cartesian(xlim=c(0.001,2.5)) + 
+  scale_fill_tableau() +
+  theme_bw() +
+   scale_alpha(guide = 'none') +
+  xlab("Temperature (GK)") + ylab(expression(N[A]~symbol("\341")*sigma*nu*symbol("\361"))) 
+
+
+
+write.csv(NA_I ,"NA_I.csv",row.names = F)
+write.csv(NA_II ,"NA_II.csv",row.names = F)
 
 
 
 #gg2 <- apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
 
-gg2 <- apply(gg[,1:5000], 1, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
-
-fu <- function(x){exp(sqrt(log(1+var(x)/mean(x)^2)))}       
-
-fu_I<-apply(gg[,1:5000], 1, fu)
-
-#gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lwr1=gg2["25%",],
-#                      lwr2 = gg2["2.5%",],lwr3=gg2["0.5%",],upr1=gg2["75%",],
-#                      upr2=gg2["97.5%",],upr3=gg2["99.5%",])
-
-gg2data <- data.frame(x =Tgrid, mean = gg2["50%",],lower = gg2["16%",], upper = gg2["84%",] )
-gg2data$fu <- fu_I
-
-xtable(gg2data, type = "latex",display=c("g","g","g","g","g","f"),digits=4,caption= "Case I")
-
-write.csv(gg2data,"NV_case_I.csv",row.names = F)
 
  
 

@@ -4,7 +4,9 @@ require(ggplot2)
 require(parallel)
 Cdat <- read.table("numRates1.out",header=F)
 
-Tgrid <- exp(seq(log(1e-3),log(10),length.out =  100))
+#Tgrid <- exp(seq(log(1e-3),log(10),length.out =  100))
+
+Tgrid <- Cdat$V1
 
 
 ptm0 <- proc.time()
@@ -19,8 +21,17 @@ proc.time() - ptm
 Rd <- data.frame(x=Tgrid ,y=Nasv)
 
 
-ggplot(Cdat,aes(x=V1,y=V2)) +
+
+
+
+
+ggplot(Cdat,aes(x=V1,y=(V2-Rd$y)/V2)) +
   geom_point() +
+  coord_cartesian(xlim=c(0,0.25)) +
+  ylim(-0.01,0.01) + xlab("Temperature") +
+  ylab("NA") 
+  
   geom_line(data=Rd,aes(x=x,y=y)) + xlab("Temperature") +
-  ylab("NA") + scale_y_log10() +
+  ylab("NA") + 
+  scale_y_log10() +
   scale_x_log10()
