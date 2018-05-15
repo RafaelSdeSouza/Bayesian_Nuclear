@@ -555,12 +555,16 @@ NA_total <-rbind(NA_I,NA_II)
 
 
 
-ggplot(NA_total, aes(x=x,y=mean,group=case,fill=Case)) +
+ggplot(Drate, aes(x=T,y=mean)) +
   geom_line() + 
-  geom_ribbon(data=NA_total,aes(ymin= lower, ymax=upper,fill=case,alpha=0.1)) +
+#  geom_ribbon(aes(ymin= lower, ymax=upper)) +
+  geom_ribbon(aes(ymin=lwr3, ymax=upr3),fill=c("#dadaeb"),show.legend=FALSE)+
+  geom_ribbon(aes(ymin=lwr2, ymax=upr2),  fill = c("#9e9ac8"),show.legend=FALSE) +
+  geom_ribbon(aes(ymin=lwr1, ymax=upr1),fill=c("#984ea3"),show.legend=FALSE) +
 #  coord_cartesian(xlim=c(0.001,2.5)) + 
   scale_fill_tableau() +
   theme_bw() +
+  scale_x_log10() +
    scale_alpha(guide = 'none') +
   xlab("Temperature (GK)") + ylab(expression(N[A]~symbol("\341")*sigma*nu*symbol("\361"))) 
 
