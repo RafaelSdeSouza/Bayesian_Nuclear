@@ -8,8 +8,8 @@
   
   Tgrid <- 10^(seq(log(1e-3,10),log(10,10),length.out =  500))
   
-   gdat <- vector('list',10)
-   for(i in 1:10){
+   gdat <- vector('list',1000)
+   for(i in 1:1000){
     y_I <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat_I[i,1],gi = mcdat_I[i,2],gf = mcdat_I[i,3],r_i=mcdat_I[i,4],r_f=mcdat_I[i,5] )
     y_II <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat_II [i,1],gi = mcdat_II [i,2],gf = mcdat_II[i,3],r_i=mcdat_II[i,4],r_f=mcdat_II[i,5] )
     

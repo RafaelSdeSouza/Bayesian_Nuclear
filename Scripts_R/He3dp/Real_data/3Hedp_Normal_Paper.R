@@ -559,10 +559,10 @@ ggplot(Drate, aes(x=T,y=mean)) +
   geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
   geom_line() + 
 #  geom_ribbon(aes(ymin= lower, ymax=upper)) +
-  geom_ribbon(aes(ymin=lwr3, ymax=upr3),fill=c("#dadaeb"),show.legend=FALSE)+
-  geom_ribbon(aes(ymin=lwr2, ymax=upr2),  fill = c("#9e9ac8"),show.legend=FALSE) +
-  geom_ribbon(aes(ymin=lwr1, ymax=upr1),fill=c("#984ea3"),show.legend=FALSE) +
- coord_cartesian(xlim=c(0.00125,7.7),ylim=c(0.85,1.1)) + 
+  geom_ribbon(aes(ymin=lwr3, ymax=upr3),fill=c("#ece7f2"),show.legend=FALSE)+
+  geom_ribbon(aes(ymin=lwr2, ymax=upr2),  fill = c("#a6bddb"),show.legend=FALSE) +
+  geom_ribbon(aes(ymin=lwr1, ymax=upr1),fill=c("#2b8cbe"),show.legend=FALSE) +
+ coord_cartesian(xlim=c(0.00125,7.7),ylim=c(0.9,1.05)) + 
   scale_fill_tableau() +
   theme_bw() +
   scale_x_log10() +
