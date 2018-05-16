@@ -6,13 +6,14 @@
   mcdat_I  <- mcdat_I [index,]
   mcdat_II  <- mcdat_II [index,]
   
+  Tgrid <- 10^(seq(log(1e-3,10),log(10,10),length.out =  500))
   
    gdat <- vector('list',10)
    for(i in 1:10){
     y_I <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat_I[i,1],gi = mcdat_I[i,2],gf = mcdat_I[i,3],r_i=mcdat_I[i,4],r_f=mcdat_I[i,5] )
     y_II <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat_II [i,1],gi = mcdat_II [i,2],gf = mcdat_II[i,3],r_i=mcdat_II[i,4],r_f=mcdat_II[i,5] )
     
-    dd <- data.frame(log(y_I,10)-log(y_II,10))
+    dd <- data.frame(y_I/y_II)
     gdat[[i]] <- dd
   }
 

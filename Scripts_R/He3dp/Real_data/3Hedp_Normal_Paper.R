@@ -537,7 +537,7 @@ Tgrid <- c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.0
            0.080,0.090,0.100,0.110,0.120,0.130,0.140,0.150,0.160,0.180,0.200,0.250,0.300,
            0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000,1.250,1.500,1.750,2.000,2.500,3.000,3.500,4.000,5.000,
            6.000,7.000,8.000,9.000,10.000)
-#Tgrid <- 10^(seq(log(1e-3,10),log(10,10),length.out =  60))
+
 
 
 
@@ -554,21 +554,34 @@ NA_II$Case <- "Case II"
 NA_total <-rbind(NA_I,NA_II)
 
 
-
+pdf("plot/Delta_rates.pdf",height = 7,width = 10)
 ggplot(Drate, aes(x=T,y=mean)) +
+  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
   geom_line() + 
 #  geom_ribbon(aes(ymin= lower, ymax=upper)) +
   geom_ribbon(aes(ymin=lwr3, ymax=upr3),fill=c("#dadaeb"),show.legend=FALSE)+
   geom_ribbon(aes(ymin=lwr2, ymax=upr2),  fill = c("#9e9ac8"),show.legend=FALSE) +
   geom_ribbon(aes(ymin=lwr1, ymax=upr1),fill=c("#984ea3"),show.legend=FALSE) +
-#  coord_cartesian(xlim=c(0.001,2.5)) + 
+ coord_cartesian(xlim=c(0.00125,7.7),ylim=c(0.85,1.1)) + 
   scale_fill_tableau() +
   theme_bw() +
   scale_x_log10() +
    scale_alpha(guide = 'none') +
-  xlab("Temperature (GK)") + ylab(expression(N[A]~symbol("\341")*sigma*nu*symbol("\361"))) 
-
-
+  xlab("Temperature (GK)") +
+  ylab(expression(N[A]~I~symbol("\341")*sigma*nu*symbol("\361")/N[A]~II~symbol("\341")*sigma*nu*symbol("\361"))) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = c(0.925,0.7),
+        legend.background = element_rect(colour = "white", fill = "white"),
+        legend.text = element_text(size=14,colour = set),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(size=18.5),
+        axis.text  = element_text(size=13),
+        axis.ticks = element_line(size = 0.75),
+        axis.line = element_line(size = 0.5, linetype = "solid")) 
+dev.off()
 
 write.csv(NA_I ,"NA_I.csv",row.names = F)
 write.csv(NA_II ,"NA_II.csv",row.names = F)
