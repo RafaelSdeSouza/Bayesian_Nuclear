@@ -3,7 +3,7 @@ pair_wise_plot <- function(s){
 my_hist <- function(data, mapping, ...) {
     ggplot(data = data, mapping = mapping) +
 #     geom_histogram(bins = 10,fill="#bf812d",colour="#1F3552",...) +
-    geom_density(fill="#bf812d",colour="#1F3552",...) +
+    geom_density(adjust = 1.5,fill="#bf812d",colour="#1F3552",...) +
 
       theme_void() + theme( panel.grid.minor=element_blank(),
                             panel.grid.major = element_blank())
@@ -24,8 +24,8 @@ my_bin <- function(data, mapping, ..., low = "gray80", high = "gray25") {
     
     scale_fill_gradient(low = low, high = high) +
     theme_bw() +
-    theme( text = element_text(size=10),
-           strip.text = element_text(face="bold", size=20),
+    theme( text = element_text(size=60),axis.text = element_text(size=7.5),
+           strip.text.x = element_text(colour = 'red',size = 20),
            panel.grid.major = element_blank(),
     panel.grid.minor = element_blank())
 }

@@ -1,0 +1,59 @@
+Welcome to JAGS 4.3.0 on Tue May 15 12:18:50 2018
+JAGS is free software and comes with ABSOLUTELY NO WARRANTY
+Loading module: basemod: ok
+Loading module: bugs: ok
+. . Reading data file data.txt
+. Compiling model graph
+   Resolving undeclared variables
+   Allocating nodes
+RUNTIME ERROR:
+Compilation error on line 24.
+Unknown function: sfactor3Hedp
+Deleting model
+. Reading parameter file inits1.txt
+Can't set initial values. No model!
+. Reading parameter file inits2.txt
+Can't set initial values. No model!
+. Reading parameter file inits3.txt
+Can't set initial values. No model!
+. Can't initialize. No model!
+. Adaptation skipped: model is not in adaptive mode.
+. Updating 100
+-------------------------------------------------| 100
+Can't update. No model!
+Deleting model
+
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Can't set monitor. No model!
+. Updating 100
+-------------------------------------------------| 100
+Can't update. No model!
+Deleting model
+
+. No model
+. No model
+. No model
+. Can't dump CODA output. No model!
+. Can't dump samplers. No model!
+. Updating 0
+Can't update. No model!
+Deleting model
+. Deleting model
+. 
