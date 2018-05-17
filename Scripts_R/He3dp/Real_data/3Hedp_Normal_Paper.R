@@ -146,16 +146,17 @@ e1 ~  dunif(0,5)
 ex <-  e1 
 gin ~  dunif(0,5)
 gout ~ dunif(0,5)
-rf ~  dnorm(5, pow(0.1,-2))T(0,)
-ri ~  dnorm(5, pow(0.1,-2))T(0,)
+rf <- 6
+ri <- 5
+
 
 tau_2 ~ dunif(0.01,5)
 e1_2  ~  dunif(0,5)
 ex_2  <-   e1_2
 gin_2 ~  dunif(0,20)
 gout_2 ~ dunif(0,20)
-rf_2 ~  dunif(0,50)
-ri_2 ~  dunif(0,50)
+rf_2 ~  dnorm(5, pow(5,-2))T(0,)
+ri_2 ~  dnorm(5, pow(5,-2))T(0,)
 
 
 
@@ -188,11 +189,11 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 1,
                 n.chains = 3,
-                n.burnin = 200,
-                n.iter = 350)
+                n.burnin = 1000,
+                n.iter = 3000)
 
-Normfit<- update(Normfit, n.burnin = 1000,n.iter=3000)
-Normfit<- update(Normfit, n.burnin = 2000,n.iter=4000)
+Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
+Normfit <- update(Normfit, n.burnin = 2500,n.iter=5000)
 
 jagsresults(x = Normfit, params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -408,20 +409,28 @@ denplot(Normfit  ,c("e1_2","gin_2", "gout_2"),style="plain")
 
 #ggs_traceplot(ss)
 
-Sp <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]) 
-
-DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")])
-
+# Case I
+Sp <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout")]) 
+DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout")])
 Sp0 <- Sp %>% as_tibble()  
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-levels(Sp0$Parameter) <- as.factor(c("E[r]","gamma[d]^2", "gamma[p]^2","a[c]^i","a[c]^f"))
+levels(Sp0$Parameter) <- as.factor(c("E[r]","gamma[d]^2", "gamma[p]^2"))
 
 pdf("plot/He3dp_corr.pdf",height = 6,width =7)
 pair_wise_plot(Sp0)
 dev.off()
 
 
+# Case II
+Sp <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]) 
+DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")])
+Sp0 <- Sp %>% as_tibble()  
+#%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
+levels(Sp0$Parameter) <- as.factor(c("E[r]","gamma[d]^2", "gamma[p]^2","a[d]","a[p]"))
 
+pdf("plot/He3dp_corr.pdf",height = 6,width =7)
+pair_wise_plot(Sp0)
+dev.off()
 
 
 S <- ggs(as.mcmc(Normfit),family="ue")
