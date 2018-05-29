@@ -68,6 +68,16 @@ syst = c(0.03,unique(ensamble$Syst))
 M <- 500
 xx <- seq(min(obsx),max(obsx),length.out = M)
 
+R<-matrix(numeric(4*4), nrow = 4)
+diag(R) <- 0.01
+#R[upper.tri(R)] <- 1
+#R[lower.tri(R)]<- 1
+
+mu0 = as.vector(c(0.1,0.1,0.1,0.1))
+S2 = diag(rep(0.1,4))
+S3 =  diag(rep(0.1,4))
+
+
 model.data <- list(obsy = obsy,    # Response variable
                    obsy2 = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
@@ -79,7 +89,12 @@ model.data <- list(obsy = obsy,    # Response variable
                    Nik = Nik,
                    ik  = ik,
                    M = M,
-                   xx = xx
+                   xx = xx,
+                   b0 =  c(1,0.5,5,5),
+                   B0 = R,
+                   mu0 = mu0,
+                   S2=S2,
+                   S3=S3
 
 )
 
@@ -90,8 +105,7 @@ Model <- "model{
 # LIKELIHOOD informative
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, ex, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-res[i] <- obsy[i]-sfactor3Hedp(obsx[i], e1,ex, gin, gout,ri,rf,0)
+y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],0),ue[ik[i]]),pow(tau, -2))
 }
 
 
@@ -100,14 +114,14 @@ for (i in 1:N) {
 obsy2[i] ~ dnorm(y_2[i], pow(erry[i], -2))
 y_2[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1_2, ex_2, gin_2, gout_2,ri_2,rf_2,ue[ik[i]]),pow(tau_2, -2))
 }
-RSS <- sum(res^2)
+#RSS <- sum(res^2)
 
 # Predicted values
 for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,0)
+mux0[j] <- sfactor3Hedp(xx[j], e1, ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],0),0)
 
 
 mux0_2[j] <- sfactor3Hedp(xx[j], e1_2,ex_2, gin_2, gout_2,ri_2,rf_2,0)
@@ -116,11 +130,11 @@ DeltaM[j] <- (mux0[j] - mux0_2[j])/mux0[j]
 
 # No inverse Kinematics 
 
-mux1[j] <- sfactor3Hedp(xx[j], e1, ex,gin, gout,ri,rf,ue[1])
+mux1[j] <- sfactor3Hedp(xx[j], e1, ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],0),ue[1])
 yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 # With inverse Kinematics 
-mux2[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,ue[2])
+mux2[j] <- sfactor3Hedp(xx[j], e1,ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],0),ue[2])
 yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 }
@@ -140,17 +154,24 @@ ue[z] ~ dnorm(0,1e3)T(0,)
 tau ~  dunif(0.01,5)
 e1 ~  dunif(0,5)
 ex <-  e1 
-gin ~  dunif(0,5)
-gout ~ dunif(0,5)
-rf ~ dnorm(5, pow(0.25,-2))T(3,6)
-ri ~ dnorm(5, pow(0.25,-2))T(3,6)
+#gin ~  dunif(0,5)
+#gout ~ dunif(0,5)
+
+theta ~ dmnorm(mu[],S3[,])
+mu[1:4] ~ dmnorm(b0[],S2[,])
+
+
+#theta ~ dmnorm(b0[],B0[,])
+
+#rf ~ dnorm(5, pow(1,-2))T(3,6)
+#ri ~ dnorm(4.5, pow(1,-2))T(3,6)
 
 
 tau_2 ~ dunif(0.01,5)
-e1_2  ~  dunif(0,5)
-ex_2  ~  dunif(0,5)
-gin_2 ~  dunif(0,10)
-gout_2 ~ dunif(0,10)
+e1_2  ~  dunif(0,10)
+ex_2  ~  dunif(0,10)
+gin_2 ~  dunif(0,50)
+gout_2 ~ dunif(0,50)
 rf_2 ~  dnorm(0, pow(10,-2))T(4,8)
 ri_2 ~  dnorm(0, pow(10,-2))T(4,8)
 
@@ -171,42 +192,54 @@ ri_2 ~  dnorm(0, pow(10,-2))T(4,8)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.3,1), gout = runif(1,1,4), gin = runif(1,0,1)) }
+inits <- function () { list(e1 = runif(1,0.2,0.25),theta = runif(4,0.5,5)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
-
-require(runjags)
-m <- run.jags(model = Model,
-              monitor = c("e1","gin", "gout","ue","tau", "ri","rf",
-                          "e1_2","ex_2","gin_2", "gout_2","tau_2","ri_2","rf_2" ),
-              data = model.data,
-              n.chains = 10, 
-              inits = inits, 
-              burnin = 1000, 
-              sample = 5000,
-              adapt = 2000
-)
-
-
-
 
 
 
 # JAGS model with R2Jags;
+require(runjags)
+m <- run.jags(model = Model,
+         monitor = c("e1","theta","ue","tau"),
+         data = model.data,
+         n.chains = 3, 
+         inits = inits, 
+         burnin = 100, 
+         sample = 4000,
+         adapt = 2000
+)
+
+
+m <- jags.model(file = textConnection(Model), 
+           data = model.data,
+           inits = inits,
+           n.chains = 300,
+           n.adapt = 100, 
+           quiet=FALSE)
+
+m.out <- coda.samples(m, c("e1","theta","ue","tau"), n.iter=1000)
+
+
+
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("e1","gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale","DeltaM",
+                parameters.to.save  = c("e1","theta","ue","tau","RSS","mux0","mux1","mux2","scale","DeltaM",
                                         "e1_2","ex_2","gin_2", "gout_2","tau_2","ri_2","rf_2" ),
                 model.file  = textConnection(Model),
                 n.thin = 1,
-                n.chains = 50,
-                n.burnin = 1500,
-                n.iter = 5000)
+                n.chains = 3,
+                n.burnin = 1000,
+                n.iter = 3000)
+
+jagsresults(x = Normfit, params = c("e1", "ex","ue","tau","theta"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+traplot(Normfit  ,c("e1","theta","ue"),style="plain")
+denplot(Normfit  ,c("e1", "theta","ue"),style="plain")
 
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
-Normfit <- update(Normfit, n.burnin = 5000,n.iter=10000)
+Normfit <- update(Normfit, n.burnin = 500,n.iter=4000)
 
-jagsresults(x = Normfit, params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 jagsresults(x = Normfit , params = c("e1_2","ex_2", "gin_2", "gout_2","ue","tau_2","ri_2","rf_2"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -390,8 +423,8 @@ div_style <- parcoord_style_np(div_color = "green", div_size = 0.05, div_alpha =
 mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout","ri","rf"))
 
 
-traplot(Normfit  ,c("e1","gin", "gout","ri","rf","ue"),style="plain")
-denplot(Normfit  ,c("e1", "gin", "gout","ri","rf","ue"),style="plain")
+
+
 caterplot(Normfit,c("scale","tau"),style="plain")
 
 
@@ -421,12 +454,11 @@ denplot(Normfit  ,c("e1_2","gin_2", "gout_2","ri_2","rf_2"),style="plain")
 #ggs_traceplot(ss)
 
 # Case I
-Sp <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]) 
-DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout")])
+Sp <- ggs(as.mcmc(Normfit)[,c("theta[1]","theta[2]","theta[3]","theta[4]")]) 
+DD <- as.matrix(as.mcmc(Normfit)[,c("theta[1]","theta[2]","theta[3]","theta[4]")]) 
 Sp0 <- Sp %>% as_tibble()  
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-levels(Sp0$Parameter) <- as.factor(c("E[0]","gamma[d]^2", "gamma[p]^2",
-                                     "r[d]","r[p]"))
+levels(Sp0$Parameter) <- as.factor(c("E[0]","gamma[d]^2", "gamma[p]^2"))
 
 pdf("plot/He3dp_corr.pdf",height = 4,width = 4)
 pair_wise_plot(Sp0)
