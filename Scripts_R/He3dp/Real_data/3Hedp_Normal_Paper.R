@@ -79,7 +79,9 @@ model.data <- list(obsy = obsy,    # Response variable
                    Nik = Nik,
                    ik  = ik,
                    M = M,
-                   xx = xx
+                   xx = xx,
+                   ap  = 5,
+                   ad = 6
 
 )
 
@@ -90,15 +92,15 @@ Model <- "model{
 # LIKELIHOOD informative
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1, ex, gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-res[i] <- obsy[i]-sfactor3Hedp(obsx[i], e1,ex, gin, gout,ri,rf,0)
+y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], E0, Er, gd2, gp2, ad, ap, ue[ik[i]]), pow(tau, -2))
+res[i] <- obsy[i]-sfactor3Hedp(obsx[i], E0, Er, gd2, gp2, ad, ap,0)
 }
 
 
 # LIKELIHOOD broad 
 for (i in 1:N) {
 obsy2[i] ~ dnorm(y_2[i], pow(erry[i], -2))
-y_2[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], e1_2, ex_2, gin_2, gout_2,ri_2,rf_2,ue[ik[i]]),pow(tau_2, -2))
+y_2[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i],  E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b, ue[ik[i]]),pow(tau_2, -2))
 }
 RSS <- sum(res^2)
 
@@ -107,20 +109,20 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,0)
+mux0[j] <- sfactor3Hedp(xx[j], E0, Er, gd2, gp2, ad, ap,0)
 
 
-mux0_2[j] <- sfactor3Hedp(xx[j], e1_2,ex_2, gin_2, gout_2,ri_2,rf_2,0)
+mux0_2[j] <- sfactor3Hedp(xx[j], E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
 
 DeltaM[j] <- (mux0[j] - mux0_2[j])/mux0[j]
 
 # No inverse Kinematics 
 
-mux1[j] <- sfactor3Hedp(xx[j], e1, ex,gin, gout,ri,rf,ue[1])
+mux1[j] <- sfactor3Hedp(xx[j], E0, Er, gd2, gp2, ad, ap,ue[1])
 yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 # With inverse Kinematics 
-mux2[j] <- sfactor3Hedp(xx[j], e1,ex, gin, gout,ri,rf,ue[2])
+mux2[j] <- sfactor3Hedp(xx[j], E0, Er, gd2, gp2, ad, ap,ue[2])
 yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 }
@@ -131,28 +133,32 @@ scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 }
 
 for (z in 1:Nik){
-ue[z] ~ dnorm(0,1e3)T(0,)
+ue[z] ~ dnorm(0,pow(0.1,-2))T(0,)
 }
 
 
 # PRIORS 1
 
-tau ~  dunif(0.01,5)
-e1 ~  dunif(0,5)
-ex <-  e1 
-gin ~  dunif(0,5)
-gout ~ dunif(0,5)
-rf ~ dnorm(5, pow(0.25,-2))T(3,6)
-ri ~ dnorm(5, pow(0.25,-2))T(3,6)
+tau ~  dnorm(0, pow(1,-2))T(0,)
+E0 ~  dnorm(0, pow(1,-2))T(0,)
+Er <-  E0 
+gd2 ~  dnorm(0, pow(1,-2))T(0,)
+gp2 ~ dnorm(0, pow(1,-2))T(0,)
 
+#  Transform
+gd <- sqrt(gd2)
+gp <- sqrt(gp2)
 
-tau_2 ~ dunif(0.01,5)
-e1_2  ~  dunif(0,5)
-ex_2  ~  dunif(0,5)
-gin_2 ~  dunif(0,10)
-gout_2 ~ dunif(0,10)
-rf_2 ~  dnorm(0, pow(10,-2))T(4,8)
-ri_2 ~  dnorm(0, pow(10,-2))T(4,8)
+tau_2  ~    dnorm(0, pow(1,-2))T(0,)
+
+E0_b  ~  dnorm(0, pow(1,-2))T(0,)
+Er_b  ~  dnorm(0, pow(1,-2))T(0,)
+
+gd2_b ~  dnorm(0, pow(1,-2))T(0,)
+gp2_b ~ dnorm(0, pow(1,-2))T(0,)
+
+ad_b ~  dnorm(6, pow(1,-2))T(1,)
+ap_b ~  dnorm(5, pow(1,-2))T(1,)
 
 
 
@@ -171,21 +177,21 @@ ri_2 ~  dnorm(0, pow(10,-2))T(4,8)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.3,1), gout = runif(1,1,4), gin = runif(1,0,1)) }
+inits <- function () { list(Er = runif(1,0.3,0.4),  gd2 = runif(1,2,5), gp2 = runif(1,0.01,0.08)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
-require(runjags)
-m <- run.jags(model = Model,
-              monitor = c("e1","gin", "gout","ue","tau", "ri","rf",
-                          "e1_2","ex_2","gin_2", "gout_2","tau_2","ri_2","rf_2" ),
-              data = model.data,
-              n.chains = 10, 
-              inits = inits, 
-              burnin = 1000, 
-              sample = 5000,
-              adapt = 2000
-)
+##require(runjags)
+#m <- run.jags(model = Model,
+#              monitor = c("e1","gin", "gout","ue","tau", "ri","rf",
+#                          "e1_2","ex_2","gin_2", "gout_2","tau_2","ri_2","rf_2" ),
+#              data = model.data,
+#              n.chains = 10, 
+#              inits = inits, 
+#              burnin = 1000, 
+#              sample = 5000,
+#              adapt = 2000
+#)
 
 
 
@@ -195,18 +201,20 @@ m <- run.jags(model = Model,
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("e1","gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale","DeltaM",
-                                        "e1_2","ex_2","gin_2", "gout_2","tau_2","ri_2","rf_2" ),
+                parameters.to.save  = c("Er","gd", "gp","ue","tau", "ad","ap","RSS","mux0","mux1","mux2","scale","DeltaM",
+                                        "E0_b","Er_b","gd2_b", "gp2_b","tau_2","ad_b","ap_b" ),
                 model.file  = textConnection(Model),
-                n.thin = 1,
-                n.chains = 50,
-                n.burnin = 1500,
-                n.iter = 5000)
+                n.thin = 100,
+                n.chains = 3,
+                n.burnin = 5000,
+                n.iter = 20000)
+
+
 
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
-Normfit <- update(Normfit, n.burnin = 5000,n.iter=10000)
+Normfit <- update(Normfit, n.iter=1000)
 
-jagsresults(x = Normfit, params = c("e1", "ex","gin", "gout","ue","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit, params = c("E0","gd", "gp","ue","tau", "ad","ap"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 jagsresults(x = Normfit , params = c("e1_2","ex_2", "gin_2", "gout_2","ue","tau_2","ri_2","rf_2"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -426,7 +434,7 @@ DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout")])
 Sp0 <- Sp %>% as_tibble()  
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
 levels(Sp0$Parameter) <- as.factor(c("E[0]","gamma[d]^2", "gamma[p]^2",
-                                     "r[d]","r[p]"))
+                                     "r[p]","r[d]"))
 
 pdf("plot/He3dp_corr.pdf",height = 4,width = 4)
 pair_wise_plot(Sp0)
