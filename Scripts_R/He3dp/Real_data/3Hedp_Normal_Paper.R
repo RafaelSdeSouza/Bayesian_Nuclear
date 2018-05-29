@@ -214,7 +214,7 @@ Normfit <- jags(data = model.data,
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
 Normfit <- update(Normfit, n.iter=1000)
 
-jagsresults(x = Normfit, params = c("E0","gd", "gp","ue","tau", "ad","ap"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 jagsresults(x = Normfit , params = c("e1_2","ex_2", "gin_2", "gout_2","ue","tau_2","ri_2","rf_2"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -398,7 +398,7 @@ div_style <- parcoord_style_np(div_color = "green", div_size = 0.05, div_alpha =
 mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout","ri","rf"))
 
 
-traplot(Normfit  ,c("e1","gin", "gout","ri","rf","ue"),style="plain")
+traplot(Normfit  ,c("Er","gd", "gp","ue"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout","ri","rf","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
@@ -429,12 +429,12 @@ denplot(Normfit  ,c("e1_2","gin_2", "gout_2","ri_2","rf_2"),style="plain")
 #ggs_traceplot(ss)
 
 # Case I
-Sp <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")]) 
+Sp <- ggs(as.mcmc(Normfit)[,c("Er", "gd", "gp")]) 
 DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout")])
 Sp0 <- Sp %>% as_tibble()  
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-levels(Sp0$Parameter) <- as.factor(c("E[0]","gamma[d]^2", "gamma[p]^2",
-                                     "r[p]","r[d]"))
+levels(Sp0$Parameter) <- as.factor(c("E[r]","gamma[d]", "gamma[p]"))
+
 
 pdf("plot/He3dp_corr.pdf",height = 4,width = 4)
 pair_wise_plot(Sp0)
