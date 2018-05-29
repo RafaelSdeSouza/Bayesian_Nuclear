@@ -121,7 +121,7 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactor3Hedp(xx[j], e1, ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],0),0)
+mux0[j] <- sfactor3Hedp(xx[j], e1, ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],4),0)
 
 
 mux0_2[j] <- sfactor3Hedp(xx[j], e1_2,ex_2, gin_2, gout_2,ri_2,rf_2,0)
@@ -130,11 +130,11 @@ DeltaM[j] <- (mux0[j] - mux0_2[j])/mux0[j]
 
 # No inverse Kinematics 
 
-mux1[j] <- sfactor3Hedp(xx[j], e1, ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],0),ue[1])
+mux1[j] <- sfactor3Hedp(xx[j], e1, ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],4),ue[1])
 yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 # With inverse Kinematics 
-mux2[j] <- sfactor3Hedp(xx[j], e1,ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],0),ue[2])
+mux2[j] <- sfactor3Hedp(xx[j], e1,ex, max(theta[1],0), max(theta[2],0),max(theta[3],0),max(theta[4],4),ue[2])
 yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 }
