@@ -148,17 +148,22 @@ gp2 ~ dnorm(0, pow(1,-2))T(0,)
 #  Transform
 gd <- sqrt(gd2)
 gp <- sqrt(gp2)
+ue_ev[1] <-1e6*ue[1]
+ue_ev[2] <-1e6*ue[2] 
+
+gd_b <- sqrt(gd2_b)
+gp_b <- sqrt(gp2_b)
 
 tau_2  ~    dnorm(0, pow(1,-2))T(0,)
 
 E0_b  ~  dnorm(0, pow(1,-2))T(0,)
 Er_b  ~  dnorm(0, pow(1,-2))T(0,)
 
-gd2_b ~  dnorm(0, pow(1,-2))T(0,)
-gp2_b ~ dnorm(0, pow(1,-2))T(0,)
+gd2_b ~  dnorm(0, pow(10,-2))T(0,)
+gp2_b ~ dnorm(0, pow(10,-2))T(0,)
 
-ad_b ~  dnorm(6, pow(1,-2))T(1,)
-ap_b ~  dnorm(5, pow(1,-2))T(1,)
+ad_b ~  dnorm(5, pow(5,-2))T(1,)
+ap_b ~  dnorm(5, pow(5,-2))T(1,)
 
 
 
@@ -201,8 +206,8 @@ inits <- function () { list(Er = runif(1,0.3,0.4),  gd2 = runif(1,2,5), gp2 = ru
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("Er","gd", "gp","ue","tau", "ad","ap","RSS","mux0","mux1","mux2","scale","DeltaM",
-                                        "E0_b","Er_b","gd2_b", "gp2_b","tau_2","ad_b","ap_b" ),
+                parameters.to.save  = c("Er","gd", "gp","ue_ev","tau", "ad","ap","RSS","mux0","mux1","mux2","scale","DeltaM",
+                                        "E0_b","Er_b","gd_b", "gp_b","tau_2","ad_b","ap_b" ),
                 model.file  = textConnection(Model),
                 n.thin = 100,
                 n.chains = 3,
@@ -212,11 +217,11 @@ Normfit <- jags(data = model.data,
 
 
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
-Normfit <- update(Normfit, n.iter=1000)
+Normfit <- update(Normfit, n.thin = 200, n.iter=15000)
 
-jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
-jagsresults(x = Normfit , params = c("e1_2","ex_2", "gin_2", "gout_2","ue","tau_2","ri_2","rf_2"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit , params = c("E0_b","Er_b","gd_b", "gp_b","tau_2","ad_b","ap_b","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 # Plot
@@ -403,7 +408,7 @@ denplot(Normfit  ,c("e1", "gin", "gout","ri","rf","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
 
-denplot(Normfit  ,c("e1_2","gin_2", "gout_2","ri_2","rf_2"),style="plain")
+denplot(Normfit ,c("E0_b","Er_b", "ad_b","ap_b","gd2_b","gp2_b"),style="plain")
 
 
 
@@ -429,24 +434,25 @@ denplot(Normfit  ,c("e1_2","gin_2", "gout_2","ri_2","rf_2"),style="plain")
 #ggs_traceplot(ss)
 
 # Case I
-Sp <- ggs(as.mcmc(Normfit)[,c("Er", "gd", "gp")]) 
-DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout")])
-Sp0 <- Sp %>% as_tibble()  
+Sp <- ggs(as.mcmc(Normfit)[,c("Er", "gd", "gp","ue_ev[1]","ue_ev[2]")]) 
+#DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout")])
+Sp0 <- Sp %>% as_tibble() 
+
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-levels(Sp0$Parameter) <- as.factor(c("E[r]","gamma[d]", "gamma[p]"))
+levels(Sp0$Parameter) <- as.factor(c("E[0]","gamma[d]", "gamma[p]","Ue[1]", "Ue[2]"))
 
 
-pdf("plot/He3dp_corr.pdf",height = 4,width = 4)
+pdf("plot/He3dp_corr.pdf",height = 6,width =6)
 pair_wise_plot(Sp0)
 dev.off()
 
 
 # Case II
-SpII <- ggs(as.mcmc(Normfit)[,c("e1_2", "gin_2", "gout_2","ri_2","rf_2")]) 
+SpII <- ggs(as.mcmc(Normfit)[,c("Er_b","E0_b", "gd_b", "gp_b","ad_b","ap_b","ue_ev[1]","ue_ev[2]")]) 
 #DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")])
 Sp0II <- SpII %>% as_tibble()  
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-levels(Sp0II$Parameter) <- as.factor(c("E[r]","gamma[d]^2", "gamma[p]^2","a[d]","a[p]"))
+levels(Sp0II$Parameter) <- as.factor(c("E[r]","E[0]","gamma[d]", "gamma[p]","a[d]","a[p]","Ue[1]", "Ue[2]"))
 
 pdf("plot/He3dp_corrII.pdf",height = 6,width =7)
 pair_wise_plot(Sp0II)
@@ -490,6 +496,42 @@ Sa$Parameter <- revalue(Sa$Parameter,
 c("scale[1]" = "Ali01a","scale[2]" = "Ali01b","scale[3]" = "Cos00",
 "scale[4]" = "Gei99","scale[5]" = "Kra87","scale[6]" = "Mol80",
 "scale[7]" = "Zhi77"))
+
+
+
+ggplot(iris, aes(x=Sepal.Length, y=Species, fill=factor(..quantile..))) +
+  stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE, quantiles = 4, quantile_lines = TRUE) +
+  scale_fill_viridis(discrete = TRUE, name = "Quartiles")
+
+
+require(ggridges)
+pdf("plot/He3dp_scale_syst.pdf",height = 5,width = 4.5)
+ggplot(Sa, aes(x = value, y = Parameter, fill=factor(..quantile..),alpha=factor(..quantile..))) + 
+
+#   geom_density_ridges(scale = 2.5,panel_scaling=F) + 
+  stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE, alpha=0.3,
+                      quantile_lines = TRUE,quantiles = c(0.025, 0.25,  0.75, 0.975)) + 
+    theme_economist_white() +
+ 
+  scale_fill_manual(name = "Probability", values = c("gray90", "gray70", "gray30",
+                                                     "gray70","gray90" ))+
+  geom_vline(xintercept = 1,linetype="dashed",color="red") +                    
+#  scale_fill_manual(values=c(rep("gray75",7))) +
+ # geom_point(size=1,color="red") +
+  theme(legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="black", face="bold", size=15),
+        axis.text  = element_text(size=10),
+        strip.background = element_rect("white")) +
+  ylab("") +
+  #  xlab("Highest Probability Interval")
+  xlab("Normalization factors")
+dev.off()
+
+
 
 pdf("plot/He3dp_scale_syst.pdf",height = 5,width = 4.5)
 ggs_caterpillar(Sa) + aes(size=0.1,color = Parameter,shape=Parameter) +
