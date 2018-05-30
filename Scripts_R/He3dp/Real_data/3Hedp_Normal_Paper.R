@@ -162,8 +162,8 @@ Er_b  ~  dnorm(0, pow(1,-2))T(0,)
 gd2_b ~  dnorm(0, pow(10,-2))T(0,)
 gp2_b ~ dnorm(0, pow(10,-2))T(0,)
 
-ad_b ~  dnorm(5, pow(5,-2))T(1,)
-ap_b ~  dnorm(5, pow(5,-2))T(1,)
+ad_b ~  dnorm(5, pow(0.25,-2))T(1,)
+ap_b ~  dnorm(5, pow(0.25,-2))T(1,)
 
 
 
@@ -408,7 +408,7 @@ denplot(Normfit  ,c("e1", "gin", "gout","ri","rf","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
 
-denplot(Normfit ,c("E0_b","Er_b", "ad_b","ap_b","gd2_b","gp2_b"),style="plain")
+denplot(Normfit ,c("E0_b","Er_b", "ad_b","ap_b","gd_b","gp_b"),style="plain")
 
 
 
@@ -452,7 +452,7 @@ SpII <- ggs(as.mcmc(Normfit)[,c("Er_b","E0_b", "gd_b", "gp_b","ad_b","ap_b","ue_
 #DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")])
 Sp0II <- SpII %>% as_tibble()  
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-levels(Sp0II$Parameter) <- as.factor(c("E[r]","E[0]","gamma[d]", "gamma[p]","a[d]","a[p]","Ue[1]", "Ue[2]"))
+levels(Sp0II$Parameter) <- as.factor(c("a[d]","a[p]","E[0]","E[r]","gamma[d]", "gamma[p]","Ue[1]", "Ue[2]"))
 
 pdf("plot/He3dp_corrII.pdf",height = 6,width =7)
 pair_wise_plot(Sp0II)
