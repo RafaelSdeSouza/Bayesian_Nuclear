@@ -5,25 +5,34 @@ N <- 150
 
 
 # data
-obsx1 <- exp(runif(N,log(1e-3),log(1)))
 
+
+obsx1 <- exp(runif(N,log(1e-3),log(1)))
+sd <- 1
 # Artificial values, here we will just fit 3 parameters Er, gi, gf
-y <- rnorm(N, sfactorTdn_5p(obsx1,0.0912,2.93,0.0794,6,5),sd = 1)
+y <- rnorm(N, sfactorTdn_5p(obsx1,0.0912,2.93,0.0794,6,5),sd = sd)
 
 
 # variables and priors
-Er = uniform(min = 0, max = 50)
-gi = uniform(min = 0, max = 50)
-gf = uniform(min = 0, max = 50)
-sd =  uniform(min = 0, max = 50)
+Er = uniform(min = 0.001, max = 50)
+gi = uniform(min = 0.001, max = 50)
+gf = uniform(min = 0.001, max = 50)
+sd =  uniform(min = 0.001, max = 50)
 # operations
 
+
+muF <- function(obsx1,Er,gi,gf){
 if (is.na(as.matrix(Er)[[1]])){
-  xx <- 0.0912  
-  mean = sfactorTdn_5p(obsx1,xx,gi,gf,6,5)
+xx <- runif(1,0,1)
+mean = sfactorTdn_5p(obsx1,xx,gi,gf,6,5)
 }else{
   mean = sfactorTdn_5p(obsx1,Er,gi,gf,6,5) 
 }
+return(mean)  
+}
+
+  
+mean = muF(obsx1,Er,gi,gf) 
 
 
 
