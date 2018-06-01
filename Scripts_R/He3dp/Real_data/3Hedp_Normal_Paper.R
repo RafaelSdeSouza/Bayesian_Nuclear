@@ -154,16 +154,17 @@ ue_ev[2] <-1e6*ue[2]
 gd_b <- sqrt(gd2_b)
 gp_b <- sqrt(gp2_b)
 
-tau_2  ~    dnorm(0, pow(1,-2))T(0,)
+tau_2  ~    dnorm(0, pow(5,-2))T(0,)
 
 E0_b  ~  dnorm(0, pow(1,-2))T(0,)
 Er_b  ~  dnorm(0, pow(1,-2))T(0,)
+#Er_b  <- E0_b
 
-gd2_b ~  dnorm(0, pow(10,-2))T(0,)
-gp2_b ~ dnorm(0, pow(10,-2))T(0,)
+gd2_b ~  dnorm(0, pow(1,-2))T(0,)
+gp2_b ~ dnorm(0, pow(1,-2))T(0,)
 
-ad_b ~  dnorm(5, pow(0.25,-2))T(1,)
-ap_b ~  dnorm(5, pow(0.25,-2))T(1,)
+ad_b ~  dnorm(5, pow(2.5,-2))T(0,)
+ap_b ~  dnorm(5, pow(2.5,-2))T(0,)
 
 
 
@@ -209,7 +210,7 @@ Normfit <- jags(data = model.data,
                 parameters.to.save  = c("Er","gd", "gp","ue_ev","tau", "ad","ap","RSS","mux0","mux1","mux2","scale","DeltaM",
                                         "E0_b","Er_b","gd_b", "gp_b","tau_2","ad_b","ap_b" ),
                 model.file  = textConnection(Model),
-                n.thin = 100,
+                n.thin = 200,
                 n.chains = 3,
                 n.burnin = 5000,
                 n.iter = 20000)
@@ -217,7 +218,7 @@ Normfit <- jags(data = model.data,
 
 
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
-Normfit <- update(Normfit, n.thin = 200, n.iter=15000)
+Normfit <- update(Normfit, n.thin = 1000, n.iter=200000)
 
 jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -454,7 +455,7 @@ Sp0II <- SpII %>% as_tibble()
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
 levels(Sp0II$Parameter) <- as.factor(c("a[d]","a[p]","E[0]","E[r]","gamma[d]", "gamma[p]","Ue[1]", "Ue[2]"))
 
-pdf("plot/He3dp_corrII.pdf",height = 6,width =7)
+pdf("plot/He3dp_corrII.pdf",height = 8,width =9)
 pair_wise_plot(Sp0II)
 dev.off()
 
