@@ -217,7 +217,7 @@ Normfit <- jags(data = model.data,
 
 
 
-Normfit <- update(Normfit, n.burnin = 300,n.iter=30000)
+Normfit <- update(Normfit, n.burnin = 50,n.iter=5000)
 #Normfit <- update(Normfit, n.thin = 250, n.iter=500000)
 
 jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
