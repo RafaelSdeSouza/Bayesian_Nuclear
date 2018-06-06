@@ -1,6 +1,6 @@
 table_reaction <- function(mat, vars=vars, N = 1000){
   mcdat_I <- as.data.frame(do.call(rbind, as.mcmc(mat)[,vars]))
-  index <- sample(1:nrow(mcdat_I ),size=Nsamp,replace=FALSE)
+  index <- sample(1:nrow(mcdat_I ),size=N,replace=FALSE)
   mcdat_I  <- mcdat_I [index,]
   
   gdat <- vector('list',N)

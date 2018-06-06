@@ -132,7 +132,7 @@ scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 }
 
 for (z in 1:Nik){
-ue[z] ~ dnorm(0,pow(0.1,-2))T(0,)
+ue[z] ~ dnorm(0,pow(0.01,-2))T(0,)
 }
 
 
@@ -153,17 +153,17 @@ ue_ev[2] <-1e6*ue[2]
 gd_b <- sqrt(gd2_b)
 gp_b <- sqrt(gp2_b)
 
-tau_2  ~    dnorm(0, pow(5,-2))T(0,)
+tau_2  ~    dnorm(0, pow(1,-2))T(0,)
 
 E0_b  ~  dnorm(0, pow(1,-2))T(0,)
 Er_b  ~  dnorm(0, pow(1,-2))T(0,)
 #Er_b  <- E0_b
 
 gd2_b ~  dnorm(0, pow(1,-2))T(0,)
-gp2_b ~ dnorm(0, pow(1,-2))T(0,)
+gp2_b ~  dnorm(0, pow(1,-2))T(0,)
 
-ad_b ~  dnorm(5, pow(2.5,-2))T(0,)
-ap_b ~  dnorm(5, pow(2.5,-2))T(0,)
+ad_b ~  dnorm(5, pow(2.5,-2))T(3,)
+ap_b ~  dnorm(5, pow(2.5,-2))T(3,)
 
 
 
@@ -182,7 +182,7 @@ ap_b ~  dnorm(5, pow(2.5,-2))T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(Er = runif(1,0.3,0.4),  gd2 = runif(1,2,5), gp2 = runif(1,0.01,0.08)) }
+inits <- function () { list(Er = runif(1,0.4,0.5),  gd2 = runif(1,0.1,3), gp2 = runif(1,0.01,0.1)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -211,6 +211,7 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 200,
                 n.chains = 3,
+<<<<<<< HEAD
                 n.burnin = 2500,
                 n.iter = 10000)
 
@@ -218,6 +219,15 @@ Normfit <- jags(data = model.data,
 
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
 Normfit <- update(Normfit, n.thin = 200, n.iter=10000)
+=======
+                n.burnin = 750,
+                n.iter = 2500)
+
+
+
+Normfit <- update(Normfit, n.burnin = 50,n.iter=5000)
+#Normfit <- update(Normfit, n.thin = 250, n.iter=500000)
+>>>>>>> 72811bcbc41160db696c3629cdb4f53161ee6987
 
 jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -439,10 +449,10 @@ Sp <- ggs(as.mcmc(Normfit)[,c("Er", "gd", "gp","ue_ev[1]","ue_ev[2]")])
 Sp0 <- Sp %>% as_tibble() 
 
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-levels(Sp0$Parameter) <- as.factor(c("E[0]","gamma[d]", "gamma[p]","Ue[1]", "Ue[2]"))
+levels(Sp0$Parameter) <- as.factor(c("E[0]~(MeV)","gamma[d]~(MeV^{1/2})", "gamma[p]~(MeV^{1/2})","Ue[1]~(eV)", "Ue[2]~(eV)"))
 
 
-pdf("plot/He3dp_corr.pdf",height = 6,width =6)
+pdf("plot/He3dp_corr.pdf",height = 6.25,width =6.25)
 pair_wise_plot(Sp0)
 dev.off()
 
@@ -452,7 +462,11 @@ SpII <- ggs(as.mcmc(Normfit)[,c("Er_b","E0_b", "gd_b", "gp_b","ad_b","ap_b","ue_
 #DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")])
 Sp0II <- SpII %>% as_tibble()  
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-levels(Sp0II$Parameter) <- as.factor(c("a[d]","a[p]","E[0]","E[r]","gamma[d]", "gamma[p]","Ue[1]", "Ue[2]"))
+#
+Sp0II$Parameter <- ordered(Sp0II$Parameter, levels = c("Er_b","E0_b", "gd_b", "gp_b","ad_b","ap_b","ue_ev[1]","ue_ev[2]"))
+
+levels(Sp0II$Parameter) <- as.factor(c("E[r]~(MeV)","E[0]~(MeV)","gamma[d]~(MeV^{1/2})", "gamma[p]~(MeV^{1/2})","a[d]~(fm)","a[p]~(fm)", "Ue[1]~(eV)", "Ue[2]~(eV)"))
+
 
 pdf("plot/He3dp_corrII.pdf",height = 8,width =9)
 pair_wise_plot(Sp0II)
@@ -497,11 +511,6 @@ c("scale[1]" = "Ali01a","scale[2]" = "Ali01b","scale[3]" = "Cos00",
 "scale[4]" = "Gei99","scale[5]" = "Kra87","scale[6]" = "Mol80",
 "scale[7]" = "Zhi77"))
 
-
-
-ggplot(iris, aes(x=Sepal.Length, y=Species, fill=factor(..quantile..))) +
-  stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE, quantiles = 4, quantile_lines = TRUE) +
-  scale_fill_viridis(discrete = TRUE, name = "Quartiles")
 
 
 require(ggridges)
@@ -616,9 +625,9 @@ Tgrid <- c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.0
 
 
 
+NA_I <-  table_reaction(Normfit,vars=c("Er", "gd", "gp","ad","ap"), N=1000)
 
-NA_I <-  table_reaction(Normfit,vars=c("e1", "gin", "gout","ri","rf"),N=1000)
-NA_II <- table_reaction(Normfit,vars=c("e1_2", "gin_2", "gout_2","ri_2","rf_2"),N=1000)
+NA_II <- table_reaction(Normfit,vars=c("Er_b","E0_b", "gd_b", "gp_b","ad_b","ap_b"),N=1000)
 
 NA_I$Case <- "Case I"
 NA_II$Case <- "Case II"
