@@ -11,7 +11,6 @@
 ######################################################################
 # preparation: remove all variables from the work space
 #rm(list=ls())
-set.seed(42)
 ######################################################################
 # data input
 # format: obsx, obsy, errobsy; the latter are the individual statistical
@@ -32,7 +31,7 @@ source("..//..//auxiliar_functions/pair_wise_plot.R")
 source("..//..//auxiliar_functions/Gamma3Hedp.R")
 source("..//..//auxiliar_functions/table_reaction.R")
 ## for block updating [we do not need to center predictor variables]
-load.module("glm")
+#load.module("glm")
 load.module("nuclear")
 
 
@@ -212,13 +211,13 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 200,
                 n.chains = 3,
-                n.burnin = 5000,
-                n.iter = 20000)
+                n.burnin = 2500,
+                n.iter = 10000)
 
 
 
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
-Normfit <- update(Normfit, n.thin = 1000, n.iter=200000)
+Normfit <- update(Normfit, n.thin = 200, n.iter=10000)
 
 jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 

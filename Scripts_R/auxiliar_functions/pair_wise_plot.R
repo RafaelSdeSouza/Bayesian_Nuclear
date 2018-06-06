@@ -4,7 +4,7 @@ my_hist <- function(data, mapping, ...) {
     ggplot(data = data, mapping = mapping) +
    
     stat_density_ridges(aes(y=0,fill=factor(..quantile..),alpha=factor(..quantile..)),geom = "density_ridges_gradient", calc_ecdf = TRUE, alpha=0.3,
-                        quantile_lines = TRUE,quantiles = c(0.025, 0.25,  0.75, 0.975)) + 
+                        quantiles = c(0.025, 0.25,  0.75, 0.975)) + 
     scale_fill_manual(name = "Probability", values = c("gray90", "gray70", "gray30",
                                                        "gray70","gray90" ))+
 #     geom_histogram(bins = 10,fill="#bf812d",colour="#1F3552",...) +
@@ -16,7 +16,7 @@ my_hist <- function(data, mapping, ...) {
   
 my_bin <- function(data, mapping, ..., low = "gray80", high = "gray15") {
   # get the x and y data to use the other code
-  ggplot(data = data, mapping = mapping,linetype-"dashed",color="red") +
+  ggplot(data = data, mapping = mapping) +
    stat_density_2d(aes(fill =..level..,alpha =..level..),geom="polygon",...) +
 #    stat_ellipse(type = "norm",level = 0.95,geom = "polygon",fill="#feb24c",...) +
 #    stat_ellipse(type = "norm",level = 0.68,geom = "polygon",fill="#f03b20",...) +
@@ -45,5 +45,5 @@ my_bin <- function(data, mapping, ..., low = "gray80", high = "gray15") {
            upper = "blank",
            lower = list(continuous = my_bin),
            switch="both",
-           showStrips=FALSE
+           showStrips=TRUE
  ) }
