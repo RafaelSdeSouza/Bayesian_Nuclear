@@ -31,7 +31,7 @@ source("..//..//auxiliar_functions/pair_wise_plot.R")
 source("..//..//auxiliar_functions/Gamma3Hedp.R")
 source("..//..//auxiliar_functions/table_reaction.R")
 ## for block updating [we do not need to center predictor variables]
-#load.module("glm")
+load.module("glm")
 load.module("nuclear")
 
 
@@ -132,17 +132,19 @@ scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 }
 
 for (z in 1:Nik){
-ue[z] ~ dnorm(0,pow(0.01,-2))T(0,)
+ue[z] ~ dnorm(0,pow(0.1,-2))T(0,)
 }
 
 
 # PRIORS 1
 
-tau ~  dnorm(0, pow(1,-2))T(0,)
-E0 ~  dnorm(0, pow(1,-2))T(0,)
-Er <-  E0 
-gd2 ~  dnorm(0, pow(1,-2))T(0,)
-gp2 ~ dnorm(0, pow(1,-2))T(0,)
+tau ~  dgamma(0.5,0.5)
+Er  ~  dgamma(0.5,0.5)
+
+E0 <-  Er 
+gd2 ~  dgamma(0.5,0.5)
+gp2 ~ dgamma(0.5,0.5)
+
 
 #  Transform
 gd <- sqrt(gd2)
@@ -155,34 +157,28 @@ gp_b <- sqrt(gp2_b)
 
 tau_2  ~    dnorm(0, pow(1,-2))T(0,)
 
-E0_b  ~  dnorm(0, pow(1,-2))T(0,)
 Er_b  ~  dnorm(0, pow(1,-2))T(0,)
-#Er_b  <- E0_b
+#E0_b  ~  dnorm(0, pow(1,-2))T(0,)
+E0_b  <- Er_b
 
 gd2_b ~  dnorm(0, pow(1,-2))T(0,)
 gp2_b ~  dnorm(0, pow(1,-2))T(0,)
 
-ad_b ~  dnorm(5, pow(2.5,-2))T(3,)
-ap_b ~  dnorm(5, pow(2.5,-2))T(3,)
+ad_b ~  dnorm(0, pow(1,-2))T(0.1,)
+ap_b ~  dnorm(0, pow(1,-2))T(0.1,)
 
 
 
 }"
 
+# inits <- function () { list(gd2_b = 1.1,
+#                            gp2_b = 0.01) }
 
-######################################################################
-# n.adapt:  number of iterations in the chain for adaptation (n.adapt)
-#           [JAGS will use to choose the sampler and to assure optimum
-#           mixing of the MCMC chain; will be discarded]
-# n.udpate: number of iterations for burnin; these will be discarded to
-#           allow the chain to converge before iterations are stored
-# n.iter:   number of iterations to store in the final chain as samples
-#           from the posterior distribution
-# n.chains: number of mcmc chains
-# n.thin:   store every n.thin element [=1 keeps all samples]
+inits <- function () { list(Er = runif(1,0.345,0.35),  gd2 = runif(1,0.1,1),
+                        gp2 = runif(1,0.01,0.05),gd2_b = 1.1,
+                        gp2_b = 0.01) }
 
 
-inits <- function () { list(Er = runif(1,0.4,0.5),  gd2 = runif(1,0.1,3), gp2 = runif(1,0.01,0.1)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -209,27 +205,18 @@ Normfit <- jags(data = model.data,
                 parameters.to.save  = c("Er","gd", "gp","ue_ev","tau", "ad","ap","RSS","mux0","mux1","mux2","scale","DeltaM",
                                         "E0_b","Er_b","gd_b", "gp_b","tau_2","ad_b","ap_b" ),
                 model.file  = textConnection(Model),
-                n.thin = 200,
+                n.thin = 5,
                 n.chains = 3,
-<<<<<<< HEAD
-                n.burnin = 2500,
-                n.iter = 10000)
+                n.burnin = 500,
+                n.iter = 2000)
 
 
 
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
-Normfit <- update(Normfit, n.thin = 200, n.iter=10000)
-=======
-                n.burnin = 750,
-                n.iter = 2500)
-
-
-
-Normfit <- update(Normfit, n.burnin = 50,n.iter=5000)
-#Normfit <- update(Normfit, n.thin = 250, n.iter=500000)
->>>>>>> 72811bcbc41160db696c3629cdb4f53161ee6987
+Normfit <- update(Normfit, n.thin = 10, n.iter = 10000)
 
 jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
 
 jagsresults(x = Normfit , params = c("E0_b","Er_b","gd_b", "gp_b","tau_2","ad_b","ap_b","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
@@ -414,9 +401,9 @@ mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout",
 
 
 traplot(Normfit  ,c("Er","gd", "gp","ue"),style="plain")
-denplot(Normfit  ,c("e1", "gin", "gout","ri","rf","ue"),style="plain")
+denplot(Normfit  ,c("Er","gd", "gp","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
-
+autocorr.plot(Normfit,c("Er","gd", "gp","ue"),style="plain")
 
 denplot(Normfit ,c("E0_b","Er_b", "ad_b","ap_b","gd_b","gp_b"),style="plain")
 
@@ -452,7 +439,7 @@ Sp0 <- Sp %>% as_tibble()
 levels(Sp0$Parameter) <- as.factor(c("E[0]~(MeV)","gamma[d]~(MeV^{1/2})", "gamma[p]~(MeV^{1/2})","Ue[1]~(eV)", "Ue[2]~(eV)"))
 
 
-pdf("plot/He3dp_corr.pdf",height = 6.25,width =6.25)
+pdf("plot/He3dp_corr.pdf",height = 6.25,width = 6.25)
 pair_wise_plot(Sp0)
 dev.off()
 
