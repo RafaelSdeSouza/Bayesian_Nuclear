@@ -80,7 +80,7 @@ model.data <- list(obsy = obsy,    # Response variable
                    M = M,
                    xx = xx,
                    ap  = 5,
-                   ad = 6
+                  ad = 6
 
 )
 
@@ -132,18 +132,35 @@ scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 }
 
 for (z in 1:Nik){
+<<<<<<< HEAD
 ue[z] ~ dnorm(0,pow(0.1,-2))T(0,)
+=======
+ue[z] ~ dnorm(0,pow(0.01,-2))T(0,)
+
+>>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
 }
 
 
 # PRIORS 1
 
+<<<<<<< HEAD
 tau ~  dgamma(0.5,0.5)
 Er  ~  dgamma(0.5,0.5)
 
 E0 <-  Er 
 gd2 ~  dgamma(0.5,0.5)
 gp2 ~ dgamma(0.5,0.5)
+
+=======
+tau ~  dnorm(0, pow(1,-2))T(0,)
+E0 ~   dnorm(0.5, pow(1,-2))T(0,)
+Er <-  E0 
+gd2 ~  dnorm(1, pow(1,-2))T(0,)
+gp2 ~ dnorm(0, pow(1,-2))T(0,)
+>>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
+
+#ad  ~  dnorm(6, pow(0.1,-2))T(0,)
+#ap  ~  dnorm(5, pow(0.1,-2))T(0,)
 
 
 #  Transform
@@ -158,14 +175,23 @@ gp_b <- sqrt(gp2_b)
 tau_2  ~    dnorm(0, pow(1,-2))T(0,)
 
 Er_b  ~  dnorm(0, pow(1,-2))T(0,)
+<<<<<<< HEAD
 #E0_b  ~  dnorm(0, pow(1,-2))T(0,)
 E0_b  <- Er_b
+=======
+#Er_b   <- E0_b 
+>>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
 
-gd2_b ~  dnorm(0, pow(1,-2))T(0,)
 gp2_b ~  dnorm(0, pow(1,-2))T(0,)
+gd2_b  ~  dnorm(0, pow(1,-2))T(0,)
 
+<<<<<<< HEAD
 ad_b ~  dnorm(0, pow(1,-2))T(0.1,)
 ap_b ~  dnorm(0, pow(1,-2))T(0.1,)
+=======
+ad_b  ~ dnorm(5, pow(1,-2))T(0,)
+ap_b  ~  dnorm(5, pow(1,-2))T(0,)
+>>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
 
 
 
@@ -213,7 +239,20 @@ Normfit <- jags(data = model.data,
 
 
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
+<<<<<<< HEAD
 Normfit <- update(Normfit, n.thin = 10, n.iter = 10000)
+=======
+Normfit <- update(Normfit, n.thin = 200, n.iter=10000)
+=======
+                n.burnin = 750,
+                n.iter = 3000)
+
+
+
+Normfit <- update(Normfit, n.burnin = 10,n.iter=5000)
+#Normfit <- update(Normfit, n.thin = 250, n.iter=500000)
+>>>>>>> 72811bcbc41160db696c3629cdb4f53161ee6987
+>>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
 
 jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
