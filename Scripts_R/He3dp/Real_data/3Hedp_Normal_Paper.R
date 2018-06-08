@@ -81,7 +81,7 @@ model.data <- list(obsy = obsy,    # Response variable
                    M = M,
                    xx = xx,
                    ap  = 5,
-                   ad = 6
+                  ad = 6
 
 )
 
@@ -134,16 +134,21 @@ scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 
 for (z in 1:Nik){
 ue[z] ~ dnorm(0,pow(0.01,-2))T(0,)
+
 }
 
 
 # PRIORS 1
 
 tau ~  dnorm(0, pow(1,-2))T(0,)
-E0 ~  dnorm(0, pow(1,-2))T(0,)
+E0 ~   dnorm(0.5, pow(1,-2))T(0,)
 Er <-  E0 
-gd2 ~  dnorm(0, pow(1,-2))T(0,)
+gd2 ~  dnorm(1, pow(1,-2))T(0,)
 gp2 ~ dnorm(0, pow(1,-2))T(0,)
+
+#ad  ~  dnorm(6, pow(0.1,-2))T(0,)
+#ap  ~  dnorm(5, pow(0.1,-2))T(0,)
+
 
 #  Transform
 gd <- sqrt(gd2)
@@ -158,13 +163,13 @@ tau_2  ~    dnorm(0, pow(1,-2))T(0,)
 
 E0_b  ~  dnorm(0, pow(1,-2))T(0,)
 Er_b  ~  dnorm(0, pow(1,-2))T(0,)
-#Er_b  <- E0_b
+#Er_b   <- E0_b 
 
-gd2_b ~  dnorm(0, pow(1,-2))T(0,)
 gp2_b ~  dnorm(0, pow(1,-2))T(0,)
+gd2_b  ~  dnorm(0, pow(1,-2))T(0,)
 
-ad_b ~  dnorm(5, pow(2.5,-2))T(3,)
-ap_b ~  dnorm(5, pow(2.5,-2))T(3,)
+ad_b  ~ dnorm(5, pow(1,-2))T(0,)
+ap_b  ~  dnorm(5, pow(1,-2))T(0,)
 
 
 
@@ -213,11 +218,11 @@ Normfit <- jags(data = model.data,
                 n.thin = 200,
                 n.chains = 3,
                 n.burnin = 750,
-                n.iter = 2500)
+                n.iter = 3000)
 
 
 
-Normfit <- update(Normfit, n.burnin = 50,n.iter=5000)
+Normfit <- update(Normfit, n.burnin = 10,n.iter=5000)
 #Normfit <- update(Normfit, n.thin = 250, n.iter=500000)
 
 jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
