@@ -24,7 +24,7 @@ library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr);library(wesanderson)
 library(dplyr);require(ggsci);require(ggmcmc);require(plyr);library(latex2exp)
-require(MCMCvis)
+require(MCMCvis);require(ggridges)
 source("..//..//auxiliar_functions/jagsresults.R")
 source("..//..//auxiliar_functions/theme_rafa.R")
 source("..//..//auxiliar_functions/pair_wise_plot.R")
@@ -34,6 +34,7 @@ source("..//..//auxiliar_functions/table_reaction.R")
 load.module("glm")
 load.module("nuclear")
 
+set.seed(27)
 
 ######################################################################
 ## Read DATA 
@@ -80,7 +81,7 @@ model.data <- list(obsy = obsy,    # Response variable
                    M = M,
                    xx = xx,
                    ap  = 5,
-                  ad = 6
+                   ad = 6
 
 )
 
@@ -113,7 +114,9 @@ mux0[j] <- sfactor3Hedp(xx[j], E0, Er, gd2, gp2, ad, ap,0)
 
 mux0_2[j] <- sfactor3Hedp(xx[j], E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
 
-DeltaM[j] <- (mux0[j] - mux0_2[j])/mux0[j]
+DeltaM[j] <- mux0[j]/mux0_2[j]
+
+
 
 # No inverse Kinematics 
 
@@ -127,72 +130,53 @@ yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 }
 
 
+
+
 for (k in 1:Nre){
 scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 }
 
 for (z in 1:Nik){
-<<<<<<< HEAD
 ue[z] ~ dnorm(0,pow(0.1,-2))T(0,)
-=======
-ue[z] ~ dnorm(0,pow(0.01,-2))T(0,)
-
->>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
 }
 
 
-# PRIORS 1
+# PRIORS 
 
-<<<<<<< HEAD
-tau ~  dgamma(0.5,0.5)
-Er  ~  dgamma(0.5,0.5)
-
-E0 <-  Er 
-gd2 ~  dgamma(0.5,0.5)
-gp2 ~ dgamma(0.5,0.5)
-
-=======
+# Case I
 tau ~  dnorm(0, pow(1,-2))T(0,)
-E0 ~   dnorm(0.5, pow(1,-2))T(0,)
+E0  ~  dnorm(0, pow(1,-2))T(0,) 
 Er <-  E0 
-gd2 ~  dnorm(1, pow(1,-2))T(0,)
-gp2 ~ dnorm(0, pow(1,-2))T(0,)
->>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
+gd2 ~  dnorm(0, pow(1,-2))T(0,) 
+gp2 ~  dnorm(0, pow(1,-2))T(0,) 
 
-#ad  ~  dnorm(6, pow(0.1,-2))T(0,)
-#ap  ~  dnorm(5, pow(0.1,-2))T(0,)
+#ad  ~  dnorm(5.5, pow(0.25,-2))T(0,)
+#ap  ~  dnorm(5.5, pow(0.25,-2))T(0,)
 
 
-#  Transform
-gd <- sqrt(gd2)
-gp <- sqrt(gp2)
+
+# Case II
+tau_2  ~    dnorm(0, pow(1,-2))T(0,)
+Er_b  ~   dnorm(0, pow(1,-2))T(0,) 
+E0_b  ~   dunif(0.12,0.3)
+#E0_b  <- Er_b
+gp2_b ~  dgamma(0.1,0.1)T(,5)
+gd2_b  ~ dgamma(0.1,0.1)T(,5)
+ad_b  ~  dunif(2.5, 7.5)
+ap_b  ~  dunif(2.5, 7.5)
+
+
+#  Transformed variables
+#gd <- sqrt(gd2)
+#gp <- sqrt(gp2)
+#gd_b <- sqrt(gd2_b)
+#gp_b <- sqrt(gp2_b)
+
 ue_ev[1] <-1e6*ue[1]
 ue_ev[2] <-1e6*ue[2] 
 
-gd_b <- sqrt(gd2_b)
-gp_b <- sqrt(gp2_b)
-
-tau_2  ~    dnorm(0, pow(1,-2))T(0,)
-
-Er_b  ~  dnorm(0, pow(1,-2))T(0,)
-<<<<<<< HEAD
-#E0_b  ~  dnorm(0, pow(1,-2))T(0,)
-E0_b  <- Er_b
-=======
-#Er_b   <- E0_b 
->>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
-
-gp2_b ~  dnorm(0, pow(1,-2))T(0,)
-gd2_b  ~  dnorm(0, pow(1,-2))T(0,)
-
-<<<<<<< HEAD
-ad_b ~  dnorm(0, pow(1,-2))T(0.1,)
-ap_b ~  dnorm(0, pow(1,-2))T(0.1,)
-=======
-ad_b  ~ dnorm(5, pow(1,-2))T(0,)
-ap_b  ~  dnorm(5, pow(1,-2))T(0,)
->>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
-
+S_0   <- sfactor3Hedp(0.0001, E0, Er, gd2, gp2, ad, ap,0)
+S_0b  <- sfactor3Hedp(0.0001, E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
 
 
 }"
@@ -200,9 +184,9 @@ ap_b  ~  dnorm(5, pow(1,-2))T(0,)
 # inits <- function () { list(gd2_b = 1.1,
 #                            gp2_b = 0.01) }
 
-inits <- function () { list(Er = runif(1,0.345,0.35),  gd2 = runif(1,0.1,1),
-                        gp2 = runif(1,0.01,0.05),gd2_b = 1.1,
-                        gp2_b = 0.01) }
+inits <- function () { list(E0 = runif(1,0.3,0.35),Er_b = runif(1,0.3,0.35),gd2 = runif(1,0.1,1),
+                        gp2 = runif(1,0.01,0.1),gd2_b = runif(1,0.01,2),
+                        gp2_b = runif(1,0.01,1)) }
 
 
 # "f": is the model specification from above;
@@ -210,7 +194,7 @@ inits <- function () { list(Er = runif(1,0.345,0.35),  gd2 = runif(1,0.1,1),
 
 ##require(runjags)
 #m <- run.jags(model = Model,
-#              monitor = c("e1","gin", "gout","ue","tau", "ri","rf",
+#              monitor = c("e1","gin", "gout","ue","tau", "ri","rf","
 #                          "e1_2","ex_2","gin_2", "gout_2","tau_2","ri_2","rf_2" ),
 #              data = model.data,
 #              n.chains = 10, 
@@ -222,42 +206,44 @@ inits <- function () { list(Er = runif(1,0.345,0.35),  gd2 = runif(1,0.1,1),
 
 
 
-
-
-
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("Er","gd", "gp","ue_ev","tau", "ad","ap","RSS","mux0","mux1","mux2","scale","DeltaM",
-                                        "E0_b","Er_b","gd_b", "gp_b","tau_2","ad_b","ap_b" ),
+                parameters.to.save  = c("Er","E0","gd2", "gp2","ue_ev","tau", "ad","ap",
+                                        "RSS","mux0","mux1","mux2","scale","DeltaM","S_0",
+                                        "S_0b","E0_b","Er_b","gd2_b",
+                                        "gp2_b","tau_2","ad_b","ap_b" ),
                 model.file  = textConnection(Model),
-                n.thin = 5,
-                n.chains = 3,
-                n.burnin = 500,
-                n.iter = 2000)
+                n.thin = 20,
+                n.chains = 5,
+                n.burnin = 2000,
+                n.iter = 4000)
 
+Normfit <- update(Normfit, n.thin = 20, n.iter = 2000)
+
+
+hdi_jags <- function(mcmc=mcmc, par = par,credMass = 0.95,allowSplit=TRUE){
+temp <- as.mcmc(mcmc)[,c(par)] 
+return(hdi(temp,allowSplit=TRUE))
+}
+hdi_jags(Normfit,par=c("Er","gd2", "gp2","ue_ev[1]","ue_ev[2]","S_0"),credMass = 0.95)
+
+jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","ue_ev","S_0"),probs = c(0.025, 0.975))
+
+
+jagsresults(x = Normfit , params = c("E0_b","Er_b","gd_b", "gp_b","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.025,0.975))
+hdi_jags(Normfit,par=c("E0_b","Er_b","gd_b", "gp_b","ad_b","ap_b","S_0b","ue_ev[1]","ue_ev[2]"),
+         credMass = 0.95)
 
 
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
-<<<<<<< HEAD
-Normfit <- update(Normfit, n.thin = 10, n.iter = 10000)
-=======
-Normfit <- update(Normfit, n.thin = 200, n.iter=10000)
-=======
-                n.burnin = 750,
-                n.iter = 3000)
 
 
 
-Normfit <- update(Normfit, n.burnin = 10,n.iter=5000)
-#Normfit <- update(Normfit, n.thin = 250, n.iter=500000)
->>>>>>> 72811bcbc41160db696c3629cdb4f53161ee6987
->>>>>>> 8cadeb25881d2ba573c7c7846c518322634e18f9
-
-jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
-jagsresults(x = Normfit , params = c("E0_b","Er_b","gd_b", "gp_b","tau_2","ad_b","ap_b","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit , params = c("E0_b","Er_b","gd_b", "gp_b","tau_2","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 # Plot
@@ -290,16 +276,16 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
   
   
   # red
-  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#fdd0a2"),show.legend=FALSE)+
+#  geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#fdd0a2"),show.legend=FALSE)+
   geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fdae6b"),show.legend=FALSE) +
   geom_ribbon(data=gdata2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#d94801"),show.legend=FALSE) +
   
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("gray95"),show.legend=FALSE)+
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("gray75"),show.legend=FALSE) +
-  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("gray55"),show.legend=FALSE) +
+#  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#B1BBCF"),show.legend=FALSE)+
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("gray70"),show.legend=FALSE) +
+  geom_ribbon(data=gdata,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("gray30"),show.legend=FALSE) +
   
   #  Bare
-  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
+#  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
   geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#9e9ac8"),show.legend=FALSE) +
   geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),show.legend=FALSE) +
   #
@@ -310,8 +296,8 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
                 width=0.01,alpha=0.4)+
   #  geom_line(data=gdata,aes(x=xx,y=mean),linetype="dashed",size=0.75,show.legend=FALSE)+
   #  geom_line(data=gdata2,aes(x=xx,y=mean),linetype="dashed",size=0.75,show.legend=FALSE)+
-  scale_colour_manual(name="",values=c("gray20","#7f0000","#7f0000","gray20","gray20",
-                                       "gray20","gray20"))+
+  scale_colour_manual(name="",values=c("black","#7f0000","#7f0000","black","black",
+                                       "black","black"))+
   scale_shape_manual(values=c(0,19,8,10,4,17,3),name="")+
   coord_cartesian(xlim=c(5e-3,0.6),ylim=c(0.5,19)) +
   theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") + 
@@ -326,10 +312,10 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(size=18.5),
-        axis.text  = element_text(size=13),
+        axis.title = element_text(size=22),
+        axis.text  = element_text(size=18),
         axis.ticks = element_line(size = 0.75),
-        axis.line = element_line(size = 0.5, linetype = "solid")) 
+        axis.line = element_line(size = 0.75, linetype = "solid")) 
 dev.off()
 
 
@@ -439,8 +425,8 @@ div_style <- parcoord_style_np(div_color = "green", div_size = 0.05, div_alpha =
 mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout","ri","rf"))
 
 
-traplot(Normfit  ,c("Er","gd", "gp","ue"),style="plain")
-denplot(Normfit  ,c("Er","gd", "gp","ue"),style="plain")
+traplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
+denplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 autocorr.plot(Normfit,c("Er","gd", "gp","ue"),style="plain")
 
@@ -470,31 +456,33 @@ denplot(Normfit ,c("E0_b","Er_b", "ad_b","ap_b","gd_b","gp_b"),style="plain")
 #ggs_traceplot(ss)
 
 # Case I
-Sp <- ggs(as.mcmc(Normfit)[,c("Er", "gd", "gp","ue_ev[1]","ue_ev[2]")]) 
+Sp <- ggs(as.mcmc(Normfit)[,c("Er", "gd2", "gp2","ue_ev[1]","ue_ev[2]","S_0")]) 
 #DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout")])
 Sp0 <- Sp %>% as_tibble() 
 
-#%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
-levels(Sp0$Parameter) <- as.factor(c("E[0]~(MeV)","gamma[d]~(MeV^{1/2})", "gamma[p]~(MeV^{1/2})","Ue[1]~(eV)", "Ue[2]~(eV)"))
+Sp0$Parameter <- ordered(Sp0$Parameter, levels = c("Er", "gd2", "gp2","ue_ev[1]","ue_ev[2]","S_0"))
+
+levels(Sp0$Parameter) <- as.factor(c("E[0]~(MeV)","gamma[d]^2~(MeV)", "gamma[p]^2~(MeV)","U[e1]~(eV)", "U[e2]~(eV)","S[b](0)~(MeV~b)"))
 
 
-pdf("plot/He3dp_corr.pdf",height = 6.25,width = 6.25)
+pdf("plot/He3dp_corr.pdf",height = 7,width = 7)
 pair_wise_plot(Sp0)
 dev.off()
 
 
 # Case II
-SpII <- ggs(as.mcmc(Normfit)[,c("Er_b","E0_b", "gd_b", "gp_b","ad_b","ap_b","ue_ev[1]","ue_ev[2]")]) 
+SpII <- ggs(as.mcmc(Normfit)[,c("Er_b","E0_b", "gd2_b", "gp2_b","ad_b","ap_b","ue_ev[1]","ue_ev[2]","S_0")]) 
 #DD <- as.matrix(as.mcmc(Normfit)[,c("e1", "gin", "gout","ri","rf")])
 Sp0II <- SpII %>% as_tibble()  
 #%>% mutate(value = ifelse(Parameter == 'e1', 10*value, value)) 
 #
-Sp0II$Parameter <- ordered(Sp0II$Parameter, levels = c("Er_b","E0_b", "gd_b", "gp_b","ad_b","ap_b","ue_ev[1]","ue_ev[2]"))
+Sp0II$Parameter <- ordered(Sp0II$Parameter, levels = c("Er_b","E0_b", "gd2_b", "gp2_b","ad_b","ap_b","ue_ev[1]","ue_ev[2]","S_0"))
 
-levels(Sp0II$Parameter) <- as.factor(c("E[r]~(MeV)","E[0]~(MeV)","gamma[d]~(MeV^{1/2})", "gamma[p]~(MeV^{1/2})","a[d]~(fm)","a[p]~(fm)", "Ue[1]~(eV)", "Ue[2]~(eV)"))
+levels(Sp0II$Parameter) <- as.factor(c("E[r]~(MeV)","E[0]~(MeV)","gamma[d]^2~(MeV)", "gamma[p]^2~(MeV)","a[d]~(fm)","a[p]~(fm)", "Ue[1]~(eV)", "Ue[2]~(eV)",
+                                       "S[b](0)~(MeV~b)"))
 
 
-pdf("plot/He3dp_corrII.pdf",height = 8,width =9)
+pdf("plot/He3dp_corrII.pdf",height = 9.5,width = 9.5)
 pair_wise_plot(Sp0II)
 dev.off()
 
@@ -537,6 +525,7 @@ c("scale[1]" = "Ali01a","scale[2]" = "Ali01b","scale[3]" = "Cos00",
 "scale[4]" = "Gei99","scale[5]" = "Kra87","scale[6]" = "Mol80",
 "scale[7]" = "Zhi77"))
 
+jagsresults(x = Normfit, params = c("scale"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 require(ggridges)
