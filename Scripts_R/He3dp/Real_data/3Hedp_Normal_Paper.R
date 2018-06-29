@@ -216,23 +216,16 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 200,
                 n.chains = 3,
-<<<<<<< HEAD
+
                 n.burnin = 2500,
                 n.iter = 10000)
 
 
 
-#Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
-Normfit <- update(Normfit, n.thin = 200, n.iter=10000)
-=======
-                n.burnin = 750,
-                n.iter = 3000)
-
-
 
 Normfit <- update(Normfit, n.burnin = 10,n.iter=5000)
 #Normfit <- update(Normfit, n.thin = 250, n.iter=500000)
->>>>>>> 72811bcbc41160db696c3629cdb4f53161ee6987
+
 
 jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","tau", "ad","ap","ue_ev"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
