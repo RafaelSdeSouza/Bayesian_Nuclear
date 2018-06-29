@@ -15,7 +15,8 @@ source("..//..//auxiliar_functions/table_reaction.R")
 ######################################################################
 ## Read DATA 
 ensamble <- read.csv("ensamble.csv",header = T) %>%
-  mutate(Syst=replace(Syst,Syst==0.06,0.078))  %>% filter(E <= 0.5)  
+  mutate(Syst=replace(Syst,Syst==0.06,0.078))  %>% filter(E <= 0.5) 
+
 
 
 re <- as.numeric(ensamble$dat)
@@ -98,7 +99,7 @@ Model <- function(parm, Data)
   gf.prior <- dhalfnorm(gf, 0.5, log=TRUE)
 #  ri.prior <- dhalfcauchy(ri, 1, log=TRUE)
 #  rf.prior <- dhalfcauchy(rf, 1, log=TRUE)
-  ri.prior <- dnorm(ri, 5, 0.01,log=TRUE)
+  ri.prior <- dnorm(ri, 6, 0.01,log=TRUE)
   rf.prior <- dnorm(rf,  5, 0.01, log=TRUE)
   ue.prior <- sum(dhalfnorm(ue, 0.01, log=TRUE))
   sigma.prior <- dhalfcauchy(sigma, 25, log=TRUE)
@@ -143,7 +144,7 @@ plot(FitAFSS, BurnIn=10000, MyData,  Parms=c("Er","gi","gf","sigma"))
 
 
 FitMWG <- LaplacesDemon(Model, Data=MyData, Initial.Values,
-                          Covar=NULL, Iterations=20000, Status=100, Thinning=1,
+                          Covar=NULL, Iterations=2000, Status=100, Thinning=1,
                           Algorithm="MWG", Specs=list(B=NULL))
                      
 plot(FitMWG, BurnIn=1000, MyData, PDF=FALSE, Parms=c("Er","gi","gf","sigma"))
