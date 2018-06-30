@@ -34,7 +34,7 @@ source("..//..//auxiliar_functions/table_reaction.R")
 load.module("glm")
 load.module("nuclear")
 
-set.seed(27)
+set.seed(1234)
 
 ######################################################################
 ## Read DATA 
@@ -79,9 +79,9 @@ model.data <- list(obsy = obsy,    # Response variable
                    Nik = Nik,
                    ik  = ik,
                    M = M,
-                   xx = xx,
-                   ap  = 5,
-                   ad = 6
+                   xx = xx
+ #                  ap  = 5,
+ #                  ad = 6
 
 )
 
@@ -147,23 +147,23 @@ ue[z] ~ dnorm(0,pow(0.1,-2))T(0,)
 tau ~  dnorm(0, pow(1,-2))T(0,)
 E0  ~  dnorm(0, pow(1,-2))T(0,) 
 Er <-  E0 
-gd2 ~  dnorm(0, pow(1,-2))T(0,) 
-gp2 ~  dnorm(0, pow(1,-2))T(0,) 
+gd2 ~  dnorm(0, pow(3,-2))T(0,) 
+gp2 ~  dnorm(0, pow(3,-2))T(0,) 
 
-#ad  ~  dnorm(5.5, pow(0.25,-2))T(0,)
-#ap  ~  dnorm(5.5, pow(0.25,-2))T(0,)
+ad  ~  dnorm(6, pow(0.01,-2))T(0,)
+ap  ~  dnorm(5, pow(0.01,-2))T(0,)
 
 
 
 # Case II
 tau_2  ~    dnorm(0, pow(1,-2))T(0,)
 Er_b  ~   dnorm(0, pow(1,-2))T(0,) 
-E0_b  ~   dunif(0.12,0.3)
+E0_b  ~   dnorm(0, pow(1,-2))T(0,)
 #E0_b  <- Er_b
-gp2_b ~  dgamma(0.1,0.1)T(,5)
-gd2_b  ~ dgamma(0.1,0.1)T(,5)
-ad_b  ~  dunif(2.5, 7.5)
-ap_b  ~  dunif(2.5, 7.5)
+gp2_b ~  dnorm(0, pow(3,-2))T(0,)
+gd2_b  ~ dnorm(0, pow(3,-2))T(0,)
+ad_b  ~  dunif(2,8)
+ap_b  ~  dunif(2,8)
 
 
 #  Transformed variables
@@ -192,15 +192,17 @@ inits <- function () { list(E0 = runif(1,0.3,0.35),Er_b = runif(1,0.3,0.35),gd2 
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
-##require(runjags)
+#require(runjags)
 #m <- run.jags(model = Model,
-#              monitor = c("e1","gin", "gout","ue","tau", "ri","rf","
-#                          "e1_2","ex_2","gin_2", "gout_2","tau_2","ri_2","rf_2" ),
-#              data = model.data,
-#              n.chains = 10, 
-#              inits = inits, 
+#              monitor = c("Er","E0","gd2", "gp2","ue_ev","tau", "ad","ap",
+#                          "RSS","mux0","mux1","mux2","scale","DeltaM","S_0",
+#                          "S_0b","E0_b","Er_b","gd2_b",
+#                          "gp2_b","tau_2","ad_b","ap_b" ),
+#             data = model.data,
+#             n.chains = 5, 
+#             inits = inits, 
 #              burnin = 1000, 
-#              sample = 5000,
+#              sample = 10000,
 #              adapt = 2000
 #)
 
@@ -214,19 +216,12 @@ Normfit <- jags(data = model.data,
                                         "S_0b","E0_b","Er_b","gd2_b",
                                         "gp2_b","tau_2","ad_b","ap_b" ),
                 model.file  = textConnection(Model),
-<<<<<<< HEAD
-                n.thin = 200,
-                n.chains = 3,
-
-                n.burnin = 2500,
-                n.iter = 10000)
-=======
-                n.thin = 20,
+                n.thin = 30,
                 n.chains = 5,
-                n.burnin = 2000,
-                n.iter = 4000)
+                n.burnin = 3500,
+                n.iter = 8500)
 
-Normfit <- update(Normfit, n.thin = 20, n.iter = 2000)
+Normfit <- update(Normfit, n.thin = 25, n.iter = 5000)
 
 
 hdi_jags <- function(mcmc=mcmc, par = par,credMass = 0.95,allowSplit=TRUE){
@@ -237,28 +232,27 @@ hdi_jags(Normfit,par=c("Er","gd2", "gp2","ue_ev[1]","ue_ev[2]","S_0"),credMass =
 
 jagsresults(x = Normfit, params = c("Er","gd", "gp","ue","ue_ev","S_0"),probs = c(0.025, 0.975))
 
->>>>>>> 52ecfec4281372406cc3803e7fe7a343457417d7
+
 
 jagsresults(x = Normfit , params = c("E0_b","Er_b","gd_b", "gp_b","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.025,0.975))
 hdi_jags(Normfit,par=c("E0_b","Er_b","gd_b", "gp_b","ad_b","ap_b","S_0b","ue_ev[1]","ue_ev[2]"),
          credMass = 0.95)
 
 
-<<<<<<< HEAD
 
 Normfit <- update(Normfit, n.burnin = 10,n.iter=5000)
 #Normfit <- update(Normfit, n.thin = 250, n.iter=500000)
 
-=======
+
 #Normfit <- update(Normfit, n.burnin = 1000,n.iter=3000)
 
 
 
 jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
->>>>>>> 52ecfec4281372406cc3803e7fe7a343457417d7
 
 
-jagsresults(x = Normfit , params = c("E0_b","Er_b","gd_b", "gp_b","tau_2","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
+jagsresults(x = Normfit , params = c("E0_b","Er_b","gd2_b", "gp2_b","tau_2","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 # Plot
@@ -445,7 +439,7 @@ denplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 autocorr.plot(Normfit,c("Er","gd", "gp","ue"),style="plain")
 
-denplot(Normfit ,c("E0_b","Er_b", "ad_b","ap_b","gd_b","gp_b"),style="plain")
+denplot(Normfit ,c("E0_b","Er_b", "ad_b","ap_b","gd2_b","gp2_b"),style="plain")
 
 
 
