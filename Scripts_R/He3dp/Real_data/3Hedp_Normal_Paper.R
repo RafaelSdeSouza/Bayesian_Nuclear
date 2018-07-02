@@ -359,7 +359,7 @@ ggplot(gdata02,aes(x=x,y=mean))+
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),alpha=0.5,show.legend=FALSE) +
   #
   #  
-  coord_cartesian(xlim=c(5e-3,0.35),ylim=c(-0.075,0.075)) +
+ coord_cartesian(xlim=c(5e-3,0.3425),ylim=c(0.9,1.1)) +
   theme_bw() + xlab("Energy (MeV)") + ylab(expression(delta["S"])) + 
   scale_x_log10()  +
   annotation_logticks(sides = "b") +
