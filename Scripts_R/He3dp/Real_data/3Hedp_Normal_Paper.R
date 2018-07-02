@@ -157,13 +157,17 @@ ap  ~  dnorm(5, pow(0.01,-2))T(0,)
 
 # Case II
 tau_2  ~    dnorm(0, pow(1,-2))T(0,)
-Er_b  ~   dnorm(0, pow(1,-2))T(0,) 
-E0_b  ~   dnorm(0, pow(1,-2))T(0,)
+#Er_b  ~   dnorm(0, pow(1,-2))T(0,) 
+#E0_b  ~   dnorm(0, pow(1,-2))T(0,1.5)
+Er_b  ~   dbeta(0.5,0.5)
+E0_b  ~   dbeta(0.5,0.5)
+
 #E0_b  <- Er_b
 gp2_b ~  dnorm(0, pow(3,-2))T(0,)
 gd2_b  ~ dnorm(0, pow(3,-2))T(0,)
-ad_b  ~  dunif(2,8)
-ap_b  ~  dunif(2,8)
+
+ad_b  ~  dnorm(5, pow(3,-2))T(2,8)
+ap_b  ~  dnorm(5, pow(3,-2))T(2,8)
 
 
 #  Transformed variables
@@ -184,9 +188,8 @@ S_0b  <- sfactor3Hedp(0.0001, E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
 # inits <- function () { list(gd2_b = 1.1,
 #                            gp2_b = 0.01) }
 
-inits <- function () { list(E0 = runif(1,0.3,0.35),Er_b = runif(1,0.3,0.35),gd2 = runif(1,0.1,1),
-                        gp2 = runif(1,0.01,0.1),gd2_b = runif(1,0.01,2),
-                        gp2_b = runif(1,0.01,1)) }
+inits <- function () { list(E0 = runif(1,0.3,0.35),E0_b = 0.4,Er_b = 0.4,gd2 = 1,
+                        gp2 = runif(1,0.01,0.1),gd2_b = 0.5) }
 
 
 # "f": is the model specification from above;
@@ -221,7 +224,7 @@ Normfit <- jags(data = model.data,
                 n.burnin = 3500,
                 n.iter = 8500)
 
-Normfit <- update(Normfit, n.thin = 25, n.iter = 5000)
+Normfit <- update(Normfit, n.thin = 50, n.iter = 500)
 
 
 hdi_jags <- function(mcmc=mcmc, par = par,credMass = 0.95,allowSplit=TRUE){
@@ -438,6 +441,8 @@ traplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
 denplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 autocorr.plot(Normfit,c("Er","gd", "gp","ue"),style="plain")
+
+traplot(Normfit ,c("E0_b","Er_b", "ad_b","ap_b","gd2_b","gp2_b"),style="plain")
 
 denplot(Normfit ,c("E0_b","Er_b", "ad_b","ap_b","gd2_b","gp2_b"),style="plain")
 

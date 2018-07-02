@@ -4,10 +4,15 @@ pair_wise_plot <- function(s){
 my_hist <- function(data, mapping, ...) {
     ggplot(data = data, mapping = mapping) +
    
-    stat_density_ridges(aes(y=0,fill=factor(..quantile..),alpha=factor(..quantile..)),geom = "density_ridges_gradient", calc_ecdf = TRUE, 
-                        quantiles = c(0.025, 0.25,  0.75, 0.975)) + 
-    scale_fill_manual(name = "Probability", values = c("#440154BF",  "#21908CBF","#FDE725BF",
-                                                       "#21908CBF","#440154BF")) +
+#    stat_density_ridges(aes(y=0,fill=factor(..quantile..),alpha=factor(..quantile..)),geom = "density_ridges_gradient", calc_ecdf = TRUE, 
+#                        quantiles = c(0.025, 0.25,  0.75, 0.975)) + 
+    stat_density_ridges(geom = "density_ridges_gradient",aes(y=0, fill = 0.5-abs(0.5 - ..ecdf..),
+                                                             alpha = 0.5-abs(0.5 - ..ecdf..)),
+                        calc_ecdf = TRUE, quantile_lines = TRUE,color="gray",
+                        quantiles = c(0.025, 0.25,  0.75, 0.975)) +
+    scale_fill_viridis(name = "Tail probability") +    
+#    scale_fill_manual(name = "Probability", values = c("#440154BF",  "#21908CBF","#FDE725BF",
+#                                                       "#21908CBF","#440154BF")) +
 #    scale_fill_viridis(discrete=TRUE)+
 #     geom_histogram(bins = 10,fill="#bf812d",colour="#1F3552",...) +
 #    geom_density(adjust = 1.5,fill="#bf812d",colour="#1F3552",...) +
@@ -28,8 +33,8 @@ my_bin <- function(data, mapping, ..., low = "#74dbef", high = "#0074e4") {
 #    stat_ellipse(type = "norm",level = 0.68,geom = "polygon",fill="#f03b20",...) +
 #    geom_point() +
 #   stat_ellipse(type = "t",level = 0.997,alpha=0.95,color="#dfc27d",...) +
-   stat_ellipse(type = "t",level = 0.95,alpha=0.75,...) +
-   stat_ellipse(type = "t",level = 0.50,alpha=0.75,...) +
+   stat_ellipse(type = "t",level = 0.95,color="gray",alpha=0.75,...) +
+   stat_ellipse(type = "t",level = 0.50,color="gray",alpha=0.75,...) +
     scale_x_continuous(breaks = scales::pretty_breaks(n = 4)) +
     scale_y_continuous(breaks = scales::pretty_breaks(n = 4)) +
      scale_fill_viridis() +
