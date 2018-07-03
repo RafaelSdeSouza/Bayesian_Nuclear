@@ -1,5 +1,6 @@
 reaction_table_Tdn <- function(mat, vars=vars, N = 1000, T9){
-  mcdat_I <- as.data.frame(as.mcmc(mcmcChain)[,vars])
+#  mcdat_I <- as.data.frame(as.mcmc(mcmcChain)[,vars])
+  mcdat_I <- mat[,vars]
   index <- sample(1:nrow(mcdat_I ),size=N,replace=FALSE)
   mcdat_I  <- mcdat_I[index,]
   
@@ -19,7 +20,7 @@ reaction_table_Tdn <- function(mat, vars=vars, N = 1000, T9){
   
   fu_I<-apply(gg, 1, fu)
   
-  gg2data <- data.frame(T9 =T9, mean = gg2["50%",],lower = gg2["16%",], upper = gg2["84%",] )
+  gg2data <- data.frame(T9 =T9, lower = gg2["16%",],mean = gg2["50%",], upper = gg2["84%",] )
   gg2data$fu <- fu_I
   return(gg2data)
 }
