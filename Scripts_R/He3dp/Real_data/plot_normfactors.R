@@ -19,8 +19,8 @@ gg <- ggplot(Sa, aes(x = value, y = Parameter, fill=factor(..quantile..),alpha=f
                       quantile_lines = TRUE,quantiles = c(0.025, 0.25,  0.75, 0.975)) +
   theme_economist_white() +
 
-  scale_fill_manual(name = "Probability", values = c("gray90", "gray70", "gray30",
-                                                     "gray70","gray90" ))+
+  scale_fill_manual(name = "Probability", values = c("#440154BF",  "#21908CBF","#FDE725BF",
+                                                     "#21908CBF","#440154BF"))+
   geom_vline(xintercept = 1,linetype="dashed",color="red") +
   #  scale_fill_manual(values=c(rep("gray75",7))) +
   # geom_point(size=1,color="red") +
@@ -29,7 +29,7 @@ gg <- ggplot(Sa, aes(x = value, y = Parameter, fill=factor(..quantile..),alpha=f
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="black", face="bold", size=15),
+        axis.title = element_text(color="black", size=15),
         axis.text  = element_text(size=10),
         strip.background = element_rect("white")) +
   ylab("") +
