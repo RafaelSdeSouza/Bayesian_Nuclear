@@ -29,11 +29,12 @@ source("..//..//auxiliar_functions/jagsresults.R")
 source("..//..//auxiliar_functions/theme_rafa.R")
 source("..//..//auxiliar_functions/pair_wise_plot.R")
 source("..//..//auxiliar_functions/Gamma3Hedp.R")
+source("plot_Sfactor.R")
+source("plot_normfactors.R")
 ## for block updating [we do not need to center predictor variables]
 load.module("glm")
 load.module("nuclear")
 
-set.seed(1234)
 
 ######################################################################
 ## Read DATA
@@ -166,8 +167,8 @@ ap_b  ~  dunif(2,10)
 ue_ev[1] <-1e6*ue[1]
 ue_ev[2] <-1e6*ue[2]
 
-S_0   <- sfactor3Hedp(1e-5, E0, Er, gd2, gp2, ad, ap,0)
-S_0b  <- sfactor3Hedp(1e-5, E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
+S_0   <- sfactor3Hedp(1e-4, E0, Er, gd2, gp2, ad, ap,0)
+S_0b  <- sfactor3Hedp(1e-4, E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
 
 
 }"
@@ -186,10 +187,10 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 30,
                 n.chains = 5,
-                n.burnin = 3500,
-                n.iter = 8500)
+                n.burnin = 5000,
+                n.iter = 10000)
 
-Normfit <- update(Normfit, n.thin = 25, n.iter = 5000)
+Normfit <- update(Normfit, n.thin = 50, n.iter = 10000)
 
 #hdi_jags <- function(mcmc=mcmc, par = par,credMass = 0.95,allowSplit=TRUE){
 #  temp <- as.mcmc(mcmc)[,c(par)]
@@ -198,9 +199,14 @@ Normfit <- update(Normfit, n.thin = 25, n.iter = 5000)
 #hdi_jags(Normfit,par=c("Er","gd2", "gp2","ue_ev[1]","ue_ev[2]","S_0"),credMass = 0.95)
 
 
+tab <- jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.16, 0.5, 0.84))
+tab <- as.data.frame(tab)
 
+tab$low <- tab[,4] - tab[,3]
+tab$hi <-  tab[,5] - tab[,4]
 
 jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+
 jagsresults(x = Normfit , params = c("E0_b","Er_b","gd2_b", "gp2_b","tau_2","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
@@ -213,7 +219,7 @@ pdf("plot/He3dp_syst_l.pdf",height = 7,width = 10)
 plot_Sfactor(Normfit)
 dev.off()
 
-
+sqrt(GammaHe3dp(Normfit)$Ga)
 
 # Plot poir-wise plot Case-I
 
