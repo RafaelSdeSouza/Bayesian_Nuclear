@@ -280,12 +280,13 @@ old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) %>%
 
 joint <- rbind(old,NAI_new )
 
+write.csv(joint ,"joint_rate.csv",row.names = F)
 
 
 ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
-  coord_cartesian(ylim=c(0.9,1.06),xlim=c(0.00125,1)) +
+  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction") +
   scale_fill_manual(values=c("#abb7d0","#93e0a8"))+
   scale_x_log10()  +
