@@ -38,15 +38,16 @@ ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) 
         panel.grid.minor = element_blank(),
         legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
-        plot.background = element_rect(colour = "white", fill = "white"),
-        panel.background = element_rect(size=3,colour = "white", fill = "white"),
+        plot.background = element_rect(size = 3, linetype='dashed',colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
         axis.title = element_text(size=22),
         axis.ticks = element_line(size = 0.75),
         axis.line = element_line(size = 0.75, linetype = "solid"),
-        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 3.5, b = 0, l = 0), "mm")),
-        axis.text.x = element_text(size = 20, margin = unit(c(t = 3.5, r = 0, b = 0, l = 0), "mm")),
-        axis.ticks.length = unit(-2.4, "mm")) 
+        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-4.25, "mm"),
+        panel.border = element_rect(size = 1.2)) 
         
 dev.off()
 
