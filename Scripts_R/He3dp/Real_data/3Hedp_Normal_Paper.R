@@ -257,10 +257,54 @@ Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.01
     0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000,1.250,1.500,1.750,2.000,2.500,3.000,3.500,4.000,5.000,
     6.000,7.000,8.000,9.000,10.000)
 
-table_reaction_He3dp(Normfit, vars=c("Er","E0","gd2", "gp2", "ad","ap"),N=50,T9=10)
+NAI <- table_reaction_He3dp(Normfit, vars=c("E0","Er","gd2", "gp2", "ad","ap"),N=800,T9=Tgrid )
+
+Norm <- NAI$mean
+
+
+NAI_new <- NAI  %>%  mutate(data = "present") %>% 
+  select(c("T9","mean","lower","upper")) %>%
+  set_colnames(c("T9","Adopted","Lower","Upper")) %>%
+  mutate(Adopted = Adopted/Norm) %>% 
+  mutate(Lower = Lower/Norm) %>%
+  mutate(Upper = Upper/Norm)  %>%  
+  mutate(data="present")  
+
+old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) %>%  
+  select(c("T9","Adopted","Lower","Upper"))  %>%
+  mutate(data="previous") %>% 
+  mutate(Adopted = Adopted/Norm) %>% 
+  mutate(Lower = Lower/Norm) %>%
+  mutate(Upper = Upper/Norm)
+
+
+joint <- rbind(old,NAI_new )
 
 
 
+ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
+  geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
+  geom_line() +
+  coord_cartesian(ylim=c(0.9,1.06),xlim=c(0.00125,1)) +
+  theme_bw() + xlab("Temperature (GK)") + ylab("Reaction") +
+  scale_fill_manual(values=c("#abb7d0","#93e0a8"))+
+  scale_x_log10()  +
+  annotation_logticks(sides = "b") +
+  annotation_logticks(base=2.875,sides = "l") +
+  scale_linetype_manual(guide=F,values=c("dashed","solid")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(size=22),
+        axis.ticks = element_line(size = 0.75),
+        axis.line = element_line(size = 0.75, linetype = "solid"),
+        axis.text.y = element_text(size = 18, margin = unit(c(t = 0, r = 3.5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 18, margin = unit(c(t = 3.5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-2.4, "mm"))
 
 
 
