@@ -302,7 +302,7 @@ ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) 
   geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
-  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
+  coord_cartesian(ylim=c(0.85,1.1),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction") +
   scale_fill_fivethirtyeight()+
   scale_x_log10()  +
