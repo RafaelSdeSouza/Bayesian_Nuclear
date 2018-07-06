@@ -241,6 +241,7 @@ plot_normfactors(Normfit)
 dev.off()
 
 
+jagsresults(x = Normfit, params = c("scale"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 
 
@@ -258,8 +259,11 @@ Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.01
     6.000,7.000,8.000,9.000,10.000)
 
 NAI <- table_reaction_He3dp(Normfit, vars=c("E0","Er","gd2", "gp2", "ad","ap"),N=800,T9=Tgrid )
+NAII <- table_reaction_He3dp(Normfit, vars=c("E0_b","Er_b","gd2_b", "gp2_b", "ad_b","ap_b"),N=800,T9=Tgrid )
 
-Norm <- NAI$mean
+
+
+Norm <- NAII$mean
 
 
 NAI_new <- NAI  %>%  mutate(data = "present") %>% 
@@ -268,7 +272,17 @@ NAI_new <- NAI  %>%  mutate(data = "present") %>%
   mutate(Adopted = Adopted/Norm) %>% 
   mutate(Lower = Lower/Norm) %>%
   mutate(Upper = Upper/Norm)  %>%  
-  mutate(data="present")  
+  mutate(data="presentI")  
+
+
+NAII_new <- NAII  %>%  mutate(data = "present") %>% 
+  select(c("T9","mean","lower","upper")) %>%
+  set_colnames(c("T9","Adopted","Lower","Upper")) %>%
+  mutate(Adopted = Adopted/Norm) %>% 
+  mutate(Lower = Lower/Norm) %>%
+  mutate(Upper = Upper/Norm)  %>%  
+  mutate(data="presentII") 
+
 
 old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) %>%  
   select(c("T9","Adopted","Lower","Upper"))  %>%
@@ -278,21 +292,23 @@ old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) %>%
   mutate(Upper = Upper/Norm)
 
 
-joint <- rbind(old,NAI_new )
+joint <- rbind(old,NAI_new,NAII_new)
 
 write.csv(joint ,"joint_rate.csv",row.names = F)
 
 
+
 ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
+  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
   coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction") +
-  scale_fill_manual(values=c("#abb7d0","#93e0a8"))+
+  scale_fill_fivethirtyeight()+
   scale_x_log10()  +
   annotation_logticks(sides = "b") +
   annotation_logticks(base=2.875,sides = "l") +
-  scale_linetype_manual(guide=F,values=c("dashed","solid")) +
+  scale_linetype_manual(guide=F,values=c("dashed","dotted","solid")) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = "none",
