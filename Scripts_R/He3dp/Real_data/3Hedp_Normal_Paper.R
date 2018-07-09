@@ -177,6 +177,7 @@ inits <- function () { list(E0 = runif(1,0.3,0.35),E0_b = 0.4,Er_b = 0.4,gd2 = 1
                         gp2 = runif(1,0.01,0.1),gd2_b = 0.5) }
 
 
+set.seed(24)
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
@@ -186,9 +187,9 @@ Normfit <- jags(data = model.data,
                                         "gp2_b","tau_2","ad_b","ap_b" ),
                 model.file  = textConnection(Model),
                 n.thin = 30,
-                n.chains = 10,
-                n.burnin = 7500,
-                n.iter = 15000)
+                n.chains = 5,
+                n.burnin = 5000,
+                n.iter = 10000)
 
 temp <- Normfit
 temp <- update(temp, n.thin = 50, n.iter = 50000)
@@ -268,6 +269,8 @@ NAI <- table_reaction_He3dp(Normfit, vars=c("E0","Er","gd2", "gp2", "ad","ap"),N
 NAII <- table_reaction_He3dp(Normfit, vars=c("E0_b","Er_b","gd2_b", "gp2_b", "ad_b","ap_b"),N=800,T9=Tgrid )
 
 
+write.csv(NAII ,"NA_II.csv",row.names = F)
+
 
 Norm <- NAII$mean
 
@@ -311,13 +314,13 @@ joint <- read.csv("joint_rate.csv",header = T)
 jointf <- filter(joint, data %in% c("previous","presentII"))
 
 pdf("rate_ratio_he3dp.pdf",height = 7,width = 10)
-ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
-  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
+ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.5)) +
+  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.4) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
   coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
-  scale_fill_manual(values=c("#606060","#6600CC"),name="") +
+  scale_fill_manual(values=c("#819987","#6600CC"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(sides = "b") +
   annotation_logticks(base=2.875,sides = "l") +
@@ -344,13 +347,13 @@ jointI_II <- filter(joint, data %in% c("presentI","presentII"))
 jointI_II$data <- factor(jointI_II$data, levels = c("presentII","presentI"))
 
 pdf("rate_ratio_he3dp_I_II.pdf",height = 7,width = 10)
-ggplot(jointI_II,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
-  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
+ggplot(jointI_II,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.5)) +
+  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.2) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
   coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
-  scale_fill_manual(values=c("#606060","#ff7f00"),name="") +
+  scale_fill_manual(values=c("#819987","#FFA500"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(sides = "b") +
   annotation_logticks(base=2.875,sides = "l") +
