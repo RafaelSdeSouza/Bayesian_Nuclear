@@ -1,6 +1,6 @@
 require(gsl)
 GammaHe3dp <- function(Normfit){
-  mcdat_I <- as.data.frame(do.call(rbind, as.mcmc(Normfit)[,c("E0","gd2", "gp2","ad","ap")]))  
+  mcdat_I <- as.data.frame(do.call(rbind, as.mcmc(Normfit)[,c("E0_b","gd2_b", "gp2_b","ad_b","ap_b")]))  
   e0 <- mcdat_I[,1]
   gi <- mcdat_I[,2]
   gf <- mcdat_I[,3]
@@ -51,5 +51,5 @@ GammaHe3dp <- function(Normfit){
   # partial width
   Gb <- 2*gf*p_f
   
-  return(list(Ga = Ga, Gb = Gb))
+  return(list(Gd = Ga, Gp = Gb))
 }

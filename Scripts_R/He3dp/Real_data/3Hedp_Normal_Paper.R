@@ -186,11 +186,12 @@ Normfit <- jags(data = model.data,
                                         "gp2_b","tau_2","ad_b","ap_b" ),
                 model.file  = textConnection(Model),
                 n.thin = 30,
-                n.chains = 5,
-                n.burnin = 5000,
-                n.iter = 10000)
+                n.chains = 10,
+                n.burnin = 7500,
+                n.iter = 15000)
 
-Normfit <- update(Normfit, n.thin = 50, n.iter = 10000)
+temp <- Normfit
+temp <- update(temp, n.thin = 50, n.iter = 50000)
 
 #hdi_jags <- function(mcmc=mcmc, par = par,credMass = 0.95,allowSplit=TRUE){
 #  temp <- as.mcmc(mcmc)[,c(par)]
@@ -207,7 +208,10 @@ tab$hi <-  tab[,5] - tab[,4]
 
 jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
-jagsresults(x = Normfit , params = c("E0_b","Er_b","gd2_b", "gp2_b","tau_2","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+tab2 <- jagsresults(x = Normfit , params = c("E0_b","Er_b","gd2_b", "gp2_b","tau_2","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.16, 0.5, 0.84))
+tab2 <- as.data.frame(tab2)
+tab2$low <- tab2[,4] - tab2[,3]
+tab2$hi <-  tab2[,5] - tab2[,4]
 
 
 traplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
@@ -219,7 +223,9 @@ pdf("plot/He3dp_syst_l.pdf",height = 7,width = 10)
 plot_Sfactor(Normfit)
 dev.off()
 
-sqrt(GammaHe3dp(Normfit)$Ga)
+quantile((GammaHe3dp(Normfit)$Gd),probs = c(0.16, 0.5, 0.84))
+
+quantile((GammaHe3dp(Normfit)$Gp),probs = c(0.16, 0.5, 0.84))
 
 # Plot poir-wise plot Case-I
 
@@ -293,36 +299,77 @@ old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) %>%
 
 
 joint <- rbind(old,NAI_new,NAII_new)
+joint$data <- as.factor(joint$data)
+#joint$data <- factor(joint$data, levels = c("previous","presentII","presentI"))
+
+
 
 write.csv(joint ,"joint_rate.csv",row.names = F)
 
+joint <- read.csv("joint_rate.csv",header = T)
 
+jointf <- filter(joint, data %in% c("previous","presentII"))
 
-ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
+pdf("rate_ratio_he3dp.pdf",height = 7,width = 10)
+ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
   geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
-  coord_cartesian(ylim=c(0.85,1.1),xlim=c(0.00125,1)) +
-  theme_bw() + xlab("Temperature (GK)") + ylab("Reaction") +
-  scale_fill_fivethirtyeight()+
-  scale_x_log10()  +
+  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
+  theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
+  scale_fill_manual(values=c("#606060","#6600CC"),name="") +
+  scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(sides = "b") +
   annotation_logticks(base=2.875,sides = "l") +
-  scale_linetype_manual(guide=F,values=c("dashed","dotted","solid")) +
+  scale_linetype_manual(guide=F,values=c("dashed","solid"),name="",labels = c("Descouvemont", "Present","Case I")) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
-        plot.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(size = 3, linetype='dashed',colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
         axis.title = element_text(size=22),
         axis.ticks = element_line(size = 0.75),
         axis.line = element_line(size = 0.75, linetype = "solid"),
-        axis.text.y = element_text(size = 18, margin = unit(c(t = 0, r = 3.5, b = 0, l = 0), "mm")),
-        axis.text.x = element_text(size = 18, margin = unit(c(t = 3.5, r = 0, b = 0, l = 0), "mm")),
-        axis.ticks.length = unit(-2.4, "mm"))
+        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-3.75, "mm"),
+        panel.border = element_rect(size = 1.2)) 
+dev.off()
 
+
+
+jointI_II <- filter(joint, data %in% c("presentI","presentII"))
+jointI_II$data <- factor(jointI_II$data, levels = c("presentII","presentI"))
+
+pdf("rate_ratio_he3dp_I_II.pdf",height = 7,width = 10)
+ggplot(jointI_II,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
+  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
+  geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
+  geom_line() +
+  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
+  theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
+  scale_fill_manual(values=c("#606060","#ff7f00"),name="") +
+  scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
+  annotation_logticks(sides = "b") +
+  annotation_logticks(base=2.875,sides = "l") +
+  scale_linetype_manual(guide=F,values=c("dashed","solid"),name="",labels = c("Descouvemont", "Present","Case I")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(size = 3, linetype='dashed',colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(size=22),
+        axis.ticks = element_line(size = 0.75),
+        axis.line = element_line(size = 0.75, linetype = "solid"),
+        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-3.75, "mm"),
+        panel.border = element_rect(size = 1.2)) 
+dev.off()
 
 
 
