@@ -319,8 +319,9 @@ ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3))
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
   scale_fill_manual(values=c("#606060","#6600CC"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
-  annotation_logticks(sides = "b") +
-  annotation_logticks(base=2.875,sides = "l") +
+  annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.3, "cm"), long = unit(0.4, "cm"),
+                      sides = "b") +
+  #  annotation_logticks(base=2.875,sides = "l") +
   scale_linetype_manual(guide=F,values=c("dashed","solid"),name="",labels = c("Descouvemont", "Present","Case I")) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -334,8 +335,9 @@ ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3))
         axis.line = element_line(size = 0.75, linetype = "solid"),
         axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
         axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
-        axis.ticks.length = unit(-3.75, "mm"),
-        panel.border = element_rect(size = 1.2)) 
+        axis.ticks.length = unit(-3.75, "mm")
+#        panel.border = element_rect(size = 1.2)
+) 
 dev.off()
 
 
