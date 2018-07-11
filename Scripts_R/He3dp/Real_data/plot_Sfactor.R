@@ -53,11 +53,13 @@ gg <- ggplot(gobs,aes(x=obsx,y=obsy))+
   scale_colour_manual(name="",values=c("black","#7f0000","#7f0000","black","black",
                                        "black","black"))+
   scale_shape_manual(values=c(0,19,8,10,4,17,3),name="")+
-  coord_cartesian(xlim=c(5e-3,0.6),ylim=c(0.5,19)) +
+  coord_cartesian(xlim=c(4.7e-3,0.6),ylim=c(0.5,19)) +
   theme_bw() + xlab("Energy (MeV)") + ylab("S-Factor (MeV b)") +
-  scale_x_log10()  +
-  annotation_logticks(sides = "b") +
-  annotation_logticks(base=2.875,sides = "l") +
+  scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
+  annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),
+                      sides = "b",size = 0.45) +
+#  annotation_logticks(base=2.875,
+#  short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),sides = "l",size = 0.45) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = c(0.925,0.7),
@@ -68,8 +70,11 @@ gg <- ggplot(gobs,aes(x=obsx,y=obsy))+
         legend.key = element_rect(colour = "white", fill = "white"),
         axis.title = element_text(size=22),
         axis.text  = element_text(size=18),
-        axis.ticks = element_line(size = 0.75),
-        axis.line = element_line(size = 0.75, linetype = "solid"))
+        axis.ticks = element_line(size = 0.45),
+#        axis.line = element_line(size = 0.45, linetype = "solid"),
+      axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+       axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-3, "mm")) 
 
 
 return(gg)
