@@ -32,8 +32,7 @@ ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) 
   scale_fill_manual(values=c("#606060","#6600CC"))+
   scale_x_log10(breaks = c(0.001,0.01,0.1,1))  +
   annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.3, "cm"), long = unit(0.4, "cm"),
-                      sides = "b") +
-  annotation_logticks(base=2.875,sides = "l") +
+                      sides = "b",size = 0.25) +
   scale_linetype_manual(guide=F,values=c("dashed","solid")) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -43,7 +42,7 @@ ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) 
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
         axis.title = element_text(size = 22),
-        axis.ticks = element_line(size = 0.75),
+        axis.ticks = element_line(size = 0.25),
  #       axis.line = element_line(size = 0.75, linetype = "solid"),
         axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
         axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
