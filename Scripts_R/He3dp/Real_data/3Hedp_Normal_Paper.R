@@ -311,14 +311,14 @@ write.csv(joint ,"joint_rate.csv",row.names = F)
 
 joint <- read.csv("joint_rate.csv",header = T)
 
-jointf <- filter(joint, data %in% c("previous","presentII"))
+jointf <- filter(joint, data %in% c("previous","presentI"))
 
 pdf("rate_ratio_he3dp.pdf",height = 7,width = 10)
 ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.5)) +
   geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.4) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
-  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
+  coord_cartesian(ylim=c(0.9,2),xlim=c(0.00125,10)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
   scale_fill_manual(values=c("#819987","#6600CC"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
@@ -353,7 +353,7 @@ ggplot(jointI_II,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.
   geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.2) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
-  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
+  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,10)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
   scale_fill_manual(values=c("#819987","#FFA500"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
