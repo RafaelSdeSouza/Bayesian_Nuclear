@@ -207,7 +207,7 @@ tab <- as.data.frame(tab)
 tab$low <- tab[,4] - tab[,3]
 tab$hi <-  tab[,5] - tab[,4]
 
-jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
 
 tab2 <- jagsresults(x = Normfit , params = c("E0_b","Er_b","gd2_b", "gp2_b","tau_2","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.16, 0.5, 0.84))
 tab2 <- as.data.frame(tab2)

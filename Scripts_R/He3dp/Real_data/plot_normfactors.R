@@ -7,7 +7,7 @@ Sa$Parameter <- revalue(Sa$Parameter,
                           "scale[4]" = "Gei99","scale[5]" = "Kra87","scale[6]" = "Mol80",
                           "scale[7]" = "Zhi77"))
 
-jagsresults(x = Normfit, params = c("scale"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit, params = c("scale"),probs = c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
 
 
 require(ggridges)
@@ -16,7 +16,7 @@ gg <- ggplot(Sa, aes(x = value, y = Parameter, fill=factor(..quantile..),alpha=f
 
   #   geom_density_ridges(scale = 2.5,panel_scaling=F) +
   stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE, alpha=0.3,
-                      quantile_lines = TRUE,quantiles = c(0.025, 0.25,  0.75, 0.975)) +
+                      quantile_lines = TRUE,quantiles = c(0.025, 0.16,  0.84, 0.975)) +
   theme_economist_white() +
 
   scale_fill_manual(name = "Probability", values = c("#440154BF",  "#21908CBF","#FDE725BF",
