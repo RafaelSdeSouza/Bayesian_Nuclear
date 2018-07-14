@@ -2,26 +2,28 @@ plot_Sfactor <- function(Normfit){
 
 # Plot
 
-y <- jagsresults(x=Normfit , params=c('mux1'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+y <- jagsresults(x=Normfit , params=c('mux1'),probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+
+
 
 
 x <- xx
-gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3=y[,"0.5%"],upr1=y[,"75%"],
-                    upr2=y[,"97.5%"],upr3=y[,"99.5%"])
+gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"16%"],lwr2=y[,"2.5%"],lwr3=y[,"0.15%"],upr1=y[,"84%"],
+                    upr2=y[,"97.5%"],upr3=y[,"99.85%"])
 gobs <- data.frame(obsx,obsy,erry,set,lab)
 gobs$set <- as.factor(gobs$set)
 
 
 
-y2 <- jagsresults(x=Normfit , params=c('mux2'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
-gdata2 <- data.frame(x =xx, mean = y2[,"mean"],lwr1=y2[,"25%"],lwr2=y2[,"2.5%"],lwr3=y2[,"0.5%"],upr1=y2[,"75%"],
-                     upr2=y2[,"97.5%"],upr3=y2[,"99.5%"])
+y2 <- jagsresults(x=Normfit , params=c('mux2'),probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+gdata2 <- data.frame(x =xx, mean = y2[,"mean"],lwr1=y2[,"16%"],lwr2=y2[,"2.5%"],lwr3=y2[,"0.15%"],upr1=y2[,"84%"],
+                     upr2=y2[,"97.5%"],upr3=y2[,"99.85%"])
 
 
-y0 <- jagsresults(x=Normfit , params=c('mux0'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+y0 <- jagsresults(x=Normfit , params=c('mux0'),probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
 
-gdata0 <- data.frame(x =xx, mean = y0[,"mean"],lwr1=y0[,"25%"],lwr2=y0[,"2.5%"],lwr3=y0[,"0.5%"],upr1=y0[,"75%"],
-                     upr2=y0[,"97.5%"],upr3=y0[,"99.5%"])
+gdata0 <- data.frame(x =xx, mean = y0[,"mean"],lwr1=y0[,"16%"],lwr2=y0[,"2.5%"],lwr3=y0[,"0.15%"],upr1=y0[,"84%"],
+                     upr2=y0[,"97.5%"],upr3=y0[,"99.85%"])
 
 
 
