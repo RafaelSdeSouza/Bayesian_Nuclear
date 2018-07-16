@@ -212,6 +212,44 @@ sum(dtc$gd2/1.0085 >= 0.95  &  dtc$gd2/1.0085 <= 1.05)/length(dtc$gd2)
 
 
 
+dtc2 <- getmcmc_var(Normfit,c("E0_b","Er_b","gd2_b","gp2_b","ad_b","ap_b"))
+1-sum(dtc2$E0_b/0.35779 >= 0.975  &  dtc2$E0_b/0.35779 <= 1.025)/nrow(dtc2)
+1-sum(dtc2$Er_b/0.35779 >= 0.975  &  dtc2$Er_b/0.35779 <= 1.025)/nrow(dtc2)
+
+sum(dtc2$ad_b/6 >= 0.9  &  dtc2$ad_b/6 <= 1.1)/nrow(dtc2)
+ad_rope <- data.frame(ad=dtc2$ad_b)
+
+pdf("plot/ad_rope.pdf",height = 7,width = 10)
+ggplot(ad_rope,aes(x=ad)) +
+  stat_density_ridges(aes(y=0,fill=factor(..quantile..),alpha=factor(..quantile..)),geom = "density_ridges_gradient", calc_ecdf = TRUE, 
+                      quantiles = c(0.025, 0.16,  0.84, 0.975)) +
+  scale_fill_manual(name = "Probability", values = c("#f2f0f7","#bcbddc","#756bb1",
+                                                     "#bcbddc","#f2f0f7")) +
+  geom_rect(aes( xmin=5.4,xmax=6.6,ymin=0,ymax=2),color="black",fill="skyblue",alpha=0.05,linetype="dashed") +
+  #  geom_density(fill="#21908CBF") +
+  
+  theme_bw() + coord_cartesian(xlim=c(4,6.5)) +
+  annotate(geom = "text",label=paste("2.5% in \n","ROPE"),x=6,y=1,size=7) +
+  xlab(expression(paste(a[d]," (fm)"))) + 
+  ylab("Probability density") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        legend.text = element_text(size=14,colour = set),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(size=22),
+        axis.text  = element_text(size=18),
+        axis.ticks = element_line(size = 0.45),
+        #        axis.line = element_line(size = 0.45, linetype = "solid"),
+        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-3, "mm")) 
+dev.off()
+
+
 
 
 pdf("plot/NoROPE_E0.pdf",height = 7,width = 10)
