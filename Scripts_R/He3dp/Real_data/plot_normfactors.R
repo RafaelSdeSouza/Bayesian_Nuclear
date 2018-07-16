@@ -34,7 +34,7 @@ gg <- ggplot(Sa, aes(x = value, y = Parameter, fill=factor(..quantile..),alpha=f
         strip.background = element_rect("white")) +
   ylab("") +
   #  xlab("Highest Probability Interval")
-  xlab("Normalization factors")
+  xlab(expression(paste("Normalization factors ",xi[j])))
 
 
 return(gg)

@@ -194,6 +194,94 @@ Normfit <- jags(data = model.data,
 temp <- Normfit
 temp <- update(temp, n.thin = 50, n.iter = 50000)
 
+getmcmc_var <- function(outjags=outjags,vars = vars){
+as.data.frame(do.call(rbind, as.mcmc(outjags)[,vars]))
+  }
+
+dtc <- getmcmc_var(Normfit,c("E0","gd2","gp2","ad_b","ap_b","S_0","ue_ev[1]",
+                             "ue_ev[2]"))
+quantile(dtc$E0-0.35779,probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+
+sum(dtc$E0/0.35779 >= 0.99  &  dtc$E0/0.35779 <= 1.01)/length(dtc$E0)
+sum(dtc$gp2/0.025425 >= 0.95  &  dtc$gp2/0.025425 <= 1.05)/length(dtc$gp2)
+sum(dtc$gd2/1.0085 >= 0.95  &  dtc$gd2/1.0085 <= 1.05)/length(dtc$gd2)
+1-sum(dtc$`ue_ev[1]`/rnorm(835,219,7) >= 0.98  &  dtc$`ue_ev[1]`/rnorm(835,219,7) <= 1.02)/nrow(dtc)
+1 - sum(dtc$`ue_ev[2]`/rnorm(835,146,5) >= 0.85  &  dtc$`ue_ev[2]`/rnorm(835,146,5) <= 1.15)/nrow(dtc)
+1 - sum(dtc$`ue_ev[2]`/65 >= 0.6  &  dtc$`ue_ev[2]`/65 <= 1.4)/nrow(dtc)
+
+
+
+
+
+
+pdf("plot/NoROPE_E0.pdf",height = 7,width = 10)
+plotPost(dtc$E0/0.35779, 
+         ROPE = 1 + c(-0.01,0.01), xlab=expression(E[0]/0.35779),border=T,
+         cex.lab = 2) 
+dev.off()
+E_cdf <- data.frame(E0=dtc$E0/0.35779)
+
+pdf("plot/NoROPE_E0.pdf",height = 0.75*7,width = 0.75*10)
+ggplot(E_cdf,aes(x=E0)) +
+  stat_density_ridges(aes(y=0,fill=factor(..quantile..),alpha=factor(..quantile..)),geom = "density_ridges_gradient", calc_ecdf = TRUE, 
+                      quantiles = c(0.025, 0.16,  0.84, 0.975)) +
+  scale_fill_manual(name = "Probability", values = c("#f2f0f7","#bcbddc","#756bb1",
+                                                     "#bcbddc","#f2f0f7")) +
+  geom_rect(aes( xmin=0.99,xmax=1.01,ymin=0,ymax=25),color="black",fill="skyblue",alpha=0.05,linetype="dashed") +
+#  geom_density(fill="#21908CBF") +
+
+  theme_bw() + coord_cartesian(xlim=c(0.925,1.01)) +
+  annotate(geom = "text",label=paste("4.5% in \n","ROPE"),x=1,y=12.5,size=7) +
+  xlab("Eigenenergy ratio") + 
+  ylab("Probability density") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "none",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        legend.text = element_text(size=14,colour = set),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(size=22),
+        axis.text  = element_text(size=18),
+        axis.ticks = element_line(size = 0.45),
+        #        axis.line = element_line(size = 0.45, linetype = "solid"),
+        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-3, "mm")) 
+dev.off()
+  
+
+  
+pdf("plot/ROPE_E0.pdf",height = 0.75*7,width = 0.75*10)
+plotAreaInROPE(dtc$E0/0.35779, compVal = 1,maxROPEradius = 0.1)
+dev.off()
+
+
+
+ggplot(E_cdf,aes(x=E0)) + 
+  geom_rect(aes(xmin=0.99*0.35779, xmax=1.01*0.35779, ymin=0, ymax=1), fill="#F0F8FF",alpha=0.2) +
+  stat_ecdf(size=1) +
+  geom_vline(xintercept=0.35779) +
+  
+ 
+E_cdf <- ecdf(dtc$E0)
+plot(ecdf(dtc$E0))
+
+
+
+
+1-sum(dtc$ad_b/6 >= 0.9  &  dtc$ad_b/6 <= 1.1)/length(dtc$ad_b)
+sum(dtc$ad_b/6 >= 0.7  &  dtc$ad_b/6 <= 1.3)/length(dtc$ad_b)
+
+
+1-sum(dtc$ap_b/5 >= 0.9  &  dtc$ap_b/5 <= 1.1)/length(dtc$ap_b)
+sum(dtc$ap_b/5 >= 0.7  &  dtc$ap_b/5 <= 1.3)/length(dtc$ap_b)
+
+
+sum(dtc$S_0/5.9 >= 0.9  &  dtc$S_0/5.9 <= 1.1)/length(dtc$S_0/5.9)
+
+
 #hdi_jags <- function(mcmc=mcmc, par = par,credMass = 0.95,allowSplit=TRUE){
 #  temp <- as.mcmc(mcmc)[,c(par)]
 #  return(hdi(temp,allowSplit=TRUE))
@@ -303,22 +391,22 @@ old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) %>%
 
 joint <- rbind(old,NAI_new,NAII_new)
 joint$data <- as.factor(joint$data)
-#joint$data <- factor(joint$data, levels = c("previous","presentII","presentI"))
+joint$data <- factor(joint$data, levels = c("previous","presentII","presentI"))
 
 
 
-write.csv(joint ,"joint_rate.csv",row.names = F)
+#write.csv(joint ,"joint_rate.csv",row.names = F)
 
 joint <- read.csv("joint_rate.csv",header = T)
 
-jointf <- filter(joint, data %in% c("previous","presentI"))
+jointf <- filter(joint, data %in% c("previous","presentII"))
 
 pdf("rate_ratio_he3dp.pdf",height = 7,width = 10)
 ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.5)) +
-  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.4) +
+#  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.4) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
-  coord_cartesian(ylim=c(0.9,2),xlim=c(0.00125,10)) +
+  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
   scale_fill_manual(values=c("#819987","#6600CC"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
@@ -350,10 +438,10 @@ jointI_II$data <- factor(jointI_II$data, levels = c("presentII","presentI"))
 
 pdf("rate_ratio_he3dp_I_II.pdf",height = 7,width = 10)
 ggplot(jointI_II,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.5)) +
-  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.2) +
+#  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.2) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
-  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,10)) +
+  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
   scale_fill_manual(values=c("#819987","#FFA500"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
@@ -389,34 +477,36 @@ dev.off()
 
 
 
-Delta_y <- jagsresults(x=Normfit , params=c('DeltaM'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
-gdata02 <- data.frame(x =xx, mean = Delta_y[,"mean"],lwr1=Delta_y[,"25%"],lwr2=Delta_y[,"2.5%"],
-                      lwr3=Delta_y[,"0.5%"],upr1=Delta_y[,"75%"],
-                     upr2=Delta_y[,"97.5%"],upr3=Delta_y[,"99.5%"])
+Delta_y <- jagsresults(x=Normfit , params=c('DeltaM'),probs=c(0.025, 0.16, 0.5, 0.84, 0.975))
+gdata02 <- data.frame(x =xx, mean = Delta_y[,"mean"],lwr1=Delta_y[,"16%"],lwr2=Delta_y[,"2.5%"],
+                     upr1=Delta_y[,"84%"],
+                     upr2=Delta_y[,"97.5%"])
 
 
 
 pdf("plot/Delta_models.pdf",height = 7,width = 10)
 ggplot(gdata02,aes(x=x,y=mean))+
-  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
+  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.3) +
 
 
   # Delta  Bare
- geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
-  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#9e9ac8"),show.legend=FALSE) +
-  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),show.legend=FALSE) +
-
+# geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
+  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#8b9dc3"),show.legend=FALSE) +
+  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#3b5998"),show.legend=FALSE) +
+  geom_line(linetype="dashed")+
   #  Bare
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#9e9ac8"),show.legend=FALSE) +
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),alpha=0.5,show.legend=FALSE) +
   #
   #
- coord_cartesian(xlim=c(5e-3,0.3425),ylim=c(0.9,1.1)) +
-  theme_bw() + xlab("Energy (MeV)") + ylab(expression(delta["S"])) +
-  scale_x_log10()  +
-  annotation_logticks(sides = "b") +
-  annotation_logticks(base=2.875,sides = "l") +
+ coord_cartesian(xlim=c(5e-3,0.325),ylim=c(0.9,1.1)) +
+  theme_bw() + xlab("Energy (MeV)") + ylab("S-factor ratio") +
+  scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
+  annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),
+                      sides = "b",size = 0.45) +
+  #  annotation_logticks(base=2.875,
+  #  short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),sides = "l",size = 0.45) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = c(0.925,0.7),
@@ -425,10 +515,13 @@ ggplot(gdata02,aes(x=x,y=mean))+
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(size=18.5),
-        axis.text  = element_text(size=13),
-        axis.ticks = element_line(size = 0.75),
-        axis.line = element_line(size = 0.5, linetype = "solid"))
+        axis.title = element_text(size=22),
+        axis.text  = element_text(size=18),
+        axis.ticks = element_line(size = 0.45),
+        #        axis.line = element_line(size = 0.45, linetype = "solid"),
+        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-3, "mm")) 
 dev.off()
 
 

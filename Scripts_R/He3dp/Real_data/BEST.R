@@ -11,7 +11,7 @@
 ### ******** SEE FILE BESTexample.R FOR INSTRUCTIONS **************
 ### ***************************************************************
 
-#source("openGraphSaveGraph.R") # graphics functions for Windows, Mac OS, Linux
+source("openGraphSaveGraph.R") # graphics functions for Windows, Mac OS, Linux
 
 BESTmcmc = function( y1, y2, numSavedSteps=100000, thinSteps=1, showMCMC=FALSE) { 
   # This function generates an MCMC sample from the posterior distribution.

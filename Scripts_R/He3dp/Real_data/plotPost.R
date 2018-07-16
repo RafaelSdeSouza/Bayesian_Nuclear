@@ -12,7 +12,7 @@ plotPost = function( paramSampleVec , credMass=0.95 , compVal=NULL ,
     if ( is.null(main) ) main=""
     if ( is.null(yaxt) ) yaxt="n"
     if ( is.null(ylab) ) ylab=""
-    if ( is.null(col) ) col="skyblue"
+    if ( is.null(col) ) col="#21908CBF"
     if ( is.null(border) ) border="white"
 
     postSummary = matrix( NA , nrow=1 , ncol=11 , 
