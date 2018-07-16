@@ -216,6 +216,14 @@ dtc2 <- getmcmc_var(Normfit,c("E0_b","Er_b","gd2_b","gp2_b","ad_b","ap_b"))
 1-sum(dtc2$E0_b/0.35779 >= 0.975  &  dtc2$E0_b/0.35779 <= 1.025)/nrow(dtc2)
 1-sum(dtc2$Er_b/0.35779 >= 0.975  &  dtc2$Er_b/0.35779 <= 1.025)/nrow(dtc2)
 
+1-sum(dtc2$gd2_b/1.0085 >= 0.25  &  dtc2$gd2_b/1.0085 <= 1.75)/nrow(dtc2)
+
+1-sum(dtc2$gp2_b/0.025425 >= 0  &  dtc2$gp2_b/0.025425 <= 2.35)/nrow(dtc2)
+
+
+1-sum(dtc2$ap_b/5 >= 0.9  &  dtc2$ap_b/5 <= 1.1)/nrow(dtc2)
+
+
 sum(dtc2$ad_b/6 >= 0.9  &  dtc2$ad_b/6 <= 1.1)/nrow(dtc2)
 ad_rope <- data.frame(ad=dtc2$ad_b)
 
