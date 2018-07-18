@@ -402,6 +402,8 @@ Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.01
 NAI <- table_reaction_He3dp(Normfit, vars=c("E0","Er","gd2", "gp2", "ad","ap"),N=800,T9=Tgrid )
 NAII <- table_reaction_He3dp(Normfit, vars=c("E0_b","Er_b","gd2_b", "gp2_b", "ad_b","ap_b"),N=800,T9=Tgrid )
 
+mean(NAI$fu)
+mean(NAII$fu)
 
 write.csv(NAII ,"NA_II.csv",row.names = F)
 
@@ -437,13 +439,13 @@ old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) %>%
 
 joint <- rbind(old,NAI_new,NAII_new)
 joint$data <- as.factor(joint$data)
-joint$data <- factor(joint$data, levels = c("previous","presentII","presentI"))
+#joint$data <- factor(joint$data, levels = c("previous","presentII","presentI"))
 
 
 
 #write.csv(joint ,"joint_rate.csv",row.names = F)
 
-joint <- read.csv("joint_rate.csv",header = T)
+#joint <- read.csv("joint_rate.csv",header = T)
 
 jointf <- filter(joint, data %in% c("previous","presentII"))
 
