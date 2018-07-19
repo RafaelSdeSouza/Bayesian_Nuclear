@@ -198,8 +198,12 @@ getmcmc_var <- function(outjags=outjags,vars = vars){
 as.data.frame(do.call(rbind, as.mcmc(outjags)[,vars]))
   }
 
+
 dtc <- getmcmc_var(Normfit,c("E0","gd2","gp2","ad_b","ap_b","S_0","ue_ev[1]",
                              "ue_ev[2]"))
+
+
+
 quantile(dtc$E0-0.35779,probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
 
 sum(dtc$E0/0.35779 >= 0.99  &  dtc$E0/0.35779 <= 1.01)/length(dtc$E0)
@@ -216,10 +220,14 @@ dtc2 <- getmcmc_var(Normfit,c("E0_b","Er_b","gd2_b","gp2_b","ad_b","ap_b"))
 1-sum(dtc2$E0_b/0.35779 >= 0.975  &  dtc2$E0_b/0.35779 <= 1.025)/nrow(dtc2)
 1-sum(dtc2$Er_b/0.35779 >= 0.975  &  dtc2$Er_b/0.35779 <= 1.025)/nrow(dtc2)
 
+
+KLD(rbeta(835,0.5,0.5), dtc2$Er_b,base=2)
+
+
 sum(dtc2$ad_b/6 >= 0.9  &  dtc2$ad_b/6 <= 1.1)/nrow(dtc2)
 ad_rope <- data.frame(ad=dtc2$ad_b)
 
-pdf("plot/ad_rope.pdf",height = 7,width = 10)
+pdf("plot/ad_rope.pdf",height = 0.75*7,width = 0.75*10)
 ggplot(ad_rope,aes(x=ad)) +
   stat_density_ridges(aes(y=0,fill=factor(..quantile..),alpha=factor(..quantile..)),geom = "density_ridges_gradient", calc_ecdf = TRUE, 
                       quantiles = c(0.025, 0.16,  0.84, 0.975)) +
@@ -439,14 +447,14 @@ joint <- read.csv("joint_rate.csv",header = T)
 
 jointf <- filter(joint, data %in% c("previous","presentII"))
 
-pdf("rate_ratio_he3dp.pdf",height = 7,width = 10)
-ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.5)) +
+pdf("rate_ratio_he3dp.pdf",height = 0.75*7,width = 0.75*10)
+ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.75)) +
 #  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.4) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
-  coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
+  coord_cartesian(ylim=c(0.9,1.06),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
-  scale_fill_manual(values=c("#819987","#6600CC"),name="") +
+  scale_fill_manual(values=c("#819987","#756bb1"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.3, "cm"), long = unit(0.4, "cm"),
                       sides = "b") +
@@ -508,13 +516,6 @@ dev.off()
 
 
 
-
-
-
-
-
-
-
 Delta_y <- jagsresults(x=Normfit , params=c('DeltaM'),probs=c(0.025, 0.16, 0.5, 0.84, 0.975))
 gdata02 <- data.frame(x =xx, mean = Delta_y[,"mean"],lwr1=Delta_y[,"16%"],lwr2=Delta_y[,"2.5%"],
                      upr1=Delta_y[,"84%"],
@@ -522,15 +523,15 @@ gdata02 <- data.frame(x =xx, mean = Delta_y[,"mean"],lwr1=Delta_y[,"16%"],lwr2=D
 
 
 
-pdf("plot/Delta_models.pdf",height = 7,width = 10)
+pdf("plot/Delta_models.pdf",height = 0.75*7,width = 0.75*10)
 ggplot(gdata02,aes(x=x,y=mean))+
   geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.3) +
 
 
   # Delta  Bare
 # geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
-  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#8b9dc3"),show.legend=FALSE) +
-  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#3b5998"),show.legend=FALSE) +
+  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL), alpha=0.65, fill = c("#bcbddc"),show.legend=FALSE) +
+  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.85,fill=c("#756bb1"),show.legend=FALSE) +
   geom_line(linetype="dashed")+
   #  Bare
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
@@ -538,7 +539,7 @@ ggplot(gdata02,aes(x=x,y=mean))+
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),alpha=0.5,show.legend=FALSE) +
   #
   #
- coord_cartesian(xlim=c(5e-3,0.325),ylim=c(0.9,1.1)) +
+ coord_cartesian(xlim=c(5e-3,0.325),ylim=c(0.9,1.055)) +
   theme_bw() + xlab("Energy (MeV)") + ylab("S-factor ratio") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),
