@@ -188,8 +188,8 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 30,
                 n.chains = 5,
-                n.burnin = 15000,
-                n.iter = 25000)
+                n.burnin = 5000,
+                n.iter = 10000)
 
 temp <- Normfit
 temp <- update(temp, n.thin = 50, n.iter = 50000)
@@ -217,8 +217,8 @@ sum(dtc$gd2/1.0085 >= 0.95  &  dtc$gd2/1.0085 <= 1.05)/length(dtc$gd2)
 
 
 dtc2 <- getmcmc_var(Normfit,c("E0_b","Er_b","gd2_b","gp2_b","ad_b","ap_b"))
-1-sum(dtc2$E0_b/0.35779 >= 0.95  &  dtc2$E0_b/0.35779 <= 1.05)/nrow(dtc2)
-1-sum(dtc2$Er_b/0.35779 >= 0.95  &  dtc2$Er_b/0.35779 <= 1.05)/nrow(dtc2)
+1-sum(dtc2$E0_b/0.35779 >= 0.975  &  dtc2$E0_b/0.35779 <= 1.025)/nrow(dtc2)
+1-sum(dtc2$Er_b/0.35779 >= 0.975  &  dtc2$Er_b/0.35779 <= 1.025)/nrow(dtc2)
 
 
 KLD(dnorm(835,0.5,0.5), dtc2$Er_b,base=2)
@@ -370,7 +370,7 @@ quantile((GammaHe3dp(Normfit)$Gp),probs = c(0.16, 0.5, 0.84))
 Sp <- ggs(as.mcmc(Normfit)[,c("Er", "gd2", "gp2","ue_ev[1]","ue_ev[2]","S_0")])
 Sp0 <- Sp %>% as_tibble()
 Sp0$Parameter <- ordered(Sp0$Parameter, levels = c("Er", "gd2", "gp2","ue_ev[1]","ue_ev[2]","S_0"))
-levels(Sp0$Parameter) <- as.factor(c("E[0]~(MeV)","gamma[d]^2~(MeV)", "gamma[p]^2~(MeV)","U[e1]~(eV)", "U[e2]~(eV)","S[b](0)~(MeV~b)"))
+levels(Sp0$Parameter) <- as.factor(c("E[0]~(MeV)","gamma[d]^2~(MeV)", "gamma[p]^2~(MeV)","U[e1]~(eV)", "U[e2]~(eV)","S[0]~(MeV~b)"))
 #
 pdf("plot/He3dp_corr.pdf",height = 7,width = 7)
 pair_wise_plot(Sp0)
@@ -397,10 +397,11 @@ require(nuclear)
 Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.012,
     0.013,0.014,0.015,0.016,0.018,0.020,0.025,0.030,0.040,0.050,0.060,0.070,
     0.080,0.090,0.100,0.110,0.120,0.130,0.140,0.150,0.160,0.180,0.200,0.250,0.300,
-    0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000)
+    0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000,1.250,1.500,1.750,2.000,2.500,3.000,3.500,4.000,5.000,
+    6.000,7.000,8.000,9.000,10.000)
 
-NAI <- table_reaction_He3dp(Normfit, vars=c("E0","Er","gd2", "gp2", "ad","ap"),N=5000,T9=Tgrid )
-NAII <- table_reaction_He3dp(Normfit, vars=c("E0_b","Er_b","gd2_b", "gp2_b", "ad_b","ap_b"),N=1000,T9=Tgrid )
+NAI <- table_reaction_He3dp(Normfit, vars=c("E0","Er","gd2", "gp2", "ad","ap"),N=800,T9=Tgrid )
+NAII <- table_reaction_He3dp(Normfit, vars=c("E0_b","Er_b","gd2_b", "gp2_b", "ad_b","ap_b"),N=800,T9=Tgrid )
 
 
 write.csv(NAII ,"NA_II.csv",row.names = F)
