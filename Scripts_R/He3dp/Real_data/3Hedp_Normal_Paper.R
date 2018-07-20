@@ -221,7 +221,7 @@ dtc2 <- getmcmc_var(Normfit,c("E0_b","Er_b","gd2_b","gp2_b","ad_b","ap_b"))
 1-sum(dtc2$Er_b/0.35779 >= 0.975  &  dtc2$Er_b/0.35779 <= 1.025)/nrow(dtc2)
 
 
-KLD(rbeta(835,0.5,0.5), dtc2$Er_b,base=2)
+KLD(dnorm(835,0.5,0.5), dtc2$Er_b,base=2)
 KLD(rbeta(835,0.5,0.5), dtc$E0,base=2)
 
 
