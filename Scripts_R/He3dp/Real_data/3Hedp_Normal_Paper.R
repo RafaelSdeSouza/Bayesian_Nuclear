@@ -206,7 +206,7 @@ dtc <- getmcmc_var(Normfit,c("E0","gd2","gp2","ad_b","ap_b","S_0","ue_ev[1]",
 
 quantile(dtc$E0-0.35779,probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
 
-sum(dtc$E0/0.35779 >= 0.99  &  dtc$E0/0.35779 <= 1.01)/length(dtc$E0)
+sum(dtc$E0/0.35779 >= 0.951  &  dtc$E0/0.35779 <= 1.049)/length(dtc$E0)
 sum(dtc$gp2/0.025425 >= 0.95  &  dtc$gp2/0.025425 <= 1.05)/length(dtc$gp2)
 sum(dtc$gd2/1.0085 >= 0.95  &  dtc$gd2/1.0085 <= 1.05)/length(dtc$gd2)
 1-sum(dtc$`ue_ev[1]`/rnorm(835,219,7) >= 0.98  &  dtc$`ue_ev[1]`/rnorm(835,219,7) <= 1.02)/nrow(dtc)
@@ -225,7 +225,11 @@ KLD(rbeta(835,0.5,0.5), dtc2$Er_b,base=2)
 KLD(rbeta(835,0.5,0.5), dtc$E0,base=2)
 
 
-sum(dtc2$ad_b/6 >= 0.9  &  dtc2$ad_b/6 <= 1.1)/nrow(dtc2)
+sum(dtc2$ad_b/5 >= 0.95  &  dtc2$ad_b/5 <= 1.05)/nrow(dtc2)
+
+1-sum(dtc2$ap_b/5 >= 0.95  &  dtc2$ap_b/5 <= 1.05)/nrow(dtc2)
+
+
 ad_rope <- data.frame(ad=dtc2$ad_b)
 
 pdf("plot/ad_rope.pdf",height = 0.75*7,width = 0.75*10)
@@ -318,7 +322,7 @@ plot(ecdf(dtc$E0))
 
 
 
-1-sum(dtc$ad_b/6 >= 0.9  &  dtc$ad_b/6 <= 1.1)/length(dtc$ad_b)
+1-sum(dtc$ad_b/6 >= 0.95  &  dtc$ad_b/6 <= 1.05)/length(dtc$ad_b)
 sum(dtc$ad_b/6 >= 0.7  &  dtc$ad_b/6 <= 1.3)/length(dtc$ad_b)
 
 
@@ -399,7 +403,7 @@ Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.01
     0.080,0.090,0.100,0.110,0.120,0.130,0.140,0.150,0.160,0.180,0.200,0.250,0.300,
     0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000)
 
-NAI <- table_reaction_He3dp(Normfit, vars=c("E0","Er","gd2", "gp2", "ad","ap"),N=5000,T9=Tgrid )
+NAI <- table_reaction_He3dp(Normfit, vars=c("E0","Er","gd2", "gp2", "ad","ap"),N=1000,T9=Tgrid )
 NAII <- table_reaction_He3dp(Normfit, vars=c("E0_b","Er_b","gd2_b", "gp2_b", "ad_b","ap_b"),N=1000,T9=Tgrid )
 
 
@@ -435,7 +439,7 @@ old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) %>%
   mutate(Upper = Upper/Norm)
 
 
-joint <- rbind(old,NAI_new,NAII_new)
+joint <- rbind(old[1:46,],NAI_new,NAII_new)
 joint$data <- as.factor(joint$data)
 joint$data <- factor(joint$data, levels = c("previous","presentII","presentI"))
 
