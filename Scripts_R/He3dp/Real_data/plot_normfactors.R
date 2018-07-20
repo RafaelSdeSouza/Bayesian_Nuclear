@@ -15,12 +15,12 @@ require(ggridges)
 gg <- ggplot(Sa, aes(x = value, y = Parameter, fill=factor(..quantile..),alpha=factor(..quantile..))) +
 
   #   geom_density_ridges(scale = 2.5,panel_scaling=F) +
-  stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE, alpha=0.3,
+  stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE, alpha=0.5, 
                       quantile_lines = TRUE,quantiles = c(0.025, 0.16,  0.84, 0.975)) +
   theme_economist_white() +
 
-  scale_fill_manual(name = "Probability", values = c("#440154BF",  "#21908CBF","#FDE725BF",
-                                                     "#21908CBF","#440154BF"))+
+  scale_fill_manual(name = "Probability", values = c("#A9A9A9D9", "#6E6E6ED9", "#191919D9",
+                                                     "#6E6E6ED9","#A9A9A9D9"))+
   geom_vline(xintercept = 1,linetype="dashed",color="red") +
   #  scale_fill_manual(values=c(rep("gray75",7))) +
   # geom_point(size=1,color="red") +
@@ -34,7 +34,7 @@ gg <- ggplot(Sa, aes(x = value, y = Parameter, fill=factor(..quantile..),alpha=f
         strip.background = element_rect("white")) +
   ylab("") +
   #  xlab("Highest Probability Interval")
-  xlab(expression(paste("Normalization factors ",xi[j])))
+  xlab(expression(paste("Normalization factors ")))
 
 
 return(gg)

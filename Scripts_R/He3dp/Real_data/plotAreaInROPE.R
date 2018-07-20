@@ -49,10 +49,10 @@ plotAreaInROPE <-
                label = paste(95,"% \n","probability"))  +
       
         geom_ribbon(data=subset(dd , x < ropeRadHDI),aes(ymax=y),ymin=0,
-                    fill="#756bb1",colour=NA,alpha=0.6) +
+                    fill="#525252",colour=NA,alpha=0.6) +
       geom_ribbon(data=subset(dd , x < 0.01),aes(ymax=y),ymin=0,
-                  fill="skyblue",colour=NA) +
-      annotate(geom="text", x = 0.01, y = 0.075, size=5,
+                  fill="#e41a1c",colour=NA) +
+      annotate(geom="text", x = 0.0075, y = 0.075, size=5,
                label = paste(4.5,"%"))  +
       geom_segment(x=-0.1,xend = 0.01,y=0.045,yend=0.045,
                    linetype="dashed") +
