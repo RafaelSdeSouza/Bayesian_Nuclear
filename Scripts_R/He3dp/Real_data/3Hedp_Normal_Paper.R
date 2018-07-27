@@ -189,6 +189,7 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 30,
                 n.chains = 5,
+<<<<<<< HEAD
                 n.burnin = 7500,
                 n.iter = 15000)
 jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.16, 0.5, 0.84))
@@ -239,84 +240,66 @@ ggplot(res_data,aes(x=obsx,y=mean,roup=set,color=set,shape=set)) +
 
 dtc <- getmcmc_var(Normfit,c("E0","gd2","gp2","ad_b","ap_b","S_0","ue_ev[1]",
                              "ue_ev[2]"))
+=======
+                n.burnin = 5000,
+                n.iter = 10000)
+
+
+tab <- jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.16, 0.5, 0.84))
+tab <- as.data.frame(tab)
+>>>>>>> e782103f99d3ed2da11c3ed8bed8204ba2d00510
+
+tab$low <- tab[,4] - tab[,3]
+tab$hi <-  tab[,5] - tab[,4]
+
+jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+
+tab2 <- jagsresults(x = Normfit , params = c("E0_b","Er_b","gd2_b", "gp2_b","tau_2","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.16, 0.5, 0.84))
+tab2 <- as.data.frame(tab2)
+tab2$low <- tab2[,4] - tab2[,3]
+tab2$hi <-  tab2[,5] - tab2[,4]
+
+
+traplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
+denplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
+
+
+#temp <- Normfit
+#temp <- update(temp, n.thin = 50, n.iter = 50000)
+
+getmcmc_var <- function(outjags=outjags,vars = vars){
+as.data.frame(do.call(rbind, as.mcmc(outjags)[,vars]))
+  }
+require(HDInterval)
+dtc <- getmcmc_var(Normfit,c("E0","gd2","gp2","ad_b","ap_b","S_0","ue_ev[1]",
+                             "ue_ev[2]"))
 
 
 
-quantile(dtc$E0-0.35779,probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
-
-sum(dtc$E0/0.35779 >= 0.99  &  dtc$E0/0.35779 <= 1.01)/length(dtc$E0)
-sum(dtc$gp2/0.025425 >= 0.95  &  dtc$gp2/0.025425 <= 1.05)/length(dtc$gp2)
-sum(dtc$gd2/1.0085 >= 0.95  &  dtc$gd2/1.0085 <= 1.05)/length(dtc$gd2)
-1-sum(dtc$`ue_ev[1]`/rnorm(835,219,7) >= 0.98  &  dtc$`ue_ev[1]`/rnorm(835,219,7) <= 1.02)/nrow(dtc)
-1 - sum(dtc$`ue_ev[2]`/rnorm(835,146,5) >= 0.85  &  dtc$`ue_ev[2]`/rnorm(835,146,5) <= 1.15)/nrow(dtc)
-1 - sum(dtc$`ue_ev[2]`/65 >= 0.6  &  dtc$`ue_ev[2]`/65 <= 1.4)/nrow(dtc)
 
 
-
-
-dtc2 <- getmcmc_var(Normfit,c("E0_b","Er_b","gd2_b","gp2_b","ad_b","ap_b"))
-1-sum(dtc2$E0_b/0.35779 >= 0.975  &  dtc2$E0_b/0.35779 <= 1.025)/nrow(dtc2)
-1-sum(dtc2$Er_b/0.35779 >= 0.975  &  dtc2$Er_b/0.35779 <= 1.025)/nrow(dtc2)
-
-
-KLD(dnorm(835,0.5,0.5), dtc2$Er_b,base=2)
-KLD(rbeta(835,0.5,0.5), dtc$E0,base=2)
-
-
-sum(dtc2$ad_b/6 >= 0.9  &  dtc2$ad_b/6 <= 1.1)/nrow(dtc2)
-ad_rope <- data.frame(ad=dtc2$ad_b)
-
-pdf("plot/ad_rope.pdf",height = 0.75*7,width = 0.75*10)
-ggplot(ad_rope,aes(x=ad)) +
-  stat_density_ridges(aes(y=0,fill=factor(..quantile..),alpha=factor(..quantile..)),geom = "density_ridges_gradient", calc_ecdf = TRUE, 
-                      quantiles = c(0.025, 0.16,  0.84, 0.975)) +
-  scale_fill_manual(name = "Probability", values = c("#f2f0f7","#bcbddc","#756bb1",
-                                                     "#bcbddc","#f2f0f7")) +
-  geom_rect(aes( xmin=5.4,xmax=6.6,ymin=0,ymax=2),color="black",fill="skyblue",alpha=0.05,linetype="dashed") +
-  #  geom_density(fill="#21908CBF") +
-  
-  theme_bw() + coord_cartesian(xlim=c(4,6.5)) +
-  annotate(geom = "text",label=paste("2.5% in \n","ROPE"),x=6,y=1,size=7) +
-  xlab(expression(paste(a[d]," (fm)"))) + 
-  ylab("Probability density") +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "none",
-        legend.background = element_rect(colour = "white", fill = "white"),
-        legend.text = element_text(size=14,colour = set),
-        plot.background = element_rect(colour = "white", fill = "white"),
-        panel.background = element_rect(colour = "white", fill = "white"),
-        legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(size=22),
-        axis.text  = element_text(size=18),
-        axis.ticks = element_line(size = 0.45),
-        #        axis.line = element_line(size = 0.45, linetype = "solid"),
-        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
-        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
-        axis.ticks.length = unit(-3, "mm")) 
+pdf("plot/ROPE_E0.pdf",height = 0.75*7,width = 0.75*10)
+plotAreaInROPE(dtc$E0/0.35779, compVal = 1,maxROPEradius = 0.1)
 dev.off()
 
 
 
 
-pdf("plot/NoROPE_E0.pdf",height = 7,width = 10)
-plotPost(dtc$E0/0.35779, 
-         ROPE = 1 + c(-0.01,0.01), xlab=expression(E[0]/0.35779),border=T,
-         cex.lab = 2) 
-dev.off()
+
 E_cdf <- data.frame(E0=dtc$E0/0.35779)
-
+dat <- with(density(E_cdf$E0,bw=0.00278,adjust = 1,n = 512), data.frame(x, y))
 pdf("plot/NoROPE_E0.pdf",height = 0.75*7,width = 0.75*10)
 ggplot(E_cdf,aes(x=E0)) +
   stat_density_ridges(aes(y=0,fill=factor(..quantile..),alpha=factor(..quantile..)),geom = "density_ridges_gradient", calc_ecdf = TRUE, 
                       quantiles = c(0.025, 0.16,  0.84, 0.975)) +
-  scale_fill_manual(name = "Probability", values = c("#f2f0f7","#bcbddc","#756bb1",
-                                                     "#bcbddc","#f2f0f7")) +
-  geom_rect(aes( xmin=0.99,xmax=1.01,ymin=0,ymax=25),color="black",fill="skyblue",alpha=0.05,linetype="dashed") +
+  scale_fill_manual(name = "Probability", values = c("#d9d9d9","#969696","#525252",
+                                                     "#969696","#d9d9d9")) +
+# geom_rect(aes( xmin=0.99,xmax=1.01,ymin=0,ymax=20),color="red",fill="white",alpha=0,linetype="dashed") +
+#  geom_area(data = subset(E_cdf, E0 > 0.99 &  E0 < 1.01),fill="red")+
 #  geom_density(fill="#21908CBF") +
 
   theme_bw() + coord_cartesian(xlim=c(0.925,1.01)) +
-  annotate(geom = "text",label=paste("4.5% in \n","ROPE"),x=1,y=12.5,size=7) +
+ 
   xlab("Eigenenergy ratio") + 
   ylab("Probability density") +
   theme(panel.grid.major = element_blank(),
@@ -333,38 +316,20 @@ ggplot(E_cdf,aes(x=E0)) +
         #        axis.line = element_line(size = 0.45, linetype = "solid"),
         axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
         axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
-        axis.ticks.length = unit(-3, "mm")) 
+        axis.ticks.length = unit(-3, "mm"))  +
+  annotate(geom = "text",label=paste("4.5% in ","ROPE"),x=1,y=20,size=7) +
+  geom_errorbarh(aes(y=15, x=1, xmin=0.99, xmax=1.01),size=1,height=5,color="red2") +
+  geom_segment(aes(x = 0.99, y = 0, xend = 0.99, yend = 12),linetype="dashed") +
+  geom_segment(aes(x = 1.01, y = 0, xend = 1.01, yend = 12),linetype="dashed")
+ # geom_ribbon(data=subset(dat, x  <= 1.01 & x >= 0.99),aes(x=x,ymax=y+0.5,ymin=0),fill = "red") 
+                 
+
+
 dev.off()
   
 
   
-pdf("plot/ROPE_E0.pdf",height = 0.75*7,width = 0.75*10)
-plotAreaInROPE(dtc$E0/0.35779, compVal = 1,maxROPEradius = 0.1)
-dev.off()
 
-
-
-ggplot(E_cdf,aes(x=E0)) + 
-  geom_rect(aes(xmin=0.99*0.35779, xmax=1.01*0.35779, ymin=0, ymax=1), fill="#F0F8FF",alpha=0.2) +
-  stat_ecdf(size=1) +
-  geom_vline(xintercept=0.35779) +
-  
- 
-E_cdf <- ecdf(dtc$E0)
-plot(ecdf(dtc$E0))
-
-
-
-
-1-sum(dtc$ad_b/6 >= 0.9  &  dtc$ad_b/6 <= 1.1)/length(dtc$ad_b)
-sum(dtc$ad_b/6 >= 0.7  &  dtc$ad_b/6 <= 1.3)/length(dtc$ad_b)
-
-
-1-sum(dtc$ap_b/5 >= 0.9  &  dtc$ap_b/5 <= 1.1)/length(dtc$ap_b)
-sum(dtc$ap_b/5 >= 0.7  &  dtc$ap_b/5 <= 1.3)/length(dtc$ap_b)
-
-
-sum(dtc$S_0/5.9 >= 0.9  &  dtc$S_0/5.9 <= 1.1)/length(dtc$S_0/5.9)
 
 
 #hdi_jags <- function(mcmc=mcmc, par = par,credMass = 0.95,allowSplit=TRUE){
@@ -373,23 +338,6 @@ sum(dtc$S_0/5.9 >= 0.9  &  dtc$S_0/5.9 <= 1.1)/length(dtc$S_0/5.9)
 #}
 #hdi_jags(Normfit,par=c("Er","gd2", "gp2","ue_ev[1]","ue_ev[2]","S_0"),credMass = 0.95)
 
-
-tab <- jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.16, 0.5, 0.84))
-tab <- as.data.frame(tab)
-
-tab$low <- tab[,4] - tab[,3]
-tab$hi <-  tab[,5] - tab[,4]
-
-jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
-
-tab2 <- jagsresults(x = Normfit , params = c("E0_b","Er_b","gd2_b", "gp2_b","tau_2","ad_b","ap_b","ue_ev","S_0b"),probs = c(0.16, 0.5, 0.84))
-tab2 <- as.data.frame(tab2)
-tab2$low <- tab2[,4] - tab2[,3]
-tab2$hi <-  tab2[,5] - tab2[,4]
-
-
-traplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
-denplot(Normfit  ,c("E0","gd2", "gp2","ue"),style="plain")
 
 
 # Plot S-factor
@@ -428,8 +376,6 @@ jagsresults(x = Normfit, params = c("scale"),probs = c(0.005,0.025, 0.25, 0.5, 0
 
 
 
-
-
 require(nuclear)
 
 Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.012,
@@ -438,11 +384,13 @@ Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.01
     0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000,1.250,1.500,1.750,2.000,2.500,3.000,3.500,4.000,5.000,
     6.000,7.000,8.000,9.000,10.000)
 
+
 NAI <- table_reaction_He3dp(Normfit, vars=c("E0","Er","gd2", "gp2", "ad","ap"),N=800,T9=Tgrid )
 NAII <- table_reaction_He3dp(Normfit, vars=c("E0_b","Er_b","gd2_b", "gp2_b", "ad_b","ap_b"),N=800,T9=Tgrid )
 
 
-write.csv(NAII ,"NA_II.csv",row.names = F)
+
+#write.csv(NAII ,"NA_II.csv",row.names = F)
 
 
 Norm <- NAII$mean
@@ -476,24 +424,25 @@ old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) %>%
 
 joint <- rbind(old,NAI_new,NAII_new)
 joint$data <- as.factor(joint$data)
-joint$data <- factor(joint$data, levels = c("previous","presentII","presentI"))
+joint$data <- factor(joint$data, levels = c("previous","presentI","presentII"))
 
 
 
 #write.csv(joint ,"joint_rate.csv",row.names = F)
 
-joint <- read.csv("joint_rate.csv",header = T)
+#joint <- read.csv("joint_rate.csv",header = T)
 
 jointf <- filter(joint, data %in% c("previous","presentII"))
+jointf$data <- factor(jointf$data, levels = c("presentII","previous"))
 
 pdf("rate_ratio_he3dp.pdf",height = 0.75*7,width = 0.75*10)
-ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.75)) +
+ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
 #  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.4) +
-  geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
-  geom_line() +
+  geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE,alpha=0.65) +
+  geom_line(size=0.5) +
   coord_cartesian(ylim=c(0.9,1.06),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
-  scale_fill_manual(values=c("#819987","#756bb1"),name="") +
+  scale_fill_manual(values=c("#969696","#e41a1c"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.3, "cm"), long = unit(0.4, "cm"),
                       sides = "b") +
@@ -522,13 +471,13 @@ jointI_II <- filter(joint, data %in% c("presentI","presentII"))
 jointI_II$data <- factor(jointI_II$data, levels = c("presentII","presentI"))
 
 pdf("rate_ratio_he3dp_I_II.pdf",height = 7,width = 10)
-ggplot(jointI_II,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.5)) +
+ggplot(jointI_II,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
 #  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.2) +
-  geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
-  geom_line() +
+  geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE,alpha=0.65) +
+  geom_line(size=0.75) +
   coord_cartesian(ylim=c(0.9,1.1),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
-  scale_fill_manual(values=c("#819987","#FFA500"),name="") +
+  scale_fill_manual(values=c("#969696","#e41a1c"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.3, "cm"), long = unit(0.4, "cm"),
                       sides = "b") +
@@ -569,8 +518,8 @@ ggplot(gdata02,aes(x=x,y=mean))+
 
   # Delta  Bare
 # geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
-  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL), alpha=0.65, fill = c("#bcbddc"),show.legend=FALSE) +
-  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.85,fill=c("#756bb1"),show.legend=FALSE) +
+  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL), alpha=0.65, fill = c("#9e9ac8"),show.legend=FALSE) +
+  geom_ribbon(data=gdata02,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),alpha=0.85,fill=c("#984ea3"),show.legend=FALSE) +
   geom_line(linetype="dashed")+
   #  Bare
 #  geom_ribbon(data=gdata0,aes(x=xx,ymin=lwr3, ymax=upr3,y= NULL),fill=c("#dadaeb"),show.legend=FALSE)+
@@ -604,249 +553,58 @@ dev.off()
 
 
 
-
-
-
-
-
-
-# Diagnostics overleap between prior and posterior
-
-PR_gin <- runif( 15000, 0, 5)
-MCMCtrace(Normfit, params = 'gin', priors = PR_gin, pdf = FALSE)
-
-PR_out <- runif( 15000, 0, 5)
-MCMCtrace(Normfit, params = 'gout', priors = PR_out, pdf = FALSE,type = "density")
-
-PR_er <- runif( 15000, 0, 5)
-MCMCtrace(Normfit, params = 'e1', priors = PR_er, pdf = FALSE)
-
-
-PR_ri <- rtruncnorm(6000, a=0, b=Inf, mean = 5, sd = 0.447)
-MCMCtrace(Normfit, params = 'ri', priors = PR_ri, pdf = FALSE)
-
-PR_rf <- rtruncnorm(6000, a=0, b=Inf, mean = 5, sd = 0.447)
-MCMCtrace(Normfit, params = 'rf', priors = PR_rf, pdf = FALSE)
-
-PR_ue <- rtruncnorm(6000, a=0, b=Inf, mean = 0, sd = 0.031)
-MCMCtrace(Normfit, params = 'ue', priors = PR_ue, pdf = FALSE)
-
-
-
-
-
-PR_gin <- rtruncnorm(6000, a=0, b=Inf, mean = 1, sd = 0.25)
-MCMCtrace(Normfit, params = 'gin', priors = PR_gin, pdf = FALSE)
-
-PR_out <- rtruncnorm(6000, a=0, b=Inf, mean = 0, sd = 0.05)
-MCMCtrace(Normfit, params = 'gout', priors = PR_out, pdf = FALSE)
-
-PR_ri <- rtruncnorm(6000, a=0, b=Inf, mean = 5, sd = 0.447)
-MCMCtrace(Normfit, params = 'ri', priors = PR_ri, pdf = FALSE)
-
-PR_rf <- rtruncnorm(6000, a=0, b=Inf, mean = 5, sd = 0.447)
-MCMCtrace(Normfit, params = 'rf', priors = PR_rf, pdf = FALSE)
-
-PR_ue <- rtruncnorm(6000, a=0, b=Inf, mean = 0, sd = 0.031)
-MCMCtrace(Normfit, params = 'ue', priors = PR_ue, pdf = FALSE)
-
-
-RSS <- as.matrix(as.mcmc(Normfit)[,c("RSS")])
-rss0 <- function(x) crossprod(x-mean(x))[1]
-1-mean(RSS)/rss0(obsy)
-
-
-color_scheme_set("darkgray")
-div_style <- parcoord_style_np(div_color = "green", div_size = 0.05, div_alpha = 0.4)
-mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout","ri","rf"))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-ss <- ggs(as.mcmc(Normfit)[,c("e1", "gin", "gout")])
-
-ss$Chain <- as.factor(ss$Chain)
-
-ggs_density(ss)
-pdf("plot/He3dp_trace_syst.pdf",height = 7,width = 8)
-ggplot(data=ss,aes(x= Iteration,y=value,group=Parameter,color=factor(Chain))) +
-  geom_line(alpha=0.5,size=0.25) +
-  theme_rafa() +
-#  scale_color_economist()+
-  theme(legend.position = "none",
-        legend.background = element_rect(colour = "white", fill = "white"),
-        plot.background = element_rect(colour = "white", fill = "white"),
-        panel.background = element_rect(colour = "white", fill = "white"),
-        legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="#666666", face="bold", size=15),
-        axis.text  = element_text(size=12),
-        strip.text = element_text(size=15),
-        strip.background = element_rect("white")) +
-  facet_wrap(~Parameter,scales="free",labeller=label_parsed,nrow=3) +
-  ylab("Parameter value") + xlab("Iteration")
-dev.off()
-#
-
-
-
-
-
-# Reaction rates
-
-Nsamp <- 2500
-Tgrid <- c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.012,
-           0.013,0.014,0.015,0.016,0.018,0.020,0.025,0.030,0.040,0.050,0.060,0.070,
-           0.080,0.090,0.100,0.110,0.120,0.130,0.140,0.150,0.160,0.180,0.200,0.250,0.300,
-           0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000,1.250,1.500,1.750,2.000,2.500,3.000,3.500,4.000,5.000,
-           6.000,7.000,8.000,9.000,10.000)
-
-
-
-
-
-
-
-
-NA_I <-  table_reaction(Normfit,vars=c("Er", "gd", "gp","ad","ap"), N=1000)
-
-NA_II <- table_reaction(Normfit,vars=c("Er_b","E0_b", "gd_b", "gp_b","ad_b","ap_b"),N=1000)
-
-NA_I$Case <- "Case I"
-NA_II$Case <- "Case II"
-NA_total <-rbind(NA_I,NA_II)
-
-
-pdf("plot/Delta_rates.pdf",height = 7,width = 10)
-ggplot(Drate, aes(x=T,y=mean)) +
-  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="gray90",alpha=0.4) +
-  geom_line() +
-#  geom_ribbon(aes(ymin= lower, ymax=upper)) +
-  geom_ribbon(aes(ymin=lwr3, ymax=upr3),fill=c("#ece7f2"),show.legend=FALSE)+
-  geom_ribbon(aes(ymin=lwr2, ymax=upr2),  fill = c("#a6bddb"),show.legend=FALSE) +
-  geom_ribbon(aes(ymin=lwr1, ymax=upr1),fill=c("#2b8cbe"),show.legend=FALSE) +
- coord_cartesian(xlim=c(0.00125,7.7),ylim=c(0.9,1.05)) +
-  scale_fill_tableau() +
-  theme_bw() +
-  scale_x_log10() +
-   scale_alpha(guide = 'none') +
-  xlab("Temperature (GK)") +
-  ylab(expression(N[A]~I~symbol("\341")*sigma*nu*symbol("\361")/N[A]~II~symbol("\341")*sigma*nu*symbol("\361"))) +
+####
+#1-sum(dtc$ad_b/6 >= 0.95  &  dtc$ad_b/6 <= 1.05)/length(dtc$ad_b)
+#sum(dtc$ad_b/6 >= 0.7  &  dtc$ad_b/6 <= 1.3)/length(dtc$ad_b)
+
+
+#1-sum(dtc$ap_b/5 >= 0.9  &  dtc$ap_b/5 <= 1.1)/length(dtc$ap_b)
+#sum(dtc$ap_b/5 >= 0.7  &  dtc$ap_b/5 <= 1.3)/length(dtc$ap_b)
+
+
+#sum(dtc$S_0/5.9 >= 0.9  &  dtc$S_0/5.9 <= 1.1)/length(dtc$S_0/5.9)
+
+#quantile(dtc$E0-0.35779,probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+#sum(dtc$E0/0.35779 >= 0.951  &  dtc$E0/0.35779 <= 1.049)/length(dtc$E0)
+#sum(dtc$gp2/0.025425 >= 0.95  &  dtc$gp2/0.025425 <= 1.05)/length(dtc$gp2)
+#sum(dtc$gd2/1.0085 >= 0.95  &  dtc$gd2/1.0085 <= 1.05)/length(dtc$gd2)
+#1-sum(dtc$`ue_ev[1]`/rnorm(835,219,7) >= 0.98  &  dtc$`ue_ev[1]`/rnorm(835,219,7) <= 1.02)/nrow(dtc)
+#1 - sum(dtc$`ue_ev[2]`/rnorm(835,146,5) >= 0.85  &  dtc$`ue_ev[2]`/rnorm(835,146,5) <= 1.15)/nrow(dtc)
+#1 - sum(dtc$`ue_ev[2]`/65 >= 0.6  &  dtc$`ue_ev[2]`/65 <= 1.4)/nrow(dtc)
+#1-sum(dtc2$E0_b/0.35779 >= 0.975  &  dtc2$E0_b/0.35779 <= 1.025)/nrow(dtc2)
+#1-sum(dtc2$Er_b/0.35779 >= 0.975  &  dtc2$Er_b/0.35779 <= 1.025)/nrow(dtc2)
+#sum(dtc2$ad_b/5 >= 0.95  &  dtc2$ad_b/5 <= 1.05)/nrow(dtc2)
+#1-sum(dtc2$ap_b/5 >= 0.95  &  dtc2$ap_b/5 <= 1.05)/nrow(dtc2)
+
+ad_rope <- data.frame(ad=dtc2$ad_b)
+pdf("plot/ad_rope.pdf",height = 0.75*7,width = 0.75*10)
+ggplot(ad_rope,aes(x=ad)) +
+  stat_density_ridges(aes(y=0,fill=factor(..quantile..),alpha=factor(..quantile..)),geom = "density_ridges_gradient", calc_ecdf = TRUE, 
+                      quantiles = c(0.025, 0.16,  0.84, 0.975)) +
+  scale_fill_manual(name = "Probability", values = c("#f2f0f7","#bcbddc","#756bb1",
+                                                     "#bcbddc","#f2f0f7")) +
+  geom_rect(aes( xmin=5.4,xmax=6.6,ymin=0,ymax=2),color="black",fill="skyblue",alpha=0.05,linetype="dashed") +
+  #  geom_density(fill="#21908CBF") +
+  
+  theme_bw() + coord_cartesian(xlim=c(4,6.5)) +
+  annotate(geom = "text",label=paste("2.5% in \n","ROPE"),x=6,y=1,size=7) +
+  xlab(expression(paste(a[d]," (fm)"))) + 
+  ylab("Probability density") +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = c(0.925,0.7),
+        legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
         legend.text = element_text(size=14,colour = set),
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(size=18.5),
-        axis.text  = element_text(size=13),
-        axis.ticks = element_line(size = 0.75),
-        axis.line = element_line(size = 0.5, linetype = "solid"))
+        axis.title = element_text(size=22),
+        axis.text  = element_text(size=18),
+        axis.ticks = element_line(size = 0.45),
+        #        axis.line = element_line(size = 0.45, linetype = "solid"),
+        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-3, "mm")) 
 dev.off()
-
-write.csv(NA_I ,"NA_I.csv",row.names = F)
-write.csv(NA_II ,"NA_II.csv",row.names = F)
-
-
-
-#gg2 <- apply(gg, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
-
-
-
-
-
-pdf("plot/He3dp_cross.pdf",height = 7,width = 10)
-ggplot(gg2data,aes(x=x,y=mean))+
-  theme_bw()  +
-  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr3, ymax=upr3,y=NULL), fill=c("#ffeda0"),show.legend=FALSE) +
-  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr2, ymax=upr2,y=NULL), fill=c("#feb24c"),show.legend=FALSE) +
-  geom_ribbon(data=gg2data,aes(x=Tgrid,ymin=lwr1, ymax=upr1,y=NULL), fill=c("#f03b20"),show.legend=FALSE) +
-   xlab("Temperature (GK)") + ylab(expression(N[A]~symbol("\341")*sigma*nu*symbol("\361"))) +
- #scale_y_continuous(breaks=c(0,5e7,1e8,1.5e8),labels=c(0,expression(5%*%10^7),
- #                             expression(10^8),expression(1.5%*%10^8))) +
-  scale_y_log10()+
-  theme(legend.position = "none",
-        plot.background = element_rect(colour = "white", fill = "white"),
-        panel.background = element_rect(colour = "white", fill = "gray95"),
-        legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="#666666", face="bold", size=17.5),
-        axis.text  = element_text(size=13),panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
-dev.off()
-
-
-
-
-cmb <- as.data.frame(filter(gg, x <= 0.105 & x >= 0.095))
-cmbhist <- data.frame(x=as.numeric(cmb[1:Nsamp]))
-pdf("plot/He3dp_hist_cmb.pdf",height = 7,width = 8)
-ggplot(cmbhist, aes(x)) +
-#  geom_histogram(aes(y=..count../sum(..count..)),bins = 15,fill="#4357a3",color="#d84951") +
-  geom_density(fill="#4357a3",color="#d84951") +
-  theme_bw() +
-  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) +
-#  scale_x_continuous(breaks=c(1.15e8,1.2e8,1.25e8),labels=c(expression(1.15%*%10^8),
- #                             expression(1.20%*%10^8),expression(1.25%*%10^8))) +
-  geom_rug(sides = "b", aes(y = 0),colour = "#d84951") +
-  theme(legend.position = "none",
-        legend.background = element_rect(colour = "white", fill = "white"),
-        plot.background = element_rect(colour = "white", fill = "white"),
-        panel.background = element_rect(colour = "white", fill = "white"),
-        legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="#666666", face="bold", size=15),
-        axis.text  = element_text(size=15),
-        strip.text = element_text(size=15),
-        strip.background = element_rect("#F0B27A"),panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())+
-  ylab("Posterior probability") + xlab(expression(N[A]~symbol("\341")*sigma*nu*symbol("\361")))
-dev.off()
-
-
-dens <- density(cmbhist)
-df <- data.frame(x=dens$x, y=dens$y)
-probs=c(0.025, 0.25, 0.5, 0.75, 0.975)
-quantiles <- quantile(df$x, prob=probs)
-df$quant <- factor(findInterval(df$x,quantiles))
-
-write.csv(df,"df.csv",row.names = F)
-
-ggplot(df, aes(x,y)) +
-  geom_ribbon(aes(ymin=0, ymax=y, fill=quant)) +
-  scale_fill_manual(values=c("#deebf7","#9ecae1","#3182bd","#3182bd","#9ecae1","#deebf7")) +
-  geom_line() + theme_wsj() + xlab(expression(N[A]~sigma*v)) + ylab("Density") +
-  theme(legend.position = "none",
-        legend.background = element_rect(colour = "white", fill = "white"),
-        plot.background = element_rect(colour = "white", fill = "white"),
-        panel.background = element_rect(colour = "white", fill = "white"),
-        legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="#666666", face="bold", size=15),
-        axis.text  = element_text(size=12),
-        strip.text = element_text(size=10),
-        strip.background = element_rect("gray85")) +
-  ggtitle(expression(paste(NULL^"3","He(d,p)",NULL^"4","He")))
-
-
-
-
-cmbquant <- apply(cmb, 1, quantile, probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995), na.rm=TRUE)
-quant <- cut(cmbhist,breaks=as.numeric(cmbquant))
-gcmb <- data.frame(cmbhist,quant)
-
 
 
