@@ -214,24 +214,30 @@ res <- jagsresults(x = Normfit, params = c("res"),probs = c(0.0015,0.025, 0.16, 
 res_data <- data.frame(x=obsx,sd=res[,"sd"], mean=res[,"50%"],lwr1=res[,"16%"],lwr2=res[,"2.5%"],lwr3=res[,"0.15%"],upr1=res[,"84%"],
                        upr2=res[,"97.5%"],upr3=res[,"99.85%"],set,lab)
 
+
+cut <- cut(obsx,breaks=c(0.002,0.004,0.006,0.008,0.01,0.02,0.04,0.06,0.08,0.1,0.2,0.4,0.6,0.8))
+res_data$cut <- cut
+
 pdf("plot/RES.pdf",height = 7,width = 10)
-ggplot(res_data,aes(x=obsx,y=mean,roup=set,fill=set,color=set,shape=set)) + 
+gres <- ggplot(res_data,aes(x=obsx,y=mean,roup=set,fill=set,color=set,shape=set)) + 
   geom_point(size=2.75,alpha=0.75) +
   geom_errorbar(show.legend=FALSE,aes(x=obsx,y=mean,ymin=lwr2,ymax=upr2),
                 width=0.01,alpha=0.4)+
-  coord_cartesian(xlim=c(4.7e-3,0.6),ylim=c(-4,2.5)) +
-  scale_colour_manual(values=c('#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e','#e6ab02','#a6761d'),name="") +
-  scale_fill_manual(values=c('#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e','#e6ab02','#a6761d'),name="") +
+  coord_cartesian(xlim=c(4.7e-3,0.6),ylim=c(-4,3)) +
+  scale_colour_manual(name="",values=c("black","#7f0000","#7f0000","black","black",
+                                       "black","black"))+
+  scale_fill_manual(values=c("black","#7f0000","#7f0000","black","black",
+                             "black","black"),name="") +
   scale_shape_manual(values=c(0,19,8,10,4,17,3),name="") + 
-  theme_bw() + xlab("Energy (MeV)") + ylab("Residuals (MeV b)") +
-  scale_x_log10(breaks = c(0.004,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
+  theme_bw() + xlab("Energy (MeV)") + ylab(expression(paste(r[i]," (MeV b)"))) +
+  scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),
                       sides = "b",size = 0.45) +
   #  annotation_logticks(base=2.875,
   #  short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),sides = "l",size = 0.45) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = c(0.9,0.2275),
+        legend.position = "none",
         legend.background = element_rect(colour = "white", fill = "white"),
         legend.text = element_text(size=14,colour = set),
         plot.background = element_rect(colour = "white", fill = "white"),
@@ -243,9 +249,21 @@ ggplot(res_data,aes(x=obsx,y=mean,roup=set,fill=set,color=set,shape=set)) +
         #        axis.line = element_line(size = 0.45, linetype = "solid"),
         axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
         axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
-        axis.ticks.length = unit(-3, "mm")) +
-  geom_smooth(family = "symmetric",method = "loess",show.legend = FALSE, se=F)
+        axis.ticks.length = unit(-3, "mm")) 
+#+  geom_smooth(family = "symmetric",method = "loess",show.legend = FALSE, se=F)
 dev.off()
+
+# Plot S-factor
+pdf("plot/He3dp_syst_l.pdf",height = 7,width = 10)
+gs <- plot_Sfactor(Normfit)
+dev.off()
+
+
+plot_grid(gs, gres, ncol = 1, rel_heights  = c(2, 1))
+
+
+
+
 
 
 dtc <- getmcmc_var(Normfit,c("E0","gd2","gp2","ad_b","ap_b","S_0","ue_ev[1]",
@@ -348,10 +366,6 @@ dev.off()
 
 
 
-# Plot S-factor
-pdf("plot/He3dp_syst_l.pdf",height = 7,width = 10)
-plot_Sfactor(Normfit)
-dev.off()
 
 quantile((GammaHe3dp(Normfit)$Gd),probs = c(0.16, 0.5, 0.84))
 
