@@ -94,6 +94,7 @@ for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
 y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], E0, Er, gd2, gp2, ad, ap, ue[ik[i]]), pow(tau, -2))
 res[i] <- obsy[i]-sfactor3Hedp(obsx[i], E0, Er, gd2, gp2, ad, ap,0)
+nres[i] <- res[i]/obsy[i]
 }
 
 
@@ -153,7 +154,7 @@ ap  ~  dnorm(5, pow(0.01,-2))T(0,)
 
 
 # Case II
-tau_2  ~    dnorm(0, pow(1,-2))T(0,)
+tau_2  ~  dnorm(0, pow(1,-2))T(0,)
 Er_b  ~   dbeta(0.5,0.5)
 E0_b  ~   dbeta(2,5)
 
@@ -173,7 +174,7 @@ S_0b  <- sfactor3Hedp(1e-4, E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
 
 }"
 
-inits <- function () { list(E0 = runif(1,0.3,0.35),E0_b = 0.4,Er_b = 0.4,gd2 = 1,
+inits <- function(){ list(E0 = runif(1,0.3,0.35),E0_b = 0.4,Er_b = 0.4,gd2 = 1,
                         gp2 = runif(1,0.01,0.1),gd2_b = 0.5) }
 
 
@@ -184,19 +185,56 @@ Normfit <- jags(data = model.data,
                 parameters.to.save  = c("Er","E0","gd2", "gp2","ue_ev","tau", "ad","ap",
                                         "RSS","mux0","mux1","mux2","scale","DeltaM","S_0",
                                         "S_0b","E0_b","Er_b","gd2_b",
-                                        "gp2_b","tau_2","ad_b","ap_b" ),
+                                        "gp2_b","tau_2","ad_b","ap_b","res","nres"),
                 model.file  = textConnection(Model),
                 n.thin = 30,
                 n.chains = 5,
-                n.burnin = 5000,
-                n.iter = 10000)
-
+                n.burnin = 7500,
+                n.iter = 15000)
+jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.16, 0.5, 0.84))
 temp <- Normfit
 temp <- update(temp, n.thin = 50, n.iter = 50000)
 
 getmcmc_var <- function(outjags=outjags,vars = vars){
 as.data.frame(do.call(rbind, as.mcmc(outjags)[,vars]))
   }
+
+
+sum(res[,"mean"]^2)
+res <- jagsresults(x = Normfit, params = c("nres"),probs = c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+res_data <- data.frame(x=obsx,sd=res[,"sd"], mean=res[,"50%"],lwr1=res[,"16%"],lwr2=res[,"2.5%"],lwr3=res[,"0.15%"],upr1=res[,"84%"],
+                       upr2=res[,"97.5%"],upr3=res[,"99.85%"],set,lab)
+
+ggplot(res_data,aes(x=obsx,y=mean,roup=set,color=set,shape=set)) + 
+  geom_point(size=2.75,alpha=0.75) +
+  geom_errorbar(show.legend=FALSE,aes(x=obsx,y=mean,ymin=lwr2,ymax=upr2),
+                width=0.01,alpha=0.4)+
+  coord_cartesian(xlim=c(0.03,0.8),ylim=c(-0.5,0.5)) +
+  scale_colour_stata(name="") +
+  scale_shape_manual(values=c(0,19,8,10,4,17,3),name="") + 
+  theme_bw() + xlab("Energy (MeV)") + ylab("Residuals") +
+  scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
+  annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),
+                      sides = "b",size = 0.45) +
+  #  annotation_logticks(base=2.875,
+  #  short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),sides = "l",size = 0.45) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = c(0.925,0.65),
+        legend.background = element_rect(colour = "white", fill = "white"),
+        legend.text = element_text(size=14,colour = set),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(size=22),
+        axis.text  = element_text(size=18),
+        axis.ticks = element_line(size = 0.45),
+        #        axis.line = element_line(size = 0.45, linetype = "solid"),
+        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-3, "mm")) +
+  geom_smooth(method = "lm")
+
 
 
 dtc <- getmcmc_var(Normfit,c("E0","gd2","gp2","ad_b","ap_b","S_0","ue_ev[1]",

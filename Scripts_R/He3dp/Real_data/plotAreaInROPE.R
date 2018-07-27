@@ -38,7 +38,7 @@ plotAreaInROPE <-
       geom_segment(x=ropeRadHDI,xend= ropeRadHDI,y=0,yend=areaInFarHDIlim,
                    linetype="dashed") +
 
-        annotate(geom="text", x = 1.2*ropeRadHDI , y = 0.1, size=5,
+        annotate(geom="text", x = 1.25*ropeRadHDI , y = 0.1, size=5,
                  label = paste(100*credMass,"% HDI limit \n",
                                "farthest from ",compVal))  +
       
@@ -52,12 +52,12 @@ plotAreaInROPE <-
                     fill="#756bb1",colour=NA,alpha=0.6) +
       geom_ribbon(data=subset(dd , x < 0.01),aes(ymax=y),ymin=0,
                   fill="skyblue",colour=NA) +
-      annotate(geom="text", x = 0.01, y = 0.075, size=5,
+      annotate(geom="text", x = 0.0075, y = 0.075, size=5,
                label = paste(4.5,"%"))  +
       geom_segment(x=-0.1,xend = 0.01,y=0.045,yend=0.045,
                    linetype="dashed") +
         theme_bw() +
-        coord_cartesian(ylim=c(0,1)) +
+        coord_cartesian(ylim=c(0.05,1)) +
         xlab(defaultArgs$xlab) + ylab(defaultArgs$ylab) +
         theme(panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),

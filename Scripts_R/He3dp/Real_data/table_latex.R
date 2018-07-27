@@ -16,7 +16,7 @@ x.big <- xtable(dfFull[,c(1,2,5,6,7,10)], type = "latex",display=c("e","g","E","
 
 
 short<- xtable(dfFull[,c(1,2,5,6,7,10)], type = "latex",display=c("e","g","E","g","g",
-                                                          "E","g"),digits=c(4,4,3,4,4,3,4),caption= "Case I")
+                                                          "E","g"),digits=4,caption= "Case I")
 
 
 print(short, include.rownames=FALSE)
