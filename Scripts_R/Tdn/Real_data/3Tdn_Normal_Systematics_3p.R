@@ -36,7 +36,8 @@ load.module("nuclear")
 
 ######################################################################
 ## Read DATA 
-ensamble <- read.csv("ensamble_Tdn.csv",header = T)
+ensamble <- read.csv("ensamble_Tdn.csv",header = T) %>% 
+  filter(E <= 0.5)
 
 
 re <- as.numeric(ensamble$dat)
