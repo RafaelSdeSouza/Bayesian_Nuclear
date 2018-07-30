@@ -6,6 +6,24 @@ require(ggplot2);require(ggthemes);require(dplyr);require(magrittr)
 
 # Data of interest
 
+# extra
+
+Mag75  <-  read.table("tdn_mag75b.dat") %>%
+  set_colnames(.,c("E","E_stat","S","Stat")) %>%
+  select(.,c("E","S","Stat")) %>%
+   mutate(.,Syst=mean(0.5*S)) %>%  
+  mutate(.,dat="Mag75") 
+
+
+
+Bam57  <-  read.table("tdn_bam57b.dat") %>%
+  set_colnames(.,c("E","E_stat","S","Stat")) %>%
+  select(.,c("E","S","Stat")) %>%
+  mutate(.,Syst=mean(0.5*S)) %>%  
+  mutate(.,dat="Bam57") 
+
+
+# Current
 Arn53  <-  read.table("data_arnold.dat") %>%
   set_colnames(.,c("E","S","Stat")) %>%
   mutate(.,Syst=mean(0.02*S)) %>%  
@@ -30,12 +48,12 @@ Kob66 <- read.table("data_kobzev.dat") %>%
 
 # Remove bad points
 
-ensamble <- rbind(Arn53, Bro87,Jar84,Kob66)
+ensamble <- rbind(Arn53, Bro87,Jar84,Kob66,Mag75,Bam57)
 
 #ensamble <- rbind(Bame57, Brown87,Jarmie86)
 
 
-write.csv(ensamble,"ensamble_Tdn.csv",row.names = F)
+write.csv(ensamble,"ensamble_Tdn_extra.csv",row.names = F)
 
 ggplot(ensamble,aes(x=E,y=S,color=dat))+geom_point(size=2.85)+
   theme_bw()+scale_x_log10()+scale_color_hc() 

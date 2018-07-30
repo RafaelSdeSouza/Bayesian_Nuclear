@@ -62,7 +62,7 @@ gg <- ggplot(gobs,aes(x=obsx,y=obsy))+
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),
                       sides = "b",size = 0.45) +
-#  annotation_logticks(base=2.875,
+# annotation_logticks(base=2.875,
 #  short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),sides = "l",size = 0.45) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -77,8 +77,11 @@ gg <- ggplot(gobs,aes(x=obsx,y=obsy))+
         axis.ticks = element_line(size = 0.45),
 #        axis.line = element_line(size = 0.45, linetype = "solid"),
       axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
-       axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
-        axis.ticks.length = unit(-3, "mm")) 
+  #axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
+        axis.ticks.length = unit(-3, "mm"),
+axis.title.x=element_blank(),
+axis.text.x=element_blank(),
+axis.ticks.x=element_blank()) 
 
 
 return(gg)

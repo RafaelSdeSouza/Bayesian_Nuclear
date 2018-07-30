@@ -36,13 +36,14 @@ load.module("nuclear")
 
 ######################################################################
 ## Read DATA 
-ensamble <- read.csv("ensamble_Tdn.csv",header = T) %>% 
-  filter(E <= 0.5)
+ensamble <- read.csv("ensamble_Tdn_extra.csv",header = T) %>%  filter(E <= 0.3)
+  #filter(dat!= "Mag75")
+#%>% filter(E <= 0.5) %>%   filter(dat!= "Arn53") %>%
+ # droplevels(ensamble$dat)
 
 
-re <- as.numeric(ensamble$dat)
+re <- as.numeric(ensamble$dat) 
 Nre <- length(unique(ensamble$dat))
-ik <- as.numeric(ensamble$invK)
 Nik <- length(unique(ensamble$invK))
 # Radius
 # r_i = 6
@@ -64,7 +65,9 @@ syst = c(unique(ensamble$Syst))
 #syst <- syst[-3]
 
 M <- 500
-xx <- seq(min(obsx),max(obsx),length.out = M)
+xx <- exp(seq(log(min(obsx)),log(max(obsx)),length.out = M))
+
+
 
 model.data <- list(obsy = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
@@ -73,8 +76,6 @@ model.data <- list(obsy = obsy,    # Response variable
                    syst = syst,
                    Nre = Nre,
                    re = re,
-                   Nik = Nik,
-                   ik  = ik,
                    M = M,
                    xx = xx
 )
@@ -85,9 +86,11 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-#y[i] ~ dnorm(scale[re[i]]*sfactorTdn(obsx[i], e1, ex,gin, gout,ri,rf,ue[ik[i]]),pow(tau, -2))
-y[i] ~ dnorm(scale[re[i]]*sfactorTdn(obsx[i], e1,ex, gin, gout,ri,rf,0),pow(tau, -2))
-res[i] <- obsy[i]-sfactorTdn(obsx[i], e1,ex, gin, gout,ri,rf,0)
+y[i] ~ dnorm(scale[re[i]]*sfactorTdn(obsx[i], e1, ex,gin, gout,ri,rf,0),pow(tau, -2))
+#y[i] ~ dnorm(scale[re[i]]*sfactorTdn_old(obsx[i], e1, gin, gout),pow(tau, -2))
+#y[i] ~ dnorm(sfactorTdn_old(obsx[i], e1, gin, gout),pow(tau, -2))
+#obsy[i] ~ dnorm(scale[re[i]]*sfactorTdn(obsx[i], e1,ex, gin, gout,ri,rf,0), pow(tau, -2))
+res[i] <- obsy[i]-sfactorTdn_old(obsx[i], e1, gin, gout)
 }
 
 RSS <- sum(res^2)
@@ -98,29 +101,26 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactorTdn(xx[j], e1,ex, gin, gout,ri,rf,0)
+mux0[j] <- sfactorTdn(xx[j], e1, ex,gin, gout,ri,rf,0)
 yx0[j] ~ dnorm(mux0[j],pow(tau,-2))
-
-# No inverse Kinematics 
-
-#mux1[j] <- sfactorTdn(xx[j], e1, gin, gout,ri,rf,ue[1])
-#yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
-
-# With inverse Kinematics 
-#mux2[j] <- sfactorTdn(xx[j], e1, gin, gout,ri,rf,ue[2])
-#yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
-
 }
 
 
 
 for (k in 1:Nre){
 scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
+#Nsyst[k] ~ dnorm(0,tt)T(0,)
 }
 
-#for (z in 1:Nik){
-#ue[z] ~ dnorm(0,1e3)T(0,)
+
+#ue ~ dnorm(0,pow(0.1,-2))T(0,)
+
+
+#for (k in 1:Nre){
+#scale[k] ~ dnorm(1,pow(taus[k],-2))T(0,)
+#taus[k] ~ dunif(0,0.5)
 #}
+
 
 
 # PRIORS
@@ -132,16 +132,16 @@ scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 # resonance energy, initial reduced width, final reduced
 # width;
 
-tau ~  dt(0, pow(5,-2), 1)T(0,)
-e1 ~  dnorm(0,0.1)T(0,)
-ex <- e1 
+tau ~ dnorm(0, pow(1,-2))T(0,)
+e1 ~  dnorm(0, pow(1,-2))T(0,)
+ex <- e1
 
 rf ~  dnorm(5,pow(0.1,-2))T(0,)
 ri ~  dnorm(6,pow(0.1,-2))T(0,)
 
 
-gin ~  dnorm(0,pow(0.5,-2))T(0,)
-gout ~ dnorm(0,pow(0.5,-2))T(0,)
+gin ~  dnorm(0, pow(3,-2))T(0,)
+gout ~ dnorm(0, pow(3,-2))T(0,)
 
 
 
@@ -161,24 +161,26 @@ gout ~ dnorm(0,pow(0.5,-2))T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.01,10),gout=runif(1,0.01,10),gin=runif(1,0.01,10)) }
+inits <- function () { list(e1 = runif(1,0.01,0.1),gout=runif(1,0.01,0.5),gin=runif(1,0.01,1)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
 
-
+set.seed(43)
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("e1","ex", "gin", "gout","ue","tau", "ri","rf","RSS","mux0","mux1","mux2","scale"),
+                parameters.to.save  = c("e1", "gin", "gout","tau", "ri","rf","RSS","mux0","scale",
+                                        "ue"),
                 model  = textConnection(Model),
-                n.thin = 1,
-                n.chains = 3,
-                n.burnin = 20000,
-                n.iter = 40000)
+                n.thin = 50,
+                n.chains = 5,
+                n.burnin = 5000,
+                n.iter = 10000)
+temp <- Normfit
+temp <- update(temp, n.thin = 10, n.iter = 10000)
 
-
-jagsresults(x = Normfit , params = c("e1","ex", "gin", "gout","scale","tau","ri","rf"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
+jagsresults(x = Normfit , params = c("e1", "gin", "gout","scale","ri","rf","tau"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
 RSS <- as.matrix(as.mcmc(Normfit)[,c("RSS")])
 rss0 <- function(x) crossprod(x-mean(x))[1]
@@ -190,7 +192,7 @@ div_style <- parcoord_style_np(div_color = "green", div_size = 0.05, div_alpha =
 mcmc_parcoord(as.mcmc(Normfit),alpha = 0.05, regex_pars = c("e1", "gin", "gout","ri","rf"))
 
 
-traplot(Normfit  ,c("e1","ex", "gin", "gout"),style="plain")
+traplot(Normfit  ,c("e1", "gin", "gout"),style="plain")
 denplot(Normfit  ,c("e1", "gin", "gout","ue"),style="plain")
 caterplot(Normfit,c("scale","tau"),style="plain")
 
@@ -198,19 +200,9 @@ caterplot(Normfit,c("scale","tau"),style="plain")
 
 # Plot
 
-y <- jagsresults(x=Normfit , params=c('mux1'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
-x <- xx
-gdata <- data.frame(x =xx, mean = y[,"mean"],lwr1=y[,"25%"],lwr2=y[,"2.5%"],lwr3=y[,"0.5%"],upr1=y[,"75%"],
-                    upr2=y[,"97.5%"],upr3=y[,"99.5%"])
+
 gobs <- data.frame(obsx,obsy,erry,set)
 gobs$set <- as.factor(gobs$set)
-
-
-
-y2 <- jagsresults(x=Normfit , params=c('mux2'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
-gdata2 <- data.frame(x =xx, mean = y2[,"mean"],lwr1=y2[,"25%"],lwr2=y2[,"2.5%"],lwr3=y2[,"0.5%"],upr1=y2[,"75%"],
-                    upr2=y2[,"97.5%"],upr3=y2[,"99.5%"])
-
 
 y0 <- jagsresults(x=Normfit , params=c('mux0'),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
 
