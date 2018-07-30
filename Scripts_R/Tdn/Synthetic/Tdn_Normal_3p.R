@@ -83,8 +83,15 @@ mux0[j] <- sfactorTdn(xx[j], e1,ex, gin, gout,6,5,0)
 tau ~  dgamma(0.1,0.1)
 e1 ~  dnorm(0,pow(1,-2))T(0,)
 ex <- e1
-gin ~  dnorm(0,pow(1,-2))T(0,)
-gout ~ dnorm(0,pow(1,-2))T(0,)
+
+
+Ngin ~ dbeta(0.5,0.5)
+Ngout ~ dbeta(0.5,0.5)
+gin  <-  3*Ngin
+gout <- 3*Ngout
+
+#gin ~  dnorm(0,pow(1,-2))T(0,)
+#gout ~ dnorm(0,pow(1,-2))T(0,)
 
 }"
 
