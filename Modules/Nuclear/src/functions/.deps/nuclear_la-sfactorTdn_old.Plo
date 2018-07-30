@@ -1,4 +1,4 @@
-nuclear_la-sfactorTdn.lo: sfactorTdn.cc sfactorTdn.h \
+nuclear_la-sfactorTdn_old.lo: sfactorTdn_old.cc sfactorTdn_old.h \
   /usr/local/include/JAGS/function/ArrayFunction.h \
   /usr/local/include/JAGS/function/Function.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/string \
@@ -171,7 +171,7 @@ nuclear_la-sfactorTdn.lo: sfactorTdn.cc sfactorTdn.h \
   /usr/local/include/gsl/gsl_sf_coulomb.h \
   /usr/local/include/gsl/gsl_mode.h /usr/local/include/gsl/gsl_inline.h
 
-sfactorTdn.h:
+sfactorTdn_old.h:
 
 /usr/local/include/JAGS/function/ArrayFunction.h:
 

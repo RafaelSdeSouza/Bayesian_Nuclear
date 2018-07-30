@@ -39,11 +39,11 @@ load.module("nuclear")
 ## ARTIFICIAL DATA GENERATION
 
 
-N <- 150
+N <- 200
 
 #obsx1 <- runif(N,0,0.7)
-obsx1 <- exp(runif(N,log(1e-3),log(1)))
-sd <- 0.1
+obsx1 <- exp(runif(N,log(1e-3),log(10)))
+sd <- 0.5
 obsy1 <- rnorm(N, Sfactor3(obsx1,0.0912,0.0912,2.93,0.0794,6,5,0),sd=sd)
 
 M <- 150
@@ -62,8 +62,8 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 #obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-obsy[i] ~ dnorm(sfactorTdn(obsx[i], e1,0.0912, gin, gout,6,5,0),pow(tau, -2))
-res[i] <- obsy[i]-sfactorTdn(obsx[i], e1,0.0912, gin, gout,6,5,0)
+obsy[i] ~ dnorm(sfactorTdn(obsx[i], e1,ex, gin, gout,6,5,0),pow(tau, -2))
+res[i] <- obsy[i]-sfactorTdn(obsx[i], e1,ex, gin, gout,6,5,0)
 }
 
 RSS <- sum(res^2)
@@ -74,20 +74,17 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactorTdn(xx[j], e1,0.0912, gin, gout,6,5,0)
+mux0[j] <- sfactorTdn(xx[j], e1,ex, gin, gout,6,5,0)
 
 
 }
 
-
-
-
-
 # PRIORS
 tau ~  dgamma(0.1,0.1)
-e1 ~  dnorm(0,0.1)T(0,)
-gin ~  dnorm(0,pow(0.5,-2))T(0,)
-gout ~ dnorm(0,pow(0.5,-2))T(0,)
+e1 ~  dnorm(0,pow(1,-2))T(0,)
+ex <- e1
+gin ~  dnorm(0,pow(1,-2))T(0,)
+gout ~ dnorm(0,pow(1,-2))T(0,)
 
 }"
 
@@ -104,23 +101,32 @@ gout ~ dnorm(0,pow(0.5,-2))T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.01,10),gout=runif(1,0.01,10),gin=runif(1,0.01,10)) }
+inits <- function () { list(e1 = runif(1,0.01,10),gout=runif(1,0.01,3),gin=runif(1,0.01,5)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
 
+Normfit <- jags(data = model.data,
+                inits = inits,
+                parameters.to.save  = c("e1", "gin", "gout","tau"),
+                model  = textConnection(Model),
+                n.thin = 10,
+                n.chains = 3,
+                n.burnin = 5000,
+                n.iter = 10000)
+
 
 # JAGS model with R2Jags;
-Normfit <- run.jags(data = model.data,
-                adapt = 15000,
-                inits = inits,
-                method ="rjags",
-                monitor = c("e1", "gin", "gout","tau"),
-                model  = Model,
-                thin = 5,
-                burnin = 5000,
-                sample = 10000,
-                n.chains = 3)
+#Normfit <- run.jags(data = model.data,
+#                adapt = 500,
+#                inits = inits,
+#                method ="rjags",
+#                monitor = c("e1", "gin", "gout","tau"),
+#                model  = Model,
+#                thin = 5,
+#                burnin = 1000,
+#                sample = 30000,
+#                n.chains = 3)
 plot(Normfit, layout=c(3,4))
 
 jagsresults(x = Normfit , params = c("e1", "gin", "gout","tau"),probs = c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))

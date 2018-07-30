@@ -87,8 +87,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = x86_64-apple-darwin17.4.0
-host_triplet = x86_64-apple-darwin17.4.0
+build_triplet = x86_64-apple-darwin17.5.0
+host_triplet = x86_64-apple-darwin17.5.0
 subdir = src/functions
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -107,7 +107,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 nuclear_la_LIBADD =
 am_nuclear_la_OBJECTS = nuclear_la-sfactor3Hedp.lo \
-	nuclear_la-sfactorTdn.lo
+	nuclear_la-sfactorTdn.lo nuclear_la-sfactorTdn_old.lo
 nuclear_la_OBJECTS = $(am_nuclear_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -276,10 +276,10 @@ am__quote =
 am__tar = $${TAR-tar} chof - "$$tardir"
 am__untar = $${TAR-tar} xf -
 bindir = ${exec_prefix}/bin
-build = x86_64-apple-darwin17.4.0
+build = x86_64-apple-darwin17.5.0
 build_alias = 
 build_cpu = x86_64
-build_os = darwin17.4.0
+build_os = darwin17.5.0
 build_vendor = apple
 builddir = .
 datadir = ${datarootdir}
@@ -287,10 +287,10 @@ datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host = x86_64-apple-darwin17.4.0
+host = x86_64-apple-darwin17.5.0
 host_alias = 
 host_cpu = x86_64
-host_os = darwin17.4.0
+host_os = darwin17.5.0
 host_vendor = apple
 htmldir = ${docdir}
 includedir = ${prefix}/include
@@ -324,8 +324,8 @@ nuclear_la_CPPFLAGS = -I$(top_srcdir)/src \
 												 -I$(includedir)/JAGS
 
 nuclear_la_LDFLAGS = -no-undefined -module -avoid-version
-nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc  
-noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h    
+nuclear_la_SOURCES = sfactor3Hedp.cc  sfactorTdn.cc  sfactorTdn_old.cc  
+noinst_HEADERS = sfactor3Hedp.h   sfactorTdn.h    sfactorTdn_old.h
 all: all-am
 
 .SUFFIXES:
@@ -382,6 +382,7 @@ distclean-compile:
 
 include ./$(DEPDIR)/nuclear_la-sfactor3Hedp.Plo
 include ./$(DEPDIR)/nuclear_la-sfactorTdn.Plo
+include ./$(DEPDIR)/nuclear_la-sfactorTdn_old.Plo
 
 .cc.o:
 	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -420,6 +421,13 @@ nuclear_la-sfactorTdn.lo: sfactorTdn.cc
 #	$(AM_V_CXX)source='sfactorTdn.cc' object='nuclear_la-sfactorTdn.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn.lo `test -f 'sfactorTdn.cc' || echo '$(srcdir)/'`sfactorTdn.cc
+
+nuclear_la-sfactorTdn_old.lo: sfactorTdn_old.cc
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT nuclear_la-sfactorTdn_old.lo -MD -MP -MF $(DEPDIR)/nuclear_la-sfactorTdn_old.Tpo -c -o nuclear_la-sfactorTdn_old.lo `test -f 'sfactorTdn_old.cc' || echo '$(srcdir)/'`sfactorTdn_old.cc
+	$(AM_V_at)$(am__mv) $(DEPDIR)/nuclear_la-sfactorTdn_old.Tpo $(DEPDIR)/nuclear_la-sfactorTdn_old.Plo
+#	$(AM_V_CXX)source='sfactorTdn_old.cc' object='nuclear_la-sfactorTdn_old.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nuclear_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o nuclear_la-sfactorTdn_old.lo `test -f 'sfactorTdn_old.cc' || echo '$(srcdir)/'`sfactorTdn_old.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo
