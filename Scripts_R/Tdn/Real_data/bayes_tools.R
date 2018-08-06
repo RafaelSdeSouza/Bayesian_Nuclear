@@ -21,17 +21,11 @@ set.seed(123)
 
 ######################################################################
 # import packages
-library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
-require(nuclear);library(magrittr);library(wesanderson)
-library(dplyr);require(ggsci);require(ggmcmc);require(plyr);library(latex2exp)
-source("..//..//auxiliar_functions/jagsresults.R")
-source("..//..//auxiliar_functions/theme_rafa.R")
-source("..//..//auxiliar_functions/pair_wise_plot.R")
-source("..//..//auxiliar_functions/Gamma3Hedp.R")
+require(nuclear);library(magrittr);
+library(dplyr);library(BayesianTools)
 ## for block updating [we do not need to center predictor variables]
-load.module("glm")
-load.module("nuclear")
+
 
 
 ######################################################################
@@ -49,10 +43,7 @@ Nik <- length(unique(ensamble$invK))
 # r_i = 6
 # r_f = 5
 
-# Literature
-#  0.35779   # resonance energy
-#  1.0085    # reduced width incoming
-#  0.025425   # reduced width outgoing
+
 
 
 N <- nrow(ensamble)
@@ -62,8 +53,46 @@ erry <- ensamble$Stat
 set <- ensamble$dat
 lab <- ensamble$invK
 syst = c(unique(ensamble$Syst))
-#syst <- syst[-3]
-library(BayesianTools)
+i = seq(1:N)
+
+
+likelihood <- function(par){
+  e1 = par[1]
+  gin = par[2]
+  gout = par[3]
+  sigmax = par[4]
+  scale = par[5:9]
+#  y = par[10:133]
+  
+  llscale = sum(dlnorm(scale,meanlog = log(1), sdlog = log(1 + syst^2), log = T))
+  
+  lly <- sum(dnorm(obsy,scale[re]*sfactorTdn_5p(obsx, e1,gin, gout,6,5), sd = sigmax,  log = T))
+    return(llscale   + lly)
+  
+}
+
+
+
+setup <- createBayesianSetup(likelihood = likelihood,
+lower = c(0.001,0.001,0.001,0.001,rep(0.5,5)),
+upper = c(1,2,2,5,rep(1.5,5)))
+settings <- list(iterations = 100000,adaptation=5000,
+                 burnin = 20000, message=T)
+
+res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
+summary(res)
+tracePlot(sampler = res, thin = 20, start = 10000, whichParameters = c(1,2,3))
+
+correlationPlot(res )
+
+
+correlationPlot(out)
+
+
+
+
+
+
 
 density = function(par){
   d1 = dnorm(par[1], 0.001,1, log =TRUE)
@@ -81,44 +110,3 @@ sampler = function(n=1){
 prior <- createPrior(density = density, sampler = sampler, 
                      lower = c(0.001,0.001,0.001), upper = c(10,10,10), best = NULL)
 
-
-
-likelihood <- function(par){
-  e1 = par[1]
-  gin = par[2]
-  gout = par[3]
-  sigmax = par[4]
-  scale = par[5:9]
-  y = par[10:]
-  
-  llRandom = sum(dlnorm(scale,meanlog = log(1), sdlog = log(1 + syst^2), log = T))
-  lly <- sum(dnorm(y,mean = scale[re]*sfactorTdn_5p(obsx, e1,gin, gout,6,5), sd = sigmax,  log = T))
-  llobs = sum(dnorm(obsy,mean = y,sd = erry,log = T))
-  
-  #llobs = sum(dnorm(obsy,scale[re]*sfactorTdn_5p(obsx, e1,gin, gout,6,5),sd = sigmax,log = T)) 
-  
-#  obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-#  y[i] ~ dnorm(scale[re[i]]*sfactorTdn(obsx[i], e1, ex,gin, gout,ri,rf,0),pow(tau, -2))
-  
-#  llytrue = sum(dnorm(scale[re]*sfactorTdn_5p(obsx, e1,gin, gout,6,5),
-#                      sd = sigmax, log = T))
-#  llobs = sum(dnorm(obsy,mean = llytrue,sd = erry,log = T))
-
-  
-  #llobs = sum(dnorm(scale[re]*sfactorTdn_5p(obsx, e1,gin, gout,6,5) - obsy,sd = sigmax,log = T))  
-  
-  return(llRandom + llobs + lles)
-  
-}
-
-
-
-setup <- createBayesianSetup(likelihood = likelihood,
-lower = c(0.001,0.001,0.001,0.001,rep(0.5,5),0.001),
-upper = c(1,2,2,5,rep(1.5,5),1))
-settings <- list(iterations = 100000,
-                 burnin = 15000, message=T)
-
-res <- runMCMC(bayesianSetup = setup, settings = settings)
-summary(res)
-tracePlot(sampler = res, thin = 10, start = 20000, whichParameters = c(1,2,3))
