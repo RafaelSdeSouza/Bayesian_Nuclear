@@ -64,6 +64,10 @@ lab <- ensamble$invK
 syst = c(unique(ensamble$Syst))
 #syst <- syst[-3]
 
+
+
+
+
 M <- 500
 xx <- exp(seq(log(min(obsx)),log(max(obsx)),length.out = M))
 
@@ -133,15 +137,26 @@ scale[k] ~ dlnorm(log(1.0),1/log(1+pow(syst[k],2)))
 # width;
 
 tau ~ dnorm(0, pow(1,-2))T(0,)
-e1 ~  dnorm(0, pow(1,-2))T(0,)
+#e1 ~  dnorm(0, pow(1,-2))T(0,)
+
+
+e1 ~  dbeta(0.5,0.5)
 ex <- e1
+Ngin ~ dbeta(0.5,0.5)
+Ngout ~ dbeta(0.5,0.5)
+gin  <-  3*Ngin
+gout <- 3*Ngout
+
+
 
 rf ~  dnorm(5,pow(0.1,-2))T(0,)
 ri ~  dnorm(6,pow(0.1,-2))T(0,)
 
 
-gin ~  dnorm(0, pow(3,-2))T(0,)
-gout ~ dnorm(0, pow(3,-2))T(0,)
+
+
+#gin ~  dnorm(0, pow(3,-2))T(0,)
+#gout ~ dnorm(0, pow(3,-2))T(0,)
 
 
 
@@ -161,7 +176,7 @@ gout ~ dnorm(0, pow(3,-2))T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.01,0.1),gout=runif(1,0.01,0.5),gin=runif(1,0.01,1)) }
+inits <- function () { list(e1 = runif(1,0.01,0.1),Ngout=runif(1,0.01,0.5),Ngin=runif(1,0.01,0.9)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -170,11 +185,10 @@ set.seed(43)
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("e1", "gin", "gout","tau", "ri","rf","RSS","mux0","scale",
-                                        "ue"),
+                parameters.to.save  = c("e1", "gin", "gout","tau", "ri","rf","RSS","mux0","scale"),
                 model  = textConnection(Model),
-                n.thin = 50,
-                n.chains = 5,
+                n.thin = 10,
+                n.chains = 3,
                 n.burnin = 5000,
                 n.iter = 10000)
 temp <- Normfit

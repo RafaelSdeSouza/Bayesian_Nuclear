@@ -81,10 +81,19 @@ mux0[j] <- sfactorTdn(xx[j], e1,ex, gin, gout,6,5,0)
 
 # PRIORS
 tau ~  dgamma(0.1,0.1)
-e1 ~  dnorm(0,pow(1,-2))T(0,)
+#e1 ~  dnorm(0,pow(1,-2))T(0,)
+e1 ~  dbeta(0.5,0.5)
 ex <- e1
-gin ~  dnorm(0,pow(1,-2))T(0,)
-gout ~ dnorm(0,pow(1,-2))T(0,)
+
+
+
+Ngin ~ dbeta(0.5,0.5)
+Ngout ~ dbeta(0.5,0.5)
+gin  <-  3*Ngin
+gout <- 3*Ngout
+
+#gin ~  dnorm(0,pow(1,-2))T(0,)
+#gout ~ dnorm(0,pow(1,-2))T(0,)
 
 }"
 
@@ -101,7 +110,7 @@ gout ~ dnorm(0,pow(1,-2))T(0,)
 # n.thin:   store every n.thin element [=1 keeps all samples]
 
 
-inits <- function () { list(e1 = runif(1,0.01,10),gout=runif(1,0.01,3),gin=runif(1,0.01,5)) }
+inits <- function () { list(e1 = runif(1,0.01,0.9),Ngout=runif(1,0.01,0.9),Ngin=runif(1,0.01,0.9)) }
 # "f": is the model specification from above;
 # data = list(...): define all data elements that are referenced in the
 
@@ -112,8 +121,8 @@ Normfit <- jags(data = model.data,
                 model  = textConnection(Model),
                 n.thin = 10,
                 n.chains = 3,
-                n.burnin = 5000,
-                n.iter = 10000)
+                n.burnin = 1000,
+                n.iter = 3000)
 
 
 # JAGS model with R2Jags;

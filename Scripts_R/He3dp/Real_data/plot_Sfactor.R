@@ -55,13 +55,13 @@ gg <- ggplot(gobs,aes(x=obsx,y=obsy))+
   scale_colour_manual(name="",values=c("black","#7f0000","#7f0000","black","black",
                                        "black","black"))+
   scale_shape_manual(values=c(0,19,8,10,4,17,3),name="")+
-  coord_cartesian(xlim=c(4.7e-3,0.6),ylim=c(0.5,19)) +
+  coord_cartesian(xlim=c(4.7e-3,0.6),ylim=c(0.2,19)) +
   theme_bw() + 
   xlab("Energy (MeV)") + 
   ylab("S-Factor (MeV b)") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
-  annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),
-                      sides = "b",size = 0.45) +
+#annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),
+#                      sides = "b",size = 0.45) +
 # annotation_logticks(base=2.875,
 #  short = unit(0.2, "cm"), mid = unit(0.25, "cm"), long = unit(0.3, "cm"),sides = "l",size = 0.45) +
   theme(panel.grid.major = element_blank(),
