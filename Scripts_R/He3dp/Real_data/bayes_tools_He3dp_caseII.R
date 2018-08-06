@@ -96,14 +96,14 @@ prior <- createPrior(density = density,
                     
 setup <- createBayesianSetup(likelihood = likelihood,lower = low,upper = up)
 
-settings <- list(iterations = 200000,
-                 burnin = 50000, message = T)
+settings <- list(iterations = 500000,
+                 burnin = 100000, message = T)
 
 
 system.time(
 res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
 )
-tracePlot(sampler = res, thin = 10, start = 3500, whichParameters = c(1,2,3,4,5,6,15,16))
+tracePlot(sampler = res, thin = 10, start = 50000, whichParameters = c(1,2,3,4,5,6,15,16))
 
 
 
