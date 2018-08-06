@@ -25,75 +25,64 @@ library(rjags);library(R2jags);library(mcmcplots)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr);library(wesanderson)
 library(dplyr);require(ggsci);require(ggmcmc);require(plyr);library(latex2exp)
-source("..//..//auxiliar_functions/jagsresults.R")
-source("..//..//auxiliar_functions/theme_rafa.R")
-source("..//..//auxiliar_functions/pair_wise_plot.R")
-source("..//..//auxiliar_functions/Gamma3Hedp.R")
-## for block updating [we do not need to center predictor variables]
-load.module("glm")
-load.module("nuclear")
-
-
-######################################################################
-## Read DATA 
-ensamble <- read.csv("ensamble_Tdn_extra.csv",header = T) %>%  filter(E <= 0.3)
-#filter(dat!= "Mag75")
-#%>% filter(E <= 0.5) %>%   filter(dat!= "Arn53") %>%
-# droplevels(ensamble$dat)
-
-
-re <- as.numeric(ensamble$dat) 
-Nre <- length(unique(ensamble$dat))
-Nik <- length(unique(ensamble$invK))
-# Radius
-# r_i = 6
-# r_f = 5
-
-# Literature
-#  0.35779   # resonance energy
-#  1.0085    # reduced width incoming
-#  0.025425   # reduced width outgoing
-
-
-N <- nrow(ensamble)
-obsy <- ensamble$S    # Response variable
-obsx <-  ensamble$E   # Predictors
-erry <- ensamble$Stat
-set <- ensamble$dat
-lab <- ensamble$invK
-syst = c(unique(ensamble$Syst))
-#syst <- syst[-3]
 library(BayesianTools)
+# Data
+set.seed(1056)                   # set seed to replicate example
+nobs = 100                   # number of obs in model
 
+sdobsx <- 1.25
+truex <- rnorm(nobs,0,2.5)       # normal variable
+#errx <- rnorm(nobs, 0, sdobsx)
+#obsx <- truex + errx 
+obsx <- truex
+
+beta1 <- -3
+beta2 <- 8
+sdy <- 1.5
+sdobsy <- 0.5 # Variance to simulate reported errors
+
+erry <- rnorm(nobs, 0, sdobsy) # reported errors
+truey <- rnorm(nobs,beta1 + beta2*truex,sdy)
+obsy <- truey + erry
+
+K <- 2
+i <- seq(4,nobs+3)
+# Level of  mistake in the reported errors
+Lambda <- 0.5
+
+# Create a general prior distribution by specifying an arbitrary density function and a
+# corresponding sampling function
 density = function(par){
-  d1 = dnorm(par[1], 0.001,1, log =TRUE)
-  d2 = dunif(par[2], 0.001,3, log =TRUE)
-  d3 = dunif(par[3], 0.001,3, log =TRUE)
-  return(d1 + d2 + d3)
+  d1 = dnorm(par[1], mean= 0, sd = 10, log =TRUE)
+  d2 = dnorm(par[2], mean= 0, sd = 10, log =TRUE)
+  d3 = dunif(par[3], 0,100, log =TRUE)
+  d4 = dunif(par[4:(nobs + 3)], obsy - 3*abs(erry), obsy + 3*abs(erry), log =TRUE)
+  return(d1 + d2 + d3 + d4)
 }
 
+# The sampling is optional but recommended because the MCMCs can generate automatic starting
+# conditions if this is provided
 sampler = function(n=1){
-  d1 = rnorm(n, 0.001,1)
-  d2 = rnorm(n, 0.001,1)
-  d3 = rnorm(n, 0.001,1)
-  return(cbind(d1,d2,d3))
+  d1 = rnorm(n, mean= 0, sd = 10)
+  d2 = rnorm(n, mean= 0, sd = 10)
+  d3 = runif(n, 0,100)
+  d4 = runif(nobs,obsy - 3*abs(erry), obsy + 3*abs(erry))
+  return(cbind(d1,d2,d3,d4))
 }
-prior <- createPrior(density = density, sampler = sampler, 
-                     lower = c(0.001,0.001,0.001), upper = c(10,10,10), best = NULL)
 
+prior <- createPrior(density = density, sampler = sampler, lower = c(-100,-100,0,obsy - 3*abs(erry)),
+                     upper = c(100,100,100,obsy + 3*abs(erry)), best = NULL)
 
 
 likelihood <- function(par){
-  e1 = par[1]
-  gin = par[2]
-  gout = par[3]
-  sigmax = par[4]
-  scale = par[5:9]
-  y = par[10:]
+#  
+  a = par[1]
+  b = par[2]
+  sy <- par[3]
+  y = par[4:(nobs + 3)]
   
-  llRandom = sum(dlnorm(scale,meanlog = log(1), sdlog = log(1 + syst^2), log = T))
-  lly <- sum(dnorm(y,mean = scale[re]*sfactorTdn_5p(obsx, e1,gin, gout,6,5), sd = sigmax,  log = T))
-  llobs = sum(dnorm(obsy,mean = y,sd = erry,log = T))
+  lly <- sum(dnorm(y,(a + b*obsx), sd = sy,  log = T))
+  llobs = sum(dnorm(obsy,y, sd = abs(erry),log = T))
   
   #llobs = sum(dnorm(obsy,scale[re]*sfactorTdn_5p(obsx, e1,gin, gout,6,5),sd = sigmax,log = T)) 
   
@@ -107,18 +96,19 @@ likelihood <- function(par){
   
   #llobs = sum(dnorm(scale[re]*sfactorTdn_5p(obsx, e1,gin, gout,6,5) - obsy,sd = sigmax,log = T))  
   
-  return(llRandom + llobs + lles)
+  return( lly + llobs)
   
 }
 
 
 
-setup <- createBayesianSetup(likelihood = likelihood,
-lower = c(0.001,0.001,0.001,0.001,rep(0.5,5),0.001),
-upper = c(1,2,2,5,rep(1.5,5),1))
-settings <- list(iterations = 100000,
-                 burnin = 15000, message=T)
+setup <- createBayesianSetup(likelihood = likelihood,lower = c(-100,-100,0,obsy - 3*abs(erry)),
+                             upper = c(100,100,100,obsy + 3*abs(erry)))
 
-res <- runMCMC(bayesianSetup = setup, settings = settings)
-summary(res)
-tracePlot(sampler = res, thin = 10, start = 20000, whichParameters = c(1,2,3))
+settings <- list(iterations = 100000,
+                 burnin = 50000, message = T)
+
+out <- runMCMC(bayesianSetup = setup, settings = settings,sample="DREAMzs")
+summary(out)
+tracePlot(sampler = out, thin = 10, start = 1000, whichParameters = c(1,2,3))
+marginalPlot(out,whichParameters = c(1,2,3))
