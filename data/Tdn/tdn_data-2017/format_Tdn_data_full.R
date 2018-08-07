@@ -18,37 +18,44 @@ Mag75  <-  read.table("tdn_mag75b.dat") %>%
 
 Bam57  <-  read.table("tdn_bam57b.dat") %>%
   set_colnames(.,c("E","E_stat","S","Stat")) %>%
-  select(.,c("E","S","Stat")) %>%
+  select(.,c("E","E_stat","S","Stat")) %>%
   mutate(.,Syst=mean(0.5*S)) %>%  
   mutate(.,dat="Bam57") 
 
 
 # Current
 Arn53  <-  read.table("data_arnold.dat") %>%
-  set_colnames(.,c("E","S","Stat")) %>%
+  set_colnames(.,c("E","E_stat","S","Stat")) %>%
   mutate(.,Syst=mean(0.02*S)) %>%  
   mutate(.,dat="Arn53") 
 
 
 Bro87 <- read.table("data_brown.dat") %>%
-  set_colnames(.,c("E","S","Stat")) %>%
+  set_colnames(.,c("E","E_stat","S","Stat")) %>%
          mutate(.,Syst= mean(0.013*S)) %>%
         mutate(.,dat="Bro87")
 
 Jar84 <- read.table("data_jarmie.dat") %>%
-  set_colnames(.,c("E","S","Stat")) %>%
+  set_colnames(.,c("E","E_stat","S","Stat")) %>%
   mutate(.,Syst= mean(0.0126*S)) %>%
   mutate(.,dat="Jar84")
 
 
 Kob66 <- read.table("data_kobzev.dat") %>%
-  set_colnames(.,c("E","S","Stat")) %>%
+  set_colnames(.,c("E","E_stat","S","Stat")) %>%
   mutate(.,Syst = mean(0.025*S)) %>%
   mutate(.,dat="Kob66")
 
+
+Con52 <- read.table("data_conner.dat") %>%
+  set_colnames(.,c("E","E_stat","S","Stat")) %>%
+  mutate(.,Syst = mean(0.018*S)) %>%
+  mutate(.,dat="Con52")
+
+
 # Remove bad points
 
-ensamble <- rbind(Arn53, Bro87,Jar84,Kob66,Mag75,Bam57)
+ensamble <- rbind(Arn53, Bro87,Jar84,Kob66,Con52)
 
 #ensamble <- rbind(Bame57, Brown87,Jarmie86)
 
