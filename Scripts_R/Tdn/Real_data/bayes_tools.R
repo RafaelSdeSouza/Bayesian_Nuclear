@@ -70,8 +70,8 @@ lower = c(0.001,0.001,0.001,0.001,rep(0.5,5),obsy - 5*abs(erry)),
 upper = c(1,2,2,5,rep(1.5,5),obsy + 5*abs(erry)),
 names = c("e0","gd2","gn2","sigma",to("scale", 5),to("y", N)))
 
-settings <- list(iterations = 500000,
-                 burnin = 100000, message = T)
+settings <- list(iterations = 50000,
+                 burnin = 10000, message = T)
 
 
 res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
