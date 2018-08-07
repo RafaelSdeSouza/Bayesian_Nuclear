@@ -50,8 +50,8 @@ likelihood <- function(par){
   gin = par[2]
   gout = par[3]
   sigmax = par[4]
-  scale = par[5:10]
-  y = par[11:(N + 10)]
+  scale = par[5:9]
+  y = par[10:(N + 9)]
 #  y = par[10:133]
  
   
