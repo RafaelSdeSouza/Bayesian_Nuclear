@@ -110,7 +110,7 @@ names = c("e0","er","gd2","gn2","ad","an","sigma",to("scale", 5),to("y", N)))
   res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
 
 summary(res)
-tracePlot(sampler = res,  start = 1000, whichParameters = c(1,2,3,4,5,6))
+tracePlot(sampler = res,  start = 200000, whichParameters = c(1,2,3,4,5,6))
 
 correlationPlot(res )
 
