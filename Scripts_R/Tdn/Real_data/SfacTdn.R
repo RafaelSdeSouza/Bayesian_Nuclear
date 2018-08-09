@@ -63,7 +63,7 @@ SfacTdn <- function(ecm, e0, er, gi, gf, ri, rf, ue){
   
   s1=pek*etpe_i*omega*Ga*Gb
   s2=((e0-ecm-tapp)^2)+0.25*((Ga+Gb)^2)
-  SF <- exp( 0.5*0.98951013e0*z1_i*z2_i*sqrt(mue_i)*(1e6*ue)*ecm^(-1.5) )*s1/s2
+  SF <- exp( 0.5*0.98951013e0*z1_i*z2_i*sqrt(mue_i)*(1e-6*ue)*ecm^(-1.5) )*s1/s2
   
   return(SF = SF)
 }
