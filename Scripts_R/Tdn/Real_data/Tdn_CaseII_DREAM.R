@@ -68,8 +68,8 @@ likelihood <- function(par){
 
 
 
-low <- c(1e-3,1e-3,1e-4,1e-4,2.5,2.5,1e-2,rep(0.8,5),obsy - 2*abs(erry))
-up <- c(1,0.3,10,10,10,10,5,rep(1.2,5),obsy + 2*abs(erry))
+low <- c(1e-4,1e-3,1e-4,1e-4,2.5,2.5,1e-2,rep(0.8,5),obsy - 2*abs(erry))
+up <- c(1,0.3,50,50,10,10,5,rep(1.2,5),obsy + 2*abs(erry))
 
 
 density = function(par){
@@ -100,21 +100,22 @@ sampler = function(){
 #                    lower = low, upper = up, best = NULL)
 
 
-setup <- createBayesianSetup(likelihood = likelihood, lower = low, upper = up,parallel=T,
+setup <- createBayesianSetup(likelihood = likelihood, lower = low, upper = up,
 names = c("e0","er","gd2","gn2","ad","an","sigma",to("scale", 5),to("y", N)))
 
-settings <- list(iterations = 600000,
-                 burnin = 200000, message = T,nrChains = 3)
+  settings <- list(iterations = 800000,
+                   burnin = 75000, message = T,nrChains = 1,adaptation = 0.5)
 
 
-res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
+  res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
+
 summary(res)
-tracePlot(sampler = res, thin = 20, start = 10000, whichParameters = c(1,2,3,4,5,6))
+tracePlot(sampler = res,  start = 1000, whichParameters = c(1,2,3,4,5,6))
 
 correlationPlot(res )
 
 
-tracePlot(sampler = res, thin = 10, start = 5000, whichParameters = c(1,2,3,4,5,6,7,8,9))
+tracePlot(sampler = res, thin = 10, start = 50000, whichParameters = c(1,2,3,4,5,6,7,8,9))
 
 
 
