@@ -106,7 +106,7 @@ settings <- list(iterations = 700000,adaptation = 0.4,
 
 res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
 summary(res)
-tracePlot(sampler = res, start = 100000, whichParameters = c(1,2,3,19))
+tracePlot(sampler = res, start = 100000, whichParameters = c(14:18))
 
 
 
