@@ -156,6 +156,14 @@ out2 <- DREAMzs(res,settings = settings)
 
 
 
+<<<<<<< HEAD
+=======
+summary(res)
+<<<<<<< HEAD
+tracePlot(sampler = res, start = 100000, whichParameters = c(14:18))
+=======
+>>>>>>> e2a42633ad7da60e14cd9131502da3005812ed00
+>>>>>>> a6445c952dd37a5d10ea738cbb73f243d051b344
 
 plot(mo$gd2,mo$gn2,type="l")
 
