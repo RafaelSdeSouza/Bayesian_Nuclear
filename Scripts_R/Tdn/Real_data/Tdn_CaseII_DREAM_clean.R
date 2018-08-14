@@ -77,13 +77,13 @@ up <- c(1,0.3, rep(10,2), 10,10, rep(1,5),  rep(1.5,5), 100,obsy + 2*abs(erry))
 createTdnPrior <- function(lower, upper, best = NULL){
 density = function(par){
   d1 = dnorm(par[1], mean = 0, sd = 1, log = TRUE)
-  d2 = sum(dtnorm(par[2:3], mean = 0, sd = 3,log = TRUE))
+  d2 = sum(dtnorm(par[2], mean = 0, sd = 3,log = TRUE))
   d3 = sum(dnorm(par[3:4], mean = 0, sd = 3, log = TRUE))
   d4 = sum(dunif(par[5:6], 2, 10, log = TRUE))
   d5 = sum(dunif(par[7:11], 0, 1,log = TRUE))
   d6 = sum(dlnorm(par[12:16],log(1),log(1 + syst^2),log = TRUE))
   d7 = dgamma(par[17], 1, 0.05,log = TRUE)
-  d8 = sum(dunif(par[18:(N + 16)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
+  d8 = sum(dunif(par[18:(N + 17)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
   return(d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8)
 }
 
