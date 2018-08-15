@@ -141,7 +141,7 @@ names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xsca
   
   
   summary(res)
-tracePlot(sampler = res,  start = 80000, whichParameters = c(1,2,3,4,5,6,27))
+tracePlot(sampler = res,  start = 10000, whichParameters = c(1,2,3,4,5,6,27))
 
 correlationPlot(res )
 
