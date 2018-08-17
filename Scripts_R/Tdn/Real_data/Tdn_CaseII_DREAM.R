@@ -65,7 +65,7 @@ likelihood <- function(par){
 
   llxnorm = sum(dnorm(xnorm,mean=0,sd=systx,log = T))
   llynorm = sum(dlnorm(ynorm,meanlog = log(1), sdlog = log(1 + syst^2), log = T))
-  llxscat <- sum(dnorm(xscat,mean = 0,sd = 1e-3, log = T))
+  llxscat <- sum(dnorm(xscat,mean = 0,sd = 1e-2, log = T))
  
 # +xscat[re] 
   
@@ -81,8 +81,12 @@ likelihood <- function(par){
 
 
 low <- c(rep(1e-3,2),1e-4,1e-4, 2,2,  rep(1e-4,5),    rep(0.5,5), rep(0,5), -5*systx, 1e-3, obsy - 2*abs(erry),obsx - errx)
-up <- c(1,0.3, rep(10,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(5e-2,5), 5*systx, 100, obsy + 2*abs(erry),obsx + errx)
+up <- c(1,0.3, rep(40,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx, 100, obsy + 2*abs(erry),obsx + errx)
 
+
+
+#wl_d <- 34.6224*pow(ri, -2)
+#wl_n <- 51.8889*pow(rf, -2)
 
 
 
@@ -90,27 +94,32 @@ createTdnPrior <- function(lower, upper, best = NULL){
 density = function(par){
   d1 = dnorm(par[1], mean = 0, sd = 1, log = TRUE)
   d2 = sum(dtnorm(par[2], mean = 0, sd = 1,log = TRUE))
-  d3 = sum(dnorm(par[3:4], mean = 0, sd = 3, log = TRUE))
-  d4 = sum(dunif(par[5:6], 2, 10, log = TRUE))
-  d3 = sum(dunif(par[7:11], 0, 1,log = TRUE))
-  d4 = sum(dlnorm(par[12:16],log(1),log(1 + syst^2),log = TRUE))
-  d5 = sum(dtnorm(par[17:21],0, 1e-3,log = TRUE))
-  d6 = sum(dnorm(par[22:26],0,sd = systx,log = TRUE))
-  d7 = dgamma(par[27], 1, 0.05,log = TRUE)
-  d8 = sum(dunif(par[28:(N + 27)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
-  d9 = sum(dunif(par[(N + 28):(2*N + 27)],obsx - errx,obsx + errx,log = TRUE))
   
-  return(d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8 + d9)
+  d3 = sum(dnorm(par[3], mean = 0, sd = 34.6224/par[5], log = TRUE))
+  
+  d4 = sum(dnorm(par[4], mean = 0, sd = 51.8889/par[6], log = TRUE))
+  
+  
+  d5 = sum(dunif(par[5:6], 2, 10, log = TRUE))
+  d6 = sum(dunif(par[7:11], 0, 1,log = TRUE))
+  d7 = sum(dlnorm(par[12:16],log(1),log(1 + syst^2),log = TRUE))
+  d8 = sum(dtnorm(par[17:21],0, 1e-3,log = TRUE))
+  d9 = sum(dnorm(par[22:26],0,sd = systx,log = TRUE))
+  d10 = dgamma(par[27], 1, 0.05,log = TRUE)
+  d11 = sum(dunif(par[28:(N + 27)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
+  d12 = sum(dunif(par[(N + 28):(2*N + 27)],obsx - errx,obsx + errx,log = TRUE))
+  
+  return(d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8 + d9 + d10 + d11 + d12 )
 }
 
 sampler = function(){
   c(runif(1, 0,  1),
     exp(runif(1, log(0.001), log(0.3))),
-    exp(runif(2, log(1e-3), log(10))),
+    exp(runif(2, log(1e-3), log(30))),
     runif(2, 2, 10),
     exp(runif(5,log(1e-4), log(1))), #xcat
     rlnorm(5, log(1), log(1 + syst^2)), #ynorm
-    runif(5, 0, 5e-3),
+    runif(5, 0, 1e-1),
     rnorm(5, 0, systx),
     rgamma(1, 1, 0.05),
     runif(N, obsy - erry,obsy + erry),
@@ -130,8 +139,8 @@ setup <- createBayesianSetup(likelihood = likelihood, lower = low, upper = up,
 names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xscat", 5),
           to("xnorm", 5),"ue", to("y", N),to("x", N)))
 
-  settings <- list(iterations = 5000000,
-                   burnin = 500000, message = T,nrChains = 1,adaptation = 0.3)
+  settings <- list(iterations = 1E7,
+                   burnin = 1E6, message = T,nrChains = 1,adaptation = 0.45)
 
 
   res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
@@ -141,7 +150,7 @@ names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xsca
   
   
   summary(res)
-tracePlot(sampler = res,  start = 10000, whichParameters = c(1,2,3,4,5,6,27))
+tracePlot(sampler = res,  start = 200000,thin=50, whichParameters = c(1,2,3,4,5,6,27))
 
 correlationPlot(res )
 
