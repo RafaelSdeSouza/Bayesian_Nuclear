@@ -54,17 +54,17 @@ likelihood <- function(par){
   scale = par[8:14]
   ue = par[15:16]
   y = par[17:(N + 16)]
-  
+
   llRandom = sum(dlnorm(scale,meanlog = log(1), sdlog = log(1 + syst^2), log = T))
   lly <- sum(dnorm(y,mean = scale[re]*sfactor3Hedp_5p(obsx, e0,er,gd2, gp2,ad,ap,ue = ue[ik]), sd = sigmax,  log = T))
   llobs = sum(dnorm(obsy,mean = y,sd = erry,log = T))
   return(llRandom + llobs + lly)
-  
+
 }
 
 
 low <- c(1e-3,1e-3,1e-5,1e-5,1,1,1e-2,rep(0.8,7),rep(0,2),obsy - 2*abs(erry))
-up <- c(1,2,10,10,15,15,5,rep(1.2,7),rep(300,2),obsy + 2*abs(erry))
+up <- c(1,0.3,20,20,15,15,5,rep(1.2,7),rep(300,2),obsy + 2*abs(erry))
 
 density = function(par){
   d1 = dnorm(par[1], mean = 0, sd = 1, log = TRUE)
@@ -79,7 +79,7 @@ density = function(par){
 }
 
 
-prior <- createPrior(density = density, 
+prior <- createPrior(density = density,
                      lower = low, upper = up, best = NULL)
 
 
@@ -92,8 +92,8 @@ prior <- createPrior(density = density,
 
 #createBayesianSetup(likelihood = likelihood,prior = prior,
 #                          names = c("e0","gd2","gp2","sigma",to("scale", 7),to("ue", 2),to("y", N)))
-                    
-                    
+
+
 setup <- createBayesianSetup(likelihood = likelihood,lower = low,upper = up)
 
 settings <- list(iterations = 500000,
