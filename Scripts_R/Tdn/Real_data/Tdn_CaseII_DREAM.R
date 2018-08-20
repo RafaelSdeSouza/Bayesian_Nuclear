@@ -93,7 +93,7 @@ up <- c(1,0.3, rep(40,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx
 createTdnPrior <- function(lower, upper, best = NULL){
 density = function(par){
   d1 = dnorm(par[1], mean = 0, sd = 1, log = TRUE)
-  d2 = sum(dtnorm(par[2], mean = 0, sd = 1,log = TRUE))
+  d2 = dtnorm(par[2], mean = 0, sd = 1,log = TRUE)
   
   d3 = sum(dnorm(par[3], mean = 0, sd = 34.6224/par[5], log = TRUE))
   
@@ -131,8 +131,8 @@ return(out)
 }
 
 
-#prior <- createPrior(density = density,
-#                    lower = low, upper = up, best = NULL)
+prior <- createTdnPrior(density = density,
+                    lower = low, upper = up)
 
 
 setup <- createBayesianSetup(likelihood = likelihood, lower = low, upper = up,

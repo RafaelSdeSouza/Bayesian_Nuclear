@@ -112,8 +112,8 @@ setup <- createBayesianSetup(likelihood = likelihood, prior = prior,
 names = c("e0","gd2","gn2",to("yscat", 5),to("ynorm", 5),to("xscat", 5),
         to("xnorm", 5),"ue", to("y", N),to("x", N)))
 
-settings <- list(iterations = 600000,adaptation = 0.4,
-                 burnin = 200000, message = T,nrChains = 1,thin=10)
+settings <- list(iterations = 6000,adaptation = 0.4,
+                 burnin = 2000, message = T,nrChains = 1,thin=10)
 
 res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
 
