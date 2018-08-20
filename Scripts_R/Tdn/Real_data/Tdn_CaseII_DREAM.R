@@ -105,7 +105,7 @@ density = function(par){
   d7 = sum(dlnorm(par[12:16],log(1),log(1 + syst^2),log = TRUE))
   d8 = sum(dtnorm(par[17:21],0, 1e-3,log = TRUE))
   d9 = sum(dnorm(par[22:26],0,sd = systx,log = TRUE))
-  d10 = dgamma(par[27], 1, 0.05,log = TRUE)
+  d10 = dtnorm(par[27], 0, 100,log = TRUE)
   d11 = sum(dunif(par[28:(N + 27)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
   d12 = sum(dunif(par[(N + 28):(2*N + 27)],obsx - errx,obsx + errx,log = TRUE))
   
@@ -121,7 +121,7 @@ sampler = function(){
     rlnorm(5, log(1), log(1 + syst^2)), #ynorm
     runif(5, 0, 1e-1),
     rnorm(5, 0, systx),
-    rgamma(1, 1, 0.05),
+    runif(0,100),
     runif(N, obsy - erry,obsy + erry),
     runif(N,obsx - errx,obsx + errx))
 }
@@ -131,8 +131,7 @@ return(out)
 }
 
 
-#prior <- createPrior(density = density,
-#                    lower = low, upper = up, best = NULL)
+prior <- createTdnPrior(lower = low, upper = up, best = NULL)
 
 
 setup <- createBayesianSetup(likelihood = likelihood, lower = low, upper = up,
@@ -140,7 +139,7 @@ names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xsca
           to("xnorm", 5),"ue", to("y", N),to("x", N)))
 
   settings <- list(iterations = 1E7,
-                   burnin = 1E6, message = T,nrChains = 1,adaptation = 0.45)
+                   burnin = 1E6, message = T,nrChains = 1,adaptation = 0.35)
 
 
   res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
