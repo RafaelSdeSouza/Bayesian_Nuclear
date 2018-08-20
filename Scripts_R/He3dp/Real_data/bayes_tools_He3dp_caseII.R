@@ -113,8 +113,8 @@ names = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to(
 
 
 
-settings <- list(iterations = 5000000,adaptation = 0.4,
-                 burnin = 1000000, message = T,nrChains = 1)
+settings <- list(iterations = 5000,adaptation = 0.4,
+                 burnin = 1000, message = T,nrChains = 1)
 
 
 system.time(

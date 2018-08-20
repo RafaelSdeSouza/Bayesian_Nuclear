@@ -80,8 +80,8 @@ likelihood <- function(par){
 }
 
 
-low <- c(rep(1e-3,2),1e-4,1e-4, 2,2,  rep(1e-4,5),    rep(0.5,5), rep(0,5), -5*systx, 1e-3, obsy - 2*abs(erry),obsx - errx)
-up <- c(1,0.3, rep(40,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx, 100, obsy + 2*abs(erry),obsx + errx)
+low <- c(rep(1e-3,2),1e-4,1e-4, 2,2,  rep(1e-4,5),    rep(0.5,5), rep(0,5), -5*systx, 1e-3, obsy - 2*erry,obsx - errx)
+up <- c(1,0.3, rep(30,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx, 100, obsy + 2*erry,obsx + errx)
 
 
 
@@ -91,7 +91,7 @@ up <- c(1,0.3, rep(40,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx
 
 
 createTdnPrior <- function(lower, upper, best = NULL){
-density = function(par){
+Tdensity = function(par){
   d1 = dnorm(par[1], mean = 0, sd = 1, log = TRUE)
   d2 = dtnorm(par[2], mean = 0, sd = 1,log = TRUE)
   
@@ -117,33 +117,34 @@ sampler = function(){
     exp(runif(1, log(0.001), log(0.3))),
     exp(runif(2, log(1e-3), log(30))),
     runif(2, 2, 10),
+    
     exp(runif(5,log(1e-4), log(1))), #xcat
     rlnorm(5, log(1), log(1 + syst^2)), #ynorm
     runif(5, 0, 1e-1),
     rnorm(5, 0, systx),
-    runif(0,100),
+    runif(1,0,100),
     runif(N, obsy - erry,obsy + erry),
     runif(N,obsx - errx,obsx + errx))
 }
 
-out <- createPrior(density = density, sampler = sampler, lower = lower, upper = upper, best = best)
+out <- createPrior(density = Tdensity, sampler = sampler, lower = lower, upper = upper, best = best)
 return(out)
 }
 
 
-<<<<<<< HEAD
-prior <- createTdnPrior(lower = low, upper = up, best = NULL)
-=======
-prior <- createTdnPrior(density = density,
-                    lower = low, upper = up)
->>>>>>> 828e038c722a0ad06997568f720d887dc0af0fb4
+prior <- createTdnPrior(lower = low, upper = up)
 
 
-setup <- createBayesianSetup(likelihood = likelihood, lower = low, upper = up,
+
+
+
+
+setup <- createBayesianSetup(likelihood = likelihood, prior = prior,
 names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xscat", 5),
           to("xnorm", 5),"ue", to("y", N),to("x", N)))
 
-  settings <- list(iterations = 1E7,
+ 
+ settings <- list(iterations = 5E6,
                    burnin = 1E6, message = T,nrChains = 1,adaptation = 0.35)
 
 
@@ -154,7 +155,7 @@ names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xsca
   
   
   summary(res)
-tracePlot(sampler = res,  start = 200000,thin=50, whichParameters = c(1,2,3,4,5,6,27))
+tracePlot(sampler = res,  start = 20000,thin=1, whichParameters = c(1,2,3,4,5,6,27))
 
 correlationPlot(res )
 
