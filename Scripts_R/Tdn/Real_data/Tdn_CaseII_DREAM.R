@@ -80,8 +80,8 @@ likelihood <- function(par){
 }
 
 
-low <- c(rep(1e-3,2),1e-4,1e-4, 2,2,  rep(1e-4,5),    rep(0.5,5), rep(0,5), -5*systx, 1e-3, obsy - 2*abs(erry),obsx - errx)
-up <- c(1,0.3, rep(40,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx, 100, obsy + 2*abs(erry),obsx + errx)
+low <- c(rep(1e-3,2),1e-4,1e-4, 2,2,  rep(1e-4,5),    rep(0.5,5), rep(0,5), -5*systx, 1e-3, obsy - 2*erry,obsx - errx)
+up <- c(1,0.3, rep(30,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx, 100, obsy + 2*erry,obsx + errx)
 
 
 
@@ -91,7 +91,7 @@ up <- c(1,0.3, rep(40,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx
 
 
 createTdnPrior <- function(lower, upper, best = NULL){
-density = function(par){
+Tdensity = function(par){
   d1 = dnorm(par[1], mean = 0, sd = 1, log = TRUE)
   d2 = dtnorm(par[2], mean = 0, sd = 1,log = TRUE)
   
@@ -105,7 +105,7 @@ density = function(par){
   d7 = sum(dlnorm(par[12:16],log(1),log(1 + syst^2),log = TRUE))
   d8 = sum(dtnorm(par[17:21],0, 1e-3,log = TRUE))
   d9 = sum(dnorm(par[22:26],0,sd = systx,log = TRUE))
-  d10 = dgamma(par[27], 1, 0.05,log = TRUE)
+  d10 = dtnorm(par[27], 0, 100,log = TRUE)
   d11 = sum(dunif(par[28:(N + 27)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
   d12 = sum(dunif(par[(N + 28):(2*N + 27)],obsx - errx,obsx + errx,log = TRUE))
   
@@ -117,30 +117,35 @@ sampler = function(){
     exp(runif(1, log(0.001), log(0.3))),
     exp(runif(2, log(1e-3), log(30))),
     runif(2, 2, 10),
+    
     exp(runif(5,log(1e-4), log(1))), #xcat
     rlnorm(5, log(1), log(1 + syst^2)), #ynorm
     runif(5, 0, 1e-1),
     rnorm(5, 0, systx),
-    rgamma(1, 1, 0.05),
+    runif(1,0,100),
     runif(N, obsy - erry,obsy + erry),
     runif(N,obsx - errx,obsx + errx))
 }
 
-out <- createPrior(density = density, sampler = sampler, lower = lower, upper = upper, best = best)
+out <- createPrior(density = Tdensity, sampler = sampler, lower = lower, upper = upper, best = best)
 return(out)
 }
 
 
-prior <- createTdnPrior(density = density,
-                    lower = low, upper = up)
+prior <- createTdnPrior(lower = low, upper = up)
 
 
-setup <- createBayesianSetup(likelihood = likelihood, lower = low, upper = up,
+
+
+
+
+setup <- createBayesianSetup(likelihood = likelihood, prior = prior,
 names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xscat", 5),
           to("xnorm", 5),"ue", to("y", N),to("x", N)))
 
-  settings <- list(iterations = 1E7,
-                   burnin = 1E6, message = T,nrChains = 1,adaptation = 0.45)
+ 
+ settings <- list(iterations = 5E6,
+                   burnin = 1E6, message = T,nrChains = 1,adaptation = 0.35)
 
 
   res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
@@ -150,7 +155,7 @@ names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xsca
   
   
   summary(res)
-tracePlot(sampler = res,  start = 200000,thin=50, whichParameters = c(1,2,3,4,5,6,27))
+tracePlot(sampler = res,  start = 20000,thin=1, whichParameters = c(1,2,3,4,5,6,27))
 
 correlationPlot(res )
 

@@ -113,8 +113,13 @@ names = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to(
 
 
 
+<<<<<<< HEAD
 settings <- list(iterations = 1e6,adaptation = 0.5,
                  burnin = 5e5, message = T,nrChains = 2)
+=======
+settings <- list(iterations = 5000,adaptation = 0.4,
+                 burnin = 1000, message = T,nrChains = 1)
+>>>>>>> 2422197509453843752c404b5e23f581d35162de
 
 
 system.time(
