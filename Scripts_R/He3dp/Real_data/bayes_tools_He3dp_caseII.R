@@ -63,31 +63,31 @@ likelihood <- function(par){
 }
 
 
-low <- c(rep(1e-3,2),rep(1e-4,2), 1,1,1e-4,rep(0.5,7),rep(0,2),obsy - 2*erry)
-up <- c(1,0.4,rep(30,2),10,10,5,rep(1.5,7),rep(300,2),obsy + 2*erry)
+low <- c(0,0,rep(1e-4,2), 1,1,1e-4,rep(0.5,7),rep(0,2),obsy - 2*erry)
+up <- c(1,1,rep(10,2),10,10,5,rep(1.5,7),rep(300,2),obsy + 2*erry)
 
 
 createHedPrior <- function(lower, upper, best = NULL){
 density = function(par){
-  d1 = dtnorm(par[1], mean = 0, sd = 1, log = TRUE)
-  d2 = dtnorm(par[2], mean = 0, sd = 0.4,log = TRUE)
+  d1 = dtnorm(par[2], mean = 0, sd = 1,log = TRUE)
+  d2 = dtnorm(par[2], mean = 0, sd = 1,log = TRUE)
   d3 = sum(dnorm(par[3:4], mean = 0, sd = 3, log = TRUE))
-  d4 = sum(dunif(par[5:6], 1, 10, log = TRUE))
+  d4 = sum(dunif(par[5:6], 2, 10, log = TRUE))
   d5 = dtnorm(par[7], mean = 0, sd = 5, log = TRUE)
   d6 = sum(dlnorm(par[8:14],log(1),log(1 + syst^2),log = TRUE))
-  d7 = sum(dtnorm(par[15:16], mean = 0, sd = 300, log = TRUE))
+  d7 = sum(dtnorm(par[15:16], mean = 0, sd = 100, log = TRUE))
   d8 = sum(dunif(par[17:(N + 16)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
   return(d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8)
 }
 
 sampler = function(){
-   c(runif(1, 0,  1),
-    exp(runif(1, log(0.001), log(0.3))),
-    exp(runif(2, log(1e-3), log(30))),
+   c(runif(1, 0, 1),
+   runif(1, 0, 1),
+    exp(runif(2, log(1e-3), log(10))),
     runif(2, 2, 10),
     runif(1, 0, 5),
     rlnorm(7, log(1), log(1 + syst^2)), #ynorm
-    runif(2, 0, 400),
+    runif(2, 0, 300),
     runif(N, obsy - 2*erry,obsy + 2*erry)
 )
 }
@@ -113,8 +113,8 @@ names = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to(
 
 
 
-settings <- list(iterations = 5000000,adaptation = 0.4,
-                 burnin = 1000000, message = T,nrChains = 1)
+settings <- list(iterations = 1e6,adaptation = 0.5,
+                 burnin = 5e5, message = T,nrChains = 2)
 
 
 system.time(
@@ -122,21 +122,14 @@ res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
 )
 
 
-tracePlot(sampler = res, thin = 1, start = 3000, whichParameters = c(1,2,3,4,5,6,15,16))
-
-
-
-
+tracePlot(sampler = res, thin = 1, start = 5E4, whichParameters = c(1,2,3,4,5,6,15,16))
 
 summary(res)
-
-
-
 
 codaObject = getSample(res, start = 500, coda = TRUE)
 
 as.mcmc(codaObject)
-getmcmc_var <- function(outjags=outjags,vars = vars){
+getmcmc_var <- function(outjags=outjags, vars = vars){
   as.data.frame(do.call(rbind, outjags[,vars]))
 }
 getmcmc_var(codaObject,vars = c("par 1","par 2","par 3","par 4"))
