@@ -13,7 +13,11 @@ set.seed(123)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr);require(gsl)
 library(dplyr);require(lessR);library(BayesianTools);
+<<<<<<< HEAD
+require(truncnorm)
+=======
 require(truncnorm);require(msm)
+>>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
 source("SfacTdn.R")
 
 
@@ -50,6 +54,67 @@ likelihood <- function(par){
   e0 = par[1]
   gin = par[2]
   gout = par[3]
+  sigma_scat = par[4:8]
+  scale = par[9:13]
+  xrand = par[14:18]
+  ue = par[19]
+  y = par[20:(N + 19)]
+  xtrue = par[(N + 20):(2*N + 19)]
+
+  llxrand = sum(dnorm(xrand,mean=0,sd=systx,log=T))
+  llRandom = sum(dlnorm(scale,meanlog = log(1), sdlog = log(1 + syst^2), log = T))
+  llx <- sum(dnorm(obsx,mean = xtrue + xrand[re],sd=errx,log=T))
+  lly <- sum(dnorm(y,mean = scale[re]*SfacTdn(xtrue, e0,e0,gin, gout,6,5,ue), sd = sigma_scat,  log = T))
+  llobs = sum(dnorm(obsy,mean = y,sd = erry,log = T))
+
+
+  return(llRandom + llobs + lly + llx + llxrand)
+}
+
+low <- c(1e-3,1e-3,1e-3,rep(1e-4,5),rep(0.8,5),rep(-0.9,5),0,obsy - 2*abs(erry),obsx - abs(errx))
+up <- c(1,6,6,rep(1,5),rep(1.2,5),rep(0.1,5),50,obsy + 2*abs(erry),obsx + abs(errx))
+
+
+
+density = function(par){
+  d1 = dnorm(par[1], mean = 0, sd = 1, log = TRUE)
+  d2 = sum(log(dtruncnorm(par[2:3], mean = 0, sd = 3)))
+  d3 = sum(log(dtruncnorm(par[4:8], 0, 2)))
+  d4 = sum(dlnorm(par[9:13],1,log(1 + syst^2),log = TRUE))
+  d5 = sum(dnorm(par[14:18],0,sd=systx,log = TRUE))
+  d6 = dunif(par[19], 0, 1000)
+  d7 = sum(dnorm(par[20:(N + 19)],mean=obsy,sd=erry,log = TRUE))
+  d8 = sum(dunif(par[(N + 20):(2*N + 19)],0.001,0.3,log = TRUE))
+  return(d1 + d2 + d3 + d4 + d5 + d6 + d7 +d8)
+}
+
+
+sampler = function(){
+  d <- list()
+  d[1] = runif(1, 0,  1)
+  d[2:3] = rtruncnorm(2, mean= 0, sd=3)
+  d[4:8] = rtruncnorm(5, 0, 2)
+  d[9:13] = runif(5, 0.8, 1.2)
+  d[14:18] = rnorm(5, 0, systx)
+  d[19] = runif(1, 0, 100)
+  d[20:(N + 19)] = rnorm(N,obsy, erry)
+  d[(N + 20):(2*N + 19)] = runif(N,0.001,0.3)
+  return(as.numeric(d))
+}
+
+
+#prior <- createPrior(density = density,
+#                    lower = low, upper = up, best = NULL)
+
+
+setup <- createBayesianSetup(likelihood = likelihood, prior=prior, sampler=sampler,lower = low, upper = up,
+names = c("e0","gd2","gn2",to("sigma_scat", 5),to("scale", 5),to("xnorm", 5),"ue",
+          to("y", N),to("x", N)))
+
+settings <- list(iterations = 700000,adaptation = 0.4,
+                 burnin = 350000, message = T,nrChains = 1)
+res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
+
   yscat = par[4:8]
   ynorm = par[9:13]
   xscat = par[14:18]
@@ -137,12 +202,15 @@ write.matrix(short_mo,"BT_Tdn_caseI.dat")
 
 
 
+>>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
 
 
 
 
 
 
+<<<<<<< HEAD
+=======
 bayesianSetup <- createBayesianSetup(likelihood = ll, prior = newPrior)
 
 settings = list(iterations = 1000,  message = FALSE)
@@ -150,18 +218,25 @@ out <- runMCMC(bayesianSetup = bayesianSetup, settings = settings)
 
 
 out2 <- DREAMzs(res,settings = settings)
+>>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
 
 
 
 
 
 summary(res)
+<<<<<<< HEAD
+tracePlot(sampler = res, start = 100000, whichParameters = c(1,2,3,19))
+
+
+=======
 
 tracePlot(sampler = res, start = 100000, whichParameters = c(14:18))
 
 
 plot(mo$gd2,mo$gn2,type="l")
 
+>>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
 
 correlationPlot(res )
 
@@ -172,6 +247,8 @@ tracePlot(sampler = res, thin = 10, start = 5000, whichParameters = c(1,2,3,4,5,
 
 
 
+<<<<<<< HEAD
+=======
 
 sampler = function(){
   d <- list()
@@ -190,6 +267,7 @@ sampler = function(){
 
 
 
+>>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
 density = function(par){
   d1 = dnorm(par[1], 0.001,1, log =TRUE)
   d2 = dunif(par[2], 0.001,3, log =TRUE)

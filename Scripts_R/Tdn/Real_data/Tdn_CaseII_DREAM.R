@@ -1,6 +1,6 @@
 # preparation: remove all variables from the work space
 rm(list=ls())
-set.seed(123)
+set.seed(42)
 ######################################################################
 # data input
 # format: obsx, obsy, errobsy; the latter are the individual statistical
@@ -42,7 +42,8 @@ erry <- ensamble$Stat
 errx <- ensamble$E_stat
 set <- ensamble$dat
 lab <- ensamble$invK
-syst = c(unique(ensamble$Syst))
+#syst = c(unique(ensamble$Syst))
+syst =  c(1.020, 1.5,1.018,1.0126,1.025)
 systx <- c(0.000075,0.000009,0.0002,0.000006,0.0032)
 
 
@@ -64,24 +65,23 @@ likelihood <- function(par){
   xx = par[(N + 28):(2*N + 27)]
 
   llxnorm = sum(dnorm(xnorm,mean=0,sd=systx,log = T))
-  llynorm = sum(dlnorm(ynorm,meanlog = log(1), sdlog = log(1 + syst^2), log = T))
+  llynorm = sum(dlnorm(ynorm,meanlog = log(1), sdlog = log(syst), log = T))
   llxscat <- sum(dnorm(xscat,mean = 0,sd = 1e-2, log = T))
- 
-# +xscat[re] 
-  
- # llxx    <- sum(dnorm(obsx,mean = xx,sd = (errx),log = T))
-  
+
   llxx  <- sum(dnorm(obsx,mean = xx + xnorm[re],sd = errx + xscat[re],log = T))
   lly <- sum(dnorm(y,mean = ynorm[re]*SfacTdn(xx, e0 ,er,gin, gout,ad,ap,ue), sd = yscat[re],  log = T))
   llobs = sum(dnorm(obsy,mean = y,sd = erry,log = T))
-#  + llxscat
+  
+  # Prediction 
+
   return(llynorm + llobs + lly + llxx  + llxnorm + llxscat )
   
 }
 
 
-low <- c(rep(1e-3,2),1e-4,1e-4, 2,2,  rep(1e-4,5),    rep(0.5,5), rep(0,5), -5*systx, 1e-3, obsy - 2*erry,obsx - errx)
-up <- c(1,0.3, rep(30,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx, 100, obsy + 2*erry,obsx + errx)
+low <- c(0.02,1e-3,1e-3,1e-3, 2.5,2.5,  rep(1e-4,5),    rep(0.5,5), rep(0,5), -5*systx, 1e-3, obsy - 2*erry,obsx - errx)
+up <- c(0.08,1, rep(50,2), 8,8,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx, 100, obsy + 2*erry,obsx + errx)
+
 
 
 
@@ -92,20 +92,28 @@ up <- c(1,0.3, rep(30,2), 10,10,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx
 
 createTdnPrior <- function(lower, upper, best = NULL){
 Tdensity = function(par){
-  d1 = dnorm(par[1], mean = 0, sd = 1, log = TRUE)
-  d2 = dtnorm(par[2], mean = 0, sd = 1,log = TRUE)
+
+#  d1 = dnorm(par[1], mean = 0, sd = 1, log = TRUE)
   
-  d3 = sum(dnorm(par[3], mean = 0, sd = 34.6224/par[5], log = TRUE))
+  d1 = dunif(par[1], 0.02, 0.08, log = TRUE)
   
-  d4 = sum(dnorm(par[4], mean = 0, sd = 51.8889/par[6], log = TRUE))
+  d2 = dunif(par[2], 0, 1, log = TRUE)
+  
+
+  
+  d3 = sum(dnorm(par[3], mean = 0, sd = 34.6224/par[5]^2, log = TRUE))
+  
+  d4 = sum(dnorm(par[4], mean = 0, sd = 51.8889/par[6]^2, log = TRUE))
   
   
-  d5 = sum(dunif(par[5:6], 2, 10, log = TRUE))
+  d5 = sum(dunif(par[5:6], 2.5, 8, log = TRUE))
+
+  
   d6 = sum(dunif(par[7:11], 0, 1,log = TRUE))
-  d7 = sum(dlnorm(par[12:16],log(1),log(1 + syst^2),log = TRUE))
+  d7 = sum(dlnorm(par[12:16],log(1),log(syst),log = TRUE))
   d8 = sum(dtnorm(par[17:21],0, 1e-3,log = TRUE))
   d9 = sum(dnorm(par[22:26],0,sd = systx,log = TRUE))
-  d10 = dtnorm(par[27], 0, 100,log = TRUE)
+  d10 = dgamma(par[27], 0.01, 0.01,log = TRUE)
   d11 = sum(dunif(par[28:(N + 27)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
   d12 = sum(dunif(par[(N + 28):(2*N + 27)],obsx - errx,obsx + errx,log = TRUE))
   
@@ -113,13 +121,13 @@ Tdensity = function(par){
 }
 
 sampler = function(){
-  c(runif(1, 0,  1),
-    exp(runif(1, log(0.001), log(0.3))),
+
+  c(runif(1,  0.02,  0.08),
+    runif(1, 0, 1),
     exp(runif(2, log(1e-3), log(30))),
-    runif(2, 2, 10),
-    
+    runif(2, 2.5, 8),
     exp(runif(5,log(1e-4), log(1))), #xcat
-    rlnorm(5, log(1), log(1 + syst^2)), #ynorm
+    rlnorm(5, log(1), log(syst)), #ynorm
     runif(5, 0, 1e-1),
     rnorm(5, 0, systx),
     runif(1,0,100),
@@ -134,6 +142,83 @@ return(out)
 
 prior <- createTdnPrior(lower = low, upper = up)
 
+
+setup <- createBayesianSetup(likelihood = likelihood, prior = prior,
+names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xscat", 5),
+          to("xnorm", 5),"ue", to("y", N),to("x", N)))
+
+ 
+settings <- list(iterations = 5E6,
+                 burnin = 1E6, message = T,thin=100,nrChains = 1,adaptation=0.5)
+
+
+res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
+
+
+
+  
+sum_chain <- summary(res)
+tracePlot(sampler = res,  start = 5e3,thin=1, whichParameters = c(1,2,3,4,5,6,27))
+
+
+
+codaObject = getSample(res, start = 5E3, coda = TRUE)
+
+getmcmc_var <- function(outjags=outjags,vars = vars){
+  as.data.frame(do.call(rbind, outjags[,vars]))
+}
+
+sDat <- getmcmc_var(codaObject,vars=c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xscat", 5),
+                                      to("xnorm", 5),"ue"))
+index <- sample(seq(1:nrow(sDat)),1E4,replace=FALSE)
+ssDat <- sDat[index,]
+
+require(MASS)
+write.matrix(ssDat,"Tdn_DREAM.dat")
+
+
+
+tdnd <- read.table("Tdn_DREAM.dat",header = T)
+
+
+index <- sample(seq(1:nrow(tdnd)),5000,replace=FALSE)
+
+
+xpred <- exp(seq(log(min(obsx)),log(max(obsx)),length.out = 250))
+df <- NULL
+for(i in 1:250){
+  temp_df <- data.frame(x=xpred,y= (SfacTdn(xpred,tdnd[index[i],1],tdnd[index[i],2],tdnd[index[i],3],tdnd[index[i],4],
+                          tdnd[index[i],5],tdnd[index[i],6],0)),col=rep(i:i, each=250))
+  df <- rbind(df,temp_df)  
+}
+
+df$col <- as.factor(df$col)
+
+ggplot(data=df,aes(x = x, y = y,group=col)) +
+  
+  geom_line(alpha = 0.5, color = "red",size=0.2) +
+  #  geom_segment(data = filter(censdat,y==L_limit),
+  #               mapping=aes(x=x1, y=y, xend=x1, yend = y-5),size=0.1,
+  #               colour=cens,arrow = arrow()) +
+  scale_x_log10()+
+  scale_shape_stata()+
+  geom_point(data=ensamble,aes(x = E, y = S,group=dat,shape=dat,size=2,color=dat)
+            ) +
+  theme_economist_white()
+
+
+
+
+fue <- ecdf(tdnd$ue)
+ff <- function(x){fue(x) - 0.975}
+uniroot(ff, c(0, 100))$root
+
+
+
+Sp <- ggs(as.mcmc(ssDat))
+Sp0 <- Sp %>% as_tibble()
+
+pair_wise_plot(Sp0)
 
 
 
@@ -191,3 +276,4 @@ getmcmc_var <- function(outjags=outjags,vars = vars){
 }
 getmcmc_var(codaObject,vars = c("par 1","par 2","par 3","par 4"))
 
+>>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5

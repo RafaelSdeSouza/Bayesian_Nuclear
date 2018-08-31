@@ -1,6 +1,6 @@
 #! /bin/sh
 # Generated automatically by config.status (JAGS-NUCLEAR-MODULE) 1.1
-# Libtool was configured on host Rafaels-Air.attlocal.net:
+# Libtool was configured on host rafaels-imac.wireless-1x.unc.edu:
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 
 # Provide generalized library-building support services.
@@ -76,13 +76,13 @@ PATH_SEPARATOR=":"
 
 # The host system.
 host_alias=
-host=x86_64-apple-darwin17.5.0
-host_os=darwin17.5.0
+host=x86_64-apple-darwin17.7.0
+host_os=darwin17.7.0
 
 # The build system.
 build_alias=
-build=x86_64-apple-darwin17.5.0
-build_os=darwin17.5.0
+build=x86_64-apple-darwin17.7.0
+build_os=darwin17.7.0
 
 # A sed program that does not truncate output.
 SED="/usr/bin/sed"
@@ -165,7 +165,7 @@ old_postuninstall_cmds=""
 lock_old_archive_extraction=yes
 
 # A C compiler.
-LTCC="clang"
+LTCC="gcc"
 
 # LTCC compiler flags.
 LTCFLAGS="-g -O2"
@@ -285,7 +285,7 @@ finish_eval=""
 hardcode_into_libs=no
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.1.0  /usr/local/lib"
+sys_lib_search_path_spec="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0  /usr/local/lib"
 
 # Detected run-time system search path for libraries.
 sys_lib_dlsearch_path_spec="/usr/local/lib /lib /usr/lib"
@@ -318,7 +318,7 @@ reload_cmds="\$LTCC \$LTCFLAGS -nostdlib \$wl-r -o \$output\$reload_objs"
 old_archive_cmds="\$AR \$AR_FLAGS \$oldlib\$oldobjs~\$RANLIB \$tool_oldlib"
 
 # A language specific compiler.
-CC="clang"
+CC="gcc"
 
 # Is the compiler the GNU compiler?
 with_gcc=yes
@@ -11671,7 +11671,7 @@ reload_cmds="\$LTCC \$LTCFLAGS -nostdlib \$wl-r -o \$output\$reload_objs"
 old_archive_cmds="\$AR \$AR_FLAGS \$oldlib\$oldobjs~\$RANLIB \$tool_oldlib"
 
 # A language specific compiler.
-CC="clang++"
+CC="g++"
 
 # Is the compiler the GNU compiler?
 with_gcc=yes

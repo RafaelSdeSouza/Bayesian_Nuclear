@@ -16,6 +16,7 @@ Mag75  <-  read.table("tdn_mag75b.dat") %>%
 
 
 
+
 Bam57  <-  read.table("tdn_bam57b.dat") %>%
   set_colnames(.,c("E","E_stat","S","Stat")) %>%
   select(.,c("E","E_stat","S","Stat")) %>%
