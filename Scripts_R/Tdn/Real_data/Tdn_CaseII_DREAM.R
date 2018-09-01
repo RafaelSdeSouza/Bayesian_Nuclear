@@ -34,6 +34,11 @@ Nik <- length(unique(ensamble$invK))
 # r_i = 6
 # r_f = 5
 
+logmu3 <- log(1.0)       # median of factor uncertainty is 1.0
+logsigma3 <- exp(log(1.025))
+rlnorm(1000,logmu3,log(1 + 0.25^2))
+
+
 
 N <- nrow(ensamble)
 obsy <- ensamble$S    # Response variable
