@@ -1,6 +1,6 @@
 # preparation: remove all variables from the work space
 rm(list=ls())
-set.seed(123)
+set.seed(42)
 ######################################################################
 # data input
 # format: obsx, obsy, errobsy; the latter are the individual statistical
@@ -41,7 +41,7 @@ obsx <-  ensamble$E   # Predictors
 erry <- ensamble$Stat
 set <- ensamble$dat
 lab <- ensamble$invK
-syst = c(0.03,unique(ensamble$Syst))
+syst = 1 + c(0.03,unique(ensamble$Syst))
 
 likelihood <- function(par){
   e0 = par[1]
@@ -55,7 +55,7 @@ likelihood <- function(par){
   ue = par[15:16]
   y = par[17:(N + 16)]
 
-  llRandom = sum(dlnorm(scale,meanlog = log(1), sdlog = log(1 + syst^2), log = T))
+  llRandom = sum(dlnorm(scale,meanlog = log(1), sdlog = log(syst), log = T))
   lly <- sum(dnorm(y,mean = scale[re]*sfactor3Hedp_5p(obsx, e0,er,gd2, gp2,ad,ap,ue = ue[ik]), sd = sigmax,  log = T))
   llobs = sum(dnorm(obsy,mean = y,sd = erry,log = T))
   return(llRandom + llobs + lly)
@@ -63,30 +63,32 @@ likelihood <- function(par){
 }
 
 
-low <- c(0,0,rep(1e-4,2), 1,1,1e-4,rep(0.5,7),rep(0,2),obsy - 2*erry)
-up <- c(1,1,rep(10,2),10,10,5,rep(1.5,7),rep(300,2),obsy + 2*erry)
+low <- c(0.1,1e-3,rep(1e-4,2), 3,3,1e-4,rep(0.5,7),rep(0,2),obsy - 2*erry)
+up <- c(0.4,1,rep(10,2),8,8,5,rep(1.5,7),rep(300,2),obsy + 2*erry)
 
 
 createHedPrior <- function(lower, upper, best = NULL){
 density = function(par){
-  d1 = dtnorm(par[2], mean = 0, sd = 1,log = TRUE)
+  d1 = dunif(par[1], 0.1, 0.4,log = TRUE)
   d2 = dtnorm(par[2], mean = 0, sd = 1,log = TRUE)
-  d3 = sum(dnorm(par[3:4], mean = 0, sd = 3, log = TRUE))
-  d4 = sum(dunif(par[5:6], 2, 10, log = TRUE))
-  d5 = dtnorm(par[7], mean = 0, sd = 5, log = TRUE)
-  d6 = sum(dlnorm(par[8:14],log(1),log(1 + syst^2),log = TRUE))
-  d7 = sum(dtnorm(par[15:16], mean = 0, sd = 100, log = TRUE))
-  d8 = sum(dunif(par[17:(N + 16)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
-  return(d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8)
+  d3 = dtnorm(par[3], 0, 34.625/par[5]^2, log = TRUE)
+  d4 = dtnorm(par[4], 0, 51.94605/par[6]^2, log = TRUE)
+
+  d5 = sum(dunif(par[5:6], 3, 8, log = TRUE))
+  d6 = dtnorm(par[7], mean = 0, sd = 5, log = TRUE)
+  d7 = sum(dlnorm(par[8:14],log(1),log(syst),log = TRUE))
+  d8 = sum(dtnorm(par[15:16], mean = 0, sd = 100, log = TRUE))
+  d9 = sum(dunif(par[17:(N + 16)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
+  return(d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8 + d9)
 }
 
 sampler = function(){
-   c(runif(1, 0, 1),
+   c(runif(1, 0.1, 0.4),
    runif(1, 0, 1),
     exp(runif(2, log(1e-3), log(10))),
-    runif(2, 2, 10),
+    runif(2, 3, 8),
     runif(1, 0, 5),
-    rlnorm(7, log(1), log(1 + syst^2)), #ynorm
+    rlnorm(7, log(1), log(syst)), #ynorm
     runif(2, 0, 300),
     runif(N, obsy - 2*erry,obsy + 2*erry)
 )
@@ -113,13 +115,12 @@ names = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to(
 
 
 
-<<<<<<< HEAD
-settings <- list(iterations = 1e6,adaptation = 0.5,
-                 burnin = 5e5, message = T,nrChains = 2)
-=======
-settings <- list(iterations = 5000,adaptation = 0.4,
-                 burnin = 1000, message = T,nrChains = 1)
->>>>>>> 2422197509453843752c404b5e23f581d35162de
+
+
+settings <- list(iterations = 6E6,adaptation = 0.5,thin=100,
+                 burnin = 2E6, message = T,nrChains = 3)
+
+
 
 
 system.time(
@@ -127,14 +128,26 @@ res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
 )
 
 
-tracePlot(sampler = res, thin = 1, start = 5E4, whichParameters = c(1,2,3,4,5,6,15,16))
+tracePlot(sampler = res, thin = 1, start = 1E4, whichParameters = c(1,2,3,4,5,6,15,16))
 
-summary(res)
 
-codaObject = getSample(res, start = 500, coda = TRUE)
 
-as.mcmc(codaObject)
-getmcmc_var <- function(outjags=outjags, vars = vars){
+codaObject = getSample(res, start = 1E4, coda = TRUE)
+
+getmcmc_var <- function(outjags=outjags,vars = vars){
   as.data.frame(do.call(rbind, outjags[,vars]))
 }
-getmcmc_var(codaObject,vars = c("par 1","par 2","par 3","par 4"))
+
+
+sDat <- getmcmc_var(codaObject,vars = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to("y", N)))
+
+
+index <- sample(seq(1:nrow(sDat)),1E4,replace=FALSE)
+ssDat <- sDat[index,]
+
+require(MASS)
+write.matrix(ssDat,"He3dp_DREAM.dat")
+
+
+dream_dat <- read.table("He3dp_DREAM.dat",header=T)
+
