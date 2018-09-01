@@ -1,6 +1,6 @@
 # preparation: remove all variables from the work space
 rm(list=ls())
-set.seed(123)
+set.seed(42)
 ######################################################################
 # data input
 # format: obsx, obsy, errobsy; the latter are the individual statistical
@@ -86,7 +86,7 @@ sampler = function(){
    c(runif(1, 0.1, 0.4),
    runif(1, 0, 1),
     exp(runif(2, log(1e-3), log(10))),
-    runif(2, 2, 10),
+    runif(2, 3, 8),
     runif(1, 0, 5),
     rlnorm(7, log(1), log(syst)), #ynorm
     runif(2, 0, 300),
@@ -117,8 +117,8 @@ names = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to(
 
 
 
-settings <- list(iterations = 2.5e6,adaptation = 0.5,thin=10,
-                 burnin = 5e5, message = T,nrChains = 1)
+settings <- list(iterations = 6E6,adaptation = 0.5,thin=100,
+                 burnin = 2E6, message = T,nrChains = 3)
 
 
 
@@ -128,20 +128,26 @@ res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
 )
 
 
-tracePlot(sampler = res, thin = 1, start = 5E4, whichParameters = c(1,2,3,4,5,6,15,16))
+tracePlot(sampler = res, thin = 1, start = 1E4, whichParameters = c(1,2,3,4,5,6,15,16))
 
-summary(res)
 
-codaObject = getSample(res, start = 500, coda = TRUE)
 
-as.mcmc(codaObject)
-getmcmc_var <- function(outjags=outjags, vars = vars){
+codaObject = getSample(res, start = 1E4, coda = TRUE)
+
+getmcmc_var <- function(outjags=outjags,vars = vars){
   as.data.frame(do.call(rbind, outjags[,vars]))
 }
-getmcmc_var(codaObject,vars = c("par 1","par 2","par 3","par 4"))
 
 
+sDat <- getmcmc_var(codaObject,vars = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to("y", N)))
 
 
+index <- sample(seq(1:nrow(sDat)),1E4,replace=FALSE)
+ssDat <- sDat[index,]
 
+require(MASS)
+write.matrix(ssDat,"He3dp_DREAM.dat")
+
+
+dream_dat <- read.table("He3dp_DREAM.dat",header=T)
 

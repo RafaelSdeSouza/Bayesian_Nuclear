@@ -196,10 +196,10 @@ Normfit <- jags(data = model.data,
                                         "S_0b","E0_b","Er_b","gd2_b",
                                         "gp2_b","tau_2","ad_b","ap_b","res","nres"),
                 model.file  = textConnection(Model),
-                n.thin = 30,
-                n.chains = 5,
-                n.burnin = 75,
-                n.iter = 150)
+                n.thin = 10,
+                n.chains = 3,
+                n.burnin = 750,
+                n.iter = 1500)
 jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.16, 0.5, 0.84))
 temp <- Normfit
 temp <- update(temp, n.thin = 50, n.iter = 50000)
