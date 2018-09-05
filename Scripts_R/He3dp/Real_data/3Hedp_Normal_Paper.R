@@ -154,24 +154,25 @@ ue[z] ~ dnorm(0,pow(0.1,-2))T(0,)
 tau ~  dnorm(0, pow(1,-2))T(0,)
 E0  ~  dnorm(0, pow(1,-2))T(0,)
 Er <-  E0
-gd2 ~  dnorm(0, pow(3,-2))T(0,)
-gp2 ~  dnorm(0, pow(3,-2))T(0,)
+gd2 ~  dnorm(0, pow(1,-2))T(0,)
+gp2 ~  dnorm(0, pow(2,-2))T(0,)
 
-ad  ~  dnorm(6, pow(0.01,-2))T(0,)
-ap  ~  dnorm(5, pow(0.01,-2))T(0,)
+ad  <- 6
+ap  <- 5
 
 
 
 # Case II
 tau_2  ~  dnorm(0, pow(1,-2))T(0,)
-Er_b  ~   dbeta(0.5,0.5)
-E0_b  ~   dbeta(2,5)
+Er_b  ~   dnorm(0.6, pow(0.1,-2))T(0,)
+E0_b  ~   dnorm(0.2,pow(0.02,-2))T(0,)
 
-gp2_b ~  dnorm(0, pow(3,-2))T(0,)
-gd2_b  ~ dnorm(0, pow(3,-2))T(0,)
+gd2_b  ~ dnorm(0.3, pow(0.05,-2))T(0,)
+gp2_b ~  dnorm(0.04, pow(0.01,-2))T(0,)
 
-ad_b  ~  dunif(2,10)
-ap_b  ~  dunif(2,10)
+
+ad_b  ~  dnorm(3.5,pow(0.5,-2))T(0,)
+ap_b  ~  dnorm(5.5,pow(1,-2))T(0,)
 
 
 ue_ev[1] <-1e6*ue[1]
@@ -183,8 +184,8 @@ S_0b  <- sfactor3Hedp(1e-4, E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
 
 }"
 
-inits <- function(){ list(E0 = runif(1,0.3,0.35),E0_b = 0.4,Er_b = 0.4,gd2 = 1,
-                        gp2 = runif(1,0.01,0.1),gd2_b = 0.5) }
+inits <- function(){ list(E0 = runif(1,0.3,0.35),E0_b = 0.2,Er_b = 0.5,gd2 = 1,
+                        gp2 = runif(1,0.01,0.06),gd2_b = 1) }
 
 
 set.seed(24)
@@ -198,9 +199,12 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 10,
                 n.chains = 3,
-                n.burnin = 750,
-                n.iter = 1500)
+                n.burnin = 7500,
+                n.iter = 15000)
 jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.16, 0.5, 0.84))
+
+
+
 temp <- Normfit
 temp <- update(temp, n.thin = 50, n.iter = 50000)
 
@@ -384,6 +388,19 @@ levels(Sp0$Parameter) <- as.factor(c("E[0]~(MeV)","gamma[d]^2~(MeV)", "gamma[p]^
 #
 pdf("plot/He3dp_corr.pdf",height = 7,width = 7)
 pair_wise_plot(Sp0)
+dev.off()
+
+
+
+# Case II
+SpII <- ggs(as.mcmc(Normfit)[,c("E0_b","Er_b","gd2_b", "gp2_b","ad_b","ap_b","ue_ev[1]","ue_ev[2]","S_0b")])
+Sp0II <- SpII %>% as_tibble()
+Sp0II$Parameter <- ordered(Sp0II$Parameter, levels = c("E0_b","Er_b","gd2_b", "gp2_b","ad_b","ap_b","ue_ev[1]","ue_ev[2]","S_0b"))
+levels(Sp0II$Parameter) <- as.factor(c("E[0]~(MeV)","E[r]~(MeV)","gamma[d]^2~(MeV)", "gamma[p]^2~(MeV)","a[d]~(fm)",
+                                       "a[p]~(fm)","U[e1]~(eV)", "U[e2]~(eV)","S[0]~(MeV~b)"))
+#
+pdf("plot/He3dp_corr.pdf",height = 7,width = 7)
+pair_wise_plot(Sp0II)
 dev.off()
 
 

@@ -1,6 +1,6 @@
 # preparation: remove all variables from the work space
 rm(list=ls())
-set.seed(42)
+set.seed(27)
 ######################################################################
 # data input
 # format: obsx, obsy, errobsy; the latter are the individual statistical
@@ -63,18 +63,18 @@ likelihood <- function(par){
 }
 
 
-low <- c(0.1,1e-3,rep(1e-4,2), 3,3,1e-4,rep(0.5,7),rep(0,2),obsy - 2*erry)
-up <- c(0.4,1,rep(10,2),8,8,5,rep(1.5,7),rep(300,2),obsy + 2*erry)
+low <- c(0.1,1e-3,rep(1e-4,2), 2.5,2.5,1e-4,rep(0.5,7),rep(0,2),obsy - 2*erry)
+up <- c(0.35,1,rep(1.5,2),8,8,5,rep(1.5,7),rep(300,2),obsy + 2*erry)
 
 
 createHedPrior <- function(lower, upper, best = NULL){
 density = function(par){
-  d1 = dunif(par[1], 0.1, 0.4,log = TRUE)
-  d2 = dtnorm(par[2], mean = 0, sd = 1,log = TRUE)
+  d1 = dunif(par[1], 0.1, 0.35,log = TRUE)
+  d2 = dunif(par[1], 0, 1,log = TRUE)
   d3 = dtnorm(par[3], 0, 34.625/par[5]^2, log = TRUE)
   d4 = dtnorm(par[4], 0, 51.94605/par[6]^2, log = TRUE)
 
-  d5 = sum(dunif(par[5:6], 3, 8, log = TRUE))
+  d5 = sum(dunif(par[5:6], 2.5, 8, log = TRUE))
   d6 = dtnorm(par[7], mean = 0, sd = 5, log = TRUE)
   d7 = sum(dlnorm(par[8:14],log(1),log(syst),log = TRUE))
   d8 = sum(dtnorm(par[15:16], mean = 0, sd = 100, log = TRUE))
@@ -83,10 +83,10 @@ density = function(par){
 }
 
 sampler = function(){
-   c(runif(1, 0.1, 0.4),
+   c(runif(1, 0.1, 0.35),
    runif(1, 0, 1),
-    exp(runif(2, log(1e-3), log(10))),
-    runif(2, 3, 8),
+    exp(runif(2, log(1e-3), log(2))),
+    runif(2, 2.5, 8),
     runif(1, 0, 5),
     rlnorm(7, log(1), log(syst)), #ynorm
     runif(2, 0, 300),
@@ -117,8 +117,8 @@ names = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to(
 
 
 
-settings <- list(iterations = 6E6,adaptation = 0.5,thin=100,
-                 burnin = 2E6, message = T,nrChains = 3)
+settings <- list(iterations = 5E6,adaptation = 0.5,thin=10,
+                 burnin = 1E6, message = T,nrChains = 1)
 
 
 
@@ -127,8 +127,12 @@ system.time(
 res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
 )
 
+require(MASS)
+write.matrix(ssDat,"He3dp_DREAM.dat")
 
-tracePlot(sampler = res, thin = 1, start = 1E4, whichParameters = c(1,2,3,4,5,6,15,16))
+
+summary(res)
+tracePlot(sampler = res, thin = 1, start = 2.5E4, whichParameters = c(1,2,3,4,5,6,15,16))
 
 
 
@@ -145,9 +149,28 @@ sDat <- getmcmc_var(codaObject,vars = c("e0","er","gd2","gp2","ad","ap","sigma",
 index <- sample(seq(1:nrow(sDat)),1E4,replace=FALSE)
 ssDat <- sDat[index,]
 
-require(MASS)
-write.matrix(ssDat,"He3dp_DREAM.dat")
+
+xx <- exp(seq(log(min(obsx)),log(max(obsx)),length.out = 250))
+
+
+
+plot_Sfactor_DREAM(ssDat)
+
+
+
+
+
 
 
 dream_dat <- read.table("He3dp_DREAM.dat",header=T)
+
+# Case II
+SpII <- ggs(as.mcmc(dream_dat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")]))
+Sp0II <- SpII %>% as_tibble()
+Sp0II$Parameter <- ordered(Sp0II$Parameter, levels =c("e0","er","gd2","gp2","ad","ap","ue1","ue2"))
+levels(Sp0II$Parameter) <- as.factor(c("E[0]~(MeV)","E[r]~(MeV)","gamma[d]^2~(MeV)", "gamma[p]^2~(MeV)","a[d]~(fm)",
+                                       "a[p]~(fm)","U[e1]~(eV)", "U[e2]~(eV)"))
+#
+pair_wise_plot(Sp0II)
+
 
