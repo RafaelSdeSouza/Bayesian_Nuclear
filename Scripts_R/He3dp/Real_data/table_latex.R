@@ -1,10 +1,10 @@
 
 require(xtable)
 NA_I_latex <- read.csv("NA_I.csv")
-NA_II_latex <- read.csv("NA_II.csv")
+#NA_II_latex <- read.csv("NA_II.csv")
 
 
-xl <- NA_II_latex 
+xl <- NA_I_latex 
 df1 = data.frame(xl[1:23,c(1,3,2,4,5)])
 df2 = data.frame(xl[24:46,c(1,3,2,4,5)])
 
