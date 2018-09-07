@@ -10,12 +10,12 @@ D$V2 <- D$V2*ff
 
 
 colnames(D) <- c("T9","Adopted")
-D$Lower <- 0.975*D$Adopted
-D$Upper <- 1.025*D$Adopted
+D$Lower <- 0.9975*D$Adopted
+D$Upper <- 1.0025*D$Adopted
 
 # Temporary
 
-D <- D[-c(9,12),]
+#D <- D[-c(9,12),]
 
 
 Norm <- read.table("numRates2.dat",header = TRUE)$median
@@ -44,7 +44,7 @@ pdf("rate_ratioii.pdf",height = 7,width = 10)
 ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=F) +
   geom_line() +
-  coord_cartesian(xlim=c(0.2,50),ylim=c(0.95,1.08)) +
+  coord_cartesian(xlim=c(0.2,50),ylim=c(0.975,1.035)) +
   theme_bw() + xlab("Thermal energy kT (keV)") + ylab("Reactivity ratio") +
   scale_fill_manual(values=c("#606060","green3"))+
   scale_x_log10(breaks = c(0.001,0.01,0.1,1))  +

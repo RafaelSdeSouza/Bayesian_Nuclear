@@ -27,7 +27,7 @@ pdf("rate_ratio.pdf",height = 7,width = 10)
 ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data,alpha=0.3)) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE) +
   geom_line() +
-  coord_cartesian(xlim=c(0.00125,1),ylim=c(0.95,1.025)) +
+  coord_cartesian(xlim=c(0.00125,1),ylim=c(0.96,1.03)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
   scale_fill_manual(values=c("#606060","#6600CC"))+
   scale_x_log10(breaks = c(0.001,0.01,0.1,1))  +
