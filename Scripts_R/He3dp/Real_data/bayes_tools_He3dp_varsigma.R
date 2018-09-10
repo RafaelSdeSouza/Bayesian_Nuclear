@@ -13,8 +13,7 @@ set.seed(27)
 require(RcppGSL);require(ggplot2);require(ggthemes)
 require(nuclear);library(magrittr);
 library(dplyr);require(lessR);library(BayesianTools)
-require(msm);require(LaplacesDemon);require(mcmcplots);require(ggmcmc);
-require(ggridges)
+require(msm)
 source("..//..//auxiliar_functions/pair_wise_plot.R")
 ######################################################################
 ## Read DATA
@@ -51,38 +50,36 @@ likelihood <- function(par){
   gp2 = par[4]
   ad   = par[5]
   ap =  par[6]
-  sigmax = par[7]
-  scale = par[8:14]
-  ue = par[15:16]
-  y = par[17:(N + 16)]
-  nu = par[231]
+  sigmax = par[7:13]
+  scale = par[14:20]
+  ue = par[21:22]
+  y = par[23:(N + 22)]
   
+  llsigmax = sum(dnorm(sigmax,mean = 0,sd = 5))
   llRandom = sum(dlnorm(scale,meanlog = log(1), sdlog = log(syst), log = T))
-#  lly <- sum(dst(y,mu = scale[re]*sfactor3Hedp_5p(obsx, e0,er,gd2, gp2,ad,ap,ue = ue[ik]),sigma = sigmax,nu = nu, log = T))
-  lly <- sum(dnorm(y,mean = scale[re]*sfactor3Hedp_5p(obsx, e0,er,gd2, gp2,ad,ap,ue = ue[ik]),sd = sigmax, log = T))
+  lly <- sum(dnorm(y,mean = scale[re]*sfactor3Hedp_5p(obsx, e0,er,gd2, gp2,ad,ap,ue = ue[ik]), sd = sigmax[re],  log = T))
   llobs = sum(dnorm(obsy,mean = y,sd = erry,log = T))
-  return(llRandom + llobs + lly)
+  return(llRandom + llobs + lly + llsigmax)
 
 }
 
 
-low <- c(0.1,1e-3,rep(1e-4,2), 1,1,1e-4,rep(0.5,7),rep(0,2),obsy - 2*erry,1)
-up <- c(0.4,1,rep(3,2),10,10,5,rep(1.5,7),rep(350,2),obsy + 2*erry,100)
+low <- c(0.1,1e-3,rep(1e-4,2), 2,2,rep(1e-3,7),rep(0.5,7),rep(0,2),obsy - 2*erry)
+up <- c(0.4,1,rep(3,2),10,10,rep(5,7),rep(1.5,7),rep(350,2),obsy + 2*erry)
 
-
+par <- low
 createHedPrior <- function(lower, upper, best = NULL){
 density = function(par){
   d1 = dunif(par[1], 0.1, 0.4,log = TRUE)
   d2 = dtnorm(par[2], 0, 1,log = TRUE)
-  d3 = dtnorm(par[3], 0, 3*34.625/par[5]^2, log = TRUE)
-  d4 = dtnorm(par[4], 0, 3*51.94605/par[6]^2, log = TRUE)
+  d3 = dtnorm(par[3], 0, 34.625/par[5]^2, log = TRUE)
+  d4 = dtnorm(par[4], 0, 51.94605/par[6]^2, log = TRUE)
   d5 = sum(dunif(par[5:6], 2, 10, log = TRUE))
-  d6 = dtnorm(par[7], mean = 0, sd = 5, log = TRUE)
-  d7 = sum(dlnorm(par[8:14],log(1),log(syst),log = TRUE))
-  d8 = sum(dtnorm(par[15:16], mean = 0, sd = 100, log = TRUE))
-  d9 = sum(dunif(par[17:(N + 16)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
-  d10 = dunif(par[231],1,100,log=TRUE)
-  return(d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8 + d9 + d10)
+  d6 = sum(dtnorm(par[7:13], mean = 0, sd = 5, log = TRUE))
+  d7 = sum(dlnorm(par[14:20],log(1),log(syst),log = TRUE))
+  d8 = sum(dtnorm(par[21:22], mean = 0, sd = 100, log = TRUE))
+  d9 = sum(dunif(par[23:(N + 22)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
+  return(d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8 + d9)
 }
 
 sampler = function(){
@@ -90,11 +87,10 @@ sampler = function(){
    runif(1, 0, 1),
     exp(runif(2, log(1e-3), log(2))),
     runif(2, 2.5, 7),
-    runif(1, 0, 5),
+    exp(runif(7,log(1e-2), log(1))),
     rlnorm(7, log(1), log(syst)), #ynorm
     runif(2, 0, 300),
-    runif(N, obsy - 2*erry,obsy + 2*erry),
-    runif(1,1,100)
+    runif(N, obsy - 2*erry,obsy + 2*erry)
 )
 }
 
@@ -111,7 +107,7 @@ prior <- createHedPrior(lower = low, upper = up)
 
 
 setup <- createBayesianSetup(likelihood = likelihood,prior = prior,
-names = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to("y", N),"nu"))
+names = c("e0","er","gd2","gp2","ad","ap",to("sigmax", 7),to("scale", 7),to("ue", 2),to("y", N)))
 
 #setup <- createBayesianSetup(likelihood = likelihood,lower = low,upper = up,
 #names = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to("y", N)))
@@ -122,40 +118,38 @@ names = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to(
 
 
 settings <- list(iterations = 1E6,thin=5,
-                 burnin = 1E5, message = T,nrChains = 1)
-
-
-
+                 burnin = 2.5E5, message = T,nrChains = 1)
 
 system.time(
-res <- runMCMC(bayesianSetup = setup,  settings = settings,sampler = "DEzs")
+  res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DEzs")
 )
 
 
-
 summary(res)
-tracePlot(sampler = res, thin = 1, start = 2E4, whichParameters = c(1,2,3,4,5,6,15,16,231))
+tracePlot(sampler = res, thin = 1, start = 2E4, whichParameters = c(1,2,3,4,5,6,15,16))
 
 
 
-codaObject = getSample(res, start = 2E4, coda = TRUE)
+codaObject = getSample(res, start = 1E4, coda = TRUE)
 
 getmcmc_var <- function(outjags=outjags,vars = vars){
   as.data.frame(do.call(rbind, outjags[,vars]))
 }
 
 
-sDat <- getmcmc_var(codaObject,vars = c("e0","er","gd2","gp2","ad","ap","sigma",to("scale", 7),to("ue", 2),to("y", N)))
+sDat <- getmcmc_var(codaObject,vars = c("e0","er","gd2","gp2","ad","ap",to("sigmax", 7),to("scale", 7),to("ue", 2),to("y", N)))
 
 
 index <- sample(seq(1:nrow(sDat)),1E4,replace=FALSE)
 ssDat <- sDat[index,]
 
 require(MASS)
-#write.matrix(ssDat,"He3dp_DREAM.dat")
+write.matrix(ssDat,"He3dp_DREAM.dat")
 
 
 xx <- exp(seq(log(min(obsx)),log(max(obsx)),length.out = 250))
+
+
 
 plot_Sfactor_DREAM(ssDat)
 
@@ -189,7 +183,7 @@ dev.off()
 
 
 pdf("plot/He3dp_scale_syst.pdf",height = 5,width = 4.5)
-plot_normfactors_DREAM(ssDat)
+plot_normfactors_DREAM(sDat)
 dev.off()
 
 quantile(sfactor3Hedp_5p(1e-4,ssDat[,1],ssDat[,2],ssDat[,3],ssDat[,4],
@@ -219,7 +213,6 @@ NAI <-  table_reaction_He3dp(ssDat, vars=c("e0","er","gd2","gp2","ad","ap"),N=50
 
 write.csv(NAI ,"NA_I.csv",row.names = F)
 
-NAI <- read.csv("NA_I.csv")
 
 Norm <- NAI$mean
 
@@ -258,12 +251,11 @@ jointf$data <- factor(jointf$data, levels = c("presentI","previous"))
 pdf("rate_ratio_he3dp.pdf",height = 0.75*7,width = 0.75*10)
 ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
   #  geom_rect(aes(xmin=0.045, xmax=0.356, ymin=-1, ymax=22), fill="#F0F8FF",alpha=0.4) +
-  geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper,alpha=data),show.legend=FALSE) +
-  scale_alpha_manual(values=c(1,0.375))+
+  geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper),show.legend=FALSE,alpha=0.65) +
   geom_line(size=0.5) +
   coord_cartesian(ylim=c(0.9,1.06),xlim=c(0.00125,1)) +
   theme_bw() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
-  scale_fill_manual(values=c("gray50","#984ea3"),name="") +
+  scale_fill_manual(values=c("#969696","#984ea3"),name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
   annotation_logticks(short = unit(0.2, "cm"), mid = unit(0.3, "cm"), long = unit(0.4, "cm"),
                       sides = "b") +
