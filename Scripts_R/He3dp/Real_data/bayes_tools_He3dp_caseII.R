@@ -77,7 +77,7 @@ density = function(par){
   d5 = sum(dunif(par[5:6], 2, 10, log = TRUE))
   d6 = dtnorm(par[7], mean = 0, sd = 5, log = TRUE)
   d7 = sum(dlnorm(par[8:14],log(1),log(syst),log = TRUE))
-  d8 = sum(dtnorm(par[15:16], mean = 0, sd = 100, log = TRUE))
+  d8 = sum(dtnorm(par[15:16], mean = 0, sd = 100E3, log = TRUE))
   d9 = sum(dunif(par[17:(N + 16)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
   return(d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8 + d9)
 }
