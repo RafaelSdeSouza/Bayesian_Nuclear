@@ -42,6 +42,7 @@ ensamble <- read.csv("ensamble.csv",header = T) %>%
   mutate(Syst=replace(Syst,Syst==0.06,0.078))  %>% filter(E <= 0.5)
 
 
+
 re <- as.numeric(ensamble$dat)
 Nre <- length(unique(ensamble$dat))
 ik <- as.numeric(ensamble$invK)
