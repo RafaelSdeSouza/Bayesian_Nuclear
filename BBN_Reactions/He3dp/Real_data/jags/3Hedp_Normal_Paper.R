@@ -378,7 +378,7 @@ quantile((GammaHe3dp(Normfit)$Gd),probs = c(0.16, 0.5, 0.84))
 
 quantile((GammaHe3dp(Normfit)$Gp),probs = c(0.16, 0.5, 0.84))
 
-# Plot poir-wise plot Case-I
+# Plot pair-wise plot Case-I
 
 
 # Case I
