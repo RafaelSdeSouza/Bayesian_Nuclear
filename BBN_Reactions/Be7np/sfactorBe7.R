@@ -19,8 +19,9 @@ sigmaE2Be7 <- function(ecm,e0,gn,gp, an = 5, ap =5){
   z1_f = 1; z2_f = 3;				# atomic numbers of p and Li
 #  rd = 6.0; rp = 5.0;			# channel radii (fm)
   la = 0; lb = 2;					  # orbital angular momenta of d and n
-  Q = 18.353053;						#reaction Q-value (MeV)
-  jt = 0.5; jp=1.0; jr=1.5;			#spins of target, projectile, resonance
+ 
+  Q = 1.644242;						   #reaction Q-value (MeV)
+  jt = 1.5; jp=1.5; jr=1.5;	 #spins of target, projectile, resonance
 
   #   DEFINITIONS
   mue_i <- (m1_i*m2_i)/(m1_i+m2_i);
