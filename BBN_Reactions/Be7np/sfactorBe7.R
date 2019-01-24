@@ -10,10 +10,11 @@
 
 #  A copy of the GNU General Public License is available at
 #  http://www.r-project.org/Licenses/
-sigmaE2Be7 <- function(ecm,e0,er,gi,gf, ri = 6, rf =5,ue=0){
+sigmaE2Be7 <- function(ecm,e0,gn,gp, an = 5, ap =5){
   # Constants
-  m1_i = 3.01493; m2_i = 2.01355;		# masses (amu) of t and d
-  m1_f = 4.00151; m2_f = 1.007277;	# masses (amu) of n and 4He
+  m1_i = 7.0169; m2_i = 1.008664;		# masses (amu) of 7Be and n
+  m1_f = 1.007276; m2_f = 7.0160;	# masses (amu) of p and Li
+  
   z1_i = 2; z2_i = 1;			# charges of t and d
   z1_f = 2; z2_f = 1;				#charges of n and 4He
 #  rd = 6.0; rp = 5.0;			# channel radii (fm)
@@ -22,7 +23,6 @@ sigmaE2Be7 <- function(ecm,e0,er,gi,gf, ri = 6, rf =5,ue=0){
   jt = 0.5; jp=1.0; jr=1.5;			#spins of target, projectile, resonance
 
   #   DEFINITIONS
-
   mue_i <- (m1_i*m2_i)/(m1_i+m2_i);
   mue_f <- (m1_f*m2_f)/(m1_f+m2_f);
   pek <- 6.56618216e-1/mue_i;
