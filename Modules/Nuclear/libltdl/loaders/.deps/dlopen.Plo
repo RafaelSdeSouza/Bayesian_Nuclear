@@ -42,8 +42,8 @@ loaders/dlopen.lo: loaders/dlopen.c libltdl/lt__private.h ../config.h \
   /usr/include/sys/_types/_dev_t.h /usr/include/sys/_types/_mode_t.h \
   /usr/include/sys/_types/_uuid_t.h /usr/include/gethostuuid.h \
   libltdl/lt__alloc.h libltdl/lt_system.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stddef.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include/stddef.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include/__stddef_max_align_t.h \
   /usr/include/stdlib.h /usr/include/sys/wait.h \
   /usr/include/sys/_types/_id_t.h /usr/include/sys/signal.h \
   /usr/include/machine/signal.h /usr/include/i386/signal.h \
@@ -52,7 +52,7 @@ loaders/dlopen.lo: loaders/dlopen.c libltdl/lt__private.h ../config.h \
   /usr/include/sys/_pthread/_pthread_attr_t.h \
   /usr/include/sys/_types/_sigaltstack.h \
   /usr/include/sys/_types/_ucontext.h /usr/include/sys/resource.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stdint.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include/stdint.h \
   /usr/include/stdint.h /usr/include/_types/_uint8_t.h \
   /usr/include/_types/_uint16_t.h /usr/include/_types/_intmax_t.h \
   /usr/include/_types/_uintmax_t.h /usr/include/machine/endian.h \
@@ -81,7 +81,7 @@ loaders/dlopen.lo: loaders/dlopen.c libltdl/lt__private.h ../config.h \
   /usr/include/dirent.h /usr/include/sys/dirent.h libltdl/lt__strl.h \
   libltdl/lt__glibc.h libltdl/lt__argz.h libltdl/slist.h ltdl.h \
   libltdl/lt_error.h libltdl/lt_dlloader.h /usr/include/dlfcn.h \
-  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stdbool.h
+  /Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include/stdbool.h
 
 libltdl/lt__private.h:
 
@@ -245,9 +245,9 @@ libltdl/lt__alloc.h:
 
 libltdl/lt_system.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stddef.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include/stddef.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/__stddef_max_align_t.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include/__stddef_max_align_t.h:
 
 /usr/include/stdlib.h:
 
@@ -277,7 +277,7 @@ libltdl/lt_system.h:
 
 /usr/include/sys/resource.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stdint.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include/stdint.h:
 
 /usr/include/stdint.h:
 
@@ -373,4 +373,4 @@ libltdl/lt_dlloader.h:
 
 /usr/include/dlfcn.h:
 
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include/stdbool.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include/stdbool.h:
