@@ -17,8 +17,9 @@ require(nuclear);library(magrittr);
 library(dplyr);require(lessR);library(BayesianTools)
 require(msm);require(mcmcplots);require(ggmcmc);
 require(ggridges);require(plyr);require(MASS);
-require(R2jags)
+require(R2jags);require(scales)
 source("..//auxiliar_functions/jagsresults.R")
+source("..//auxiliar_functions/pair_wise_plot.R")
 
 ######################################################################
 # DATA INPUT
@@ -65,7 +66,7 @@ Model <- "model{
 # LIKELIHOOD
 for (i in 1:N) {
 obsy[i] ~ dnorm(ya[i], pow(erry[i], -2))
-ya[i] ~ dnorm(y.norm[re[i]]*mut[i],pow(tau, -2))
+ya[i] ~ dnorm(y.norm[re[i]]*mut[i],pow(tau[re[i]], -2))
 mut[i] <- a.scale*interp.lin(obsx[i], interp.x, interp.y)
 }
 
@@ -80,16 +81,19 @@ mux[j] <- a.scale*interp.lin(xx[j], interp.x, interp.y)
 
 
 ### scaling factor of theory 
-a.scale ~ dnorm(0.0, pow(10, -2))T(0,)        
+a.scale ~ dt(0, pow(5,-2), 1)T(0,)    
 
 for (k in 1:Nre){
 y.norm[k] ~ dlnorm(log(1.0),pow(syst[k],-2))
+tau[k] ~  dt(mt, pow(5,-2), 1)T(0,)
 }
-tau ~  dt(0, pow(5,-2), 1)T(0,)
+
+mt ~  dt(0, pow(5,-2), 1)T(0,)
+
 }"
 
 
-inits <- function(){list(a.scale = runif(1,0.5,1.5),y.norm=runif(4,0.5,1.5),tau=runif(1,0.01,10)) }
+inits <- function(){list(a.scale = runif(1,0.5,1.5),y.norm=runif(4,0.5,1.5),tau=runif(4,0.01,10)) }
 
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
@@ -98,8 +102,8 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 5,
                 n.chains = 3,
-                n.burnin = 5000,
-                n.iter = 10000)
+                n.burnin = 10000,
+                n.iter = 20000)
 
 
 jagsresults(x=Normfit , params=c('tau',"a.scale", "y.norm"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
@@ -147,3 +151,10 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
         axis.line = element_line(size = 0.5, linetype = "solid")) 
 
 
+
+
+
+Sp <- ggs(as.mcmc(Normfit)[,c("a.scale", "y.norm[1]","y.norm[2]","y.norm[3]","y.norm[4]",
+                              "tau[1]","tau[2]","tau[3]","tau[4]")]) %>% as_tibble()
+
+pair_wise_plot(Sp)
