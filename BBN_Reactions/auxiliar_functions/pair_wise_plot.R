@@ -33,8 +33,8 @@ my_bin <- function(data, mapping, ..., low = "#74dbef", high = "#0074e4") {
 #    stat_ellipse(type = "norm",level = 0.68,geom = "polygon",fill="#f03b20",...) +
 #    geom_point() +
 #   stat_ellipse(type = "t",level = 0.997,alpha=0.95,color="#dfc27d",...) +
-  stat_ellipse(type = "t",level = 0.95,color="black",linetype="dashed",alpha=0.5,...) +
-  stat_ellipse(type = "t",level = 0.68,color="black",linetype="dashed",alpha=0.5,...) +
+#  stat_ellipse(type = "t",level = 0.95,color="black",linetype="dashed",alpha=0.5,...) +
+ # stat_ellipse(type = "t",level = 0.68,color="black",linetype="dashed",alpha=0.5,...) +
     scale_x_continuous(breaks = scales::pretty_breaks(n = 4)) +
     scale_y_continuous(breaks = scales::pretty_breaks(n = 4)) +
      scale_fill_viridis() +
