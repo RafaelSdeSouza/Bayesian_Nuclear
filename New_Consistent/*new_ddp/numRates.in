@@ -1,0 +1,14 @@
+d(d,p)              ! title
+1 1                 ! charge projectile and target
+2.01355318262d0     ! mass projectile in u
+2.01355318262d0     ! mass target in u
+5000                ! number of samples from MCMC output [5000]
+1                   ! output rate samples (0=no/1=yes) for plotting pdf's 
+0.0                 ! y_initial [y0]
+0.0                 ! E_min (MeV) [xi]
+10.0                ! E_max (MeV) [xf] *** high-E cutoff for Arai 
+1.0d-08             ! accuracy [eps]
+1.0d-10             ! initial step size (MeV) [h1] ***
+0.0                 ! minimum step size (MeV) [hmin]
+1.0d-03             ! maximum step size (MeV) [hmax]
+10.0                ! dx for intermediate output [dxsav]

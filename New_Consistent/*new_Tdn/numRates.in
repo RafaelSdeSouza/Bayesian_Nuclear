@@ -1,0 +1,14 @@
+T(d,n)              ! title
+1 1                 ! charge projectile and target
+3.01550             ! mass projectile in u
+2.01355             ! mass target in u
+10                   ! number of samples from MCMC output [5000]
+0                   ! output rate samples (0=no/1=yes) for plotting pdf's 
+0.0                 ! y_initial [y0]
+0.001               ! E_min (MeV) [xi] ***
+1.2                 ! E_max (MeV) [xf] ***
+1.0d-10             ! accuracy [eps]
+1.0d-10             ! initial step size (MeV) [h1] ***
+0.0                 ! minimum step size (MeV) [hmin]
+1.0d-03             ! maximum step size (MeV) [hmax]
+10.0                ! dx for intermediate output [dxsav]
