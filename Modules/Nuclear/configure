@@ -597,9 +597,13 @@ PACKAGE_STRING='JAGS-NUCLEAR 1.1'
 PACKAGE_BUGREPORT='drsouza@email.unc.edu'
 PACKAGE_URL=''
 
-ac_unique_file="src/functions/sfactor3Hedp.cc"
 ac_unique_file="src/functions/sfactorTdn.cc"
-ac_unique_file="src/functions/sfactorTdn_old.cc"
+ac_unique_file="src/functions/sfactor3Hedp.cc"
+ac_unique_file="src/functions/sfactor3Hedpx.cc"
+ac_unique_file="src/functions/sfactorTdn2.cc"
+ac_unique_file="src/functions/sfactor3Hdnx.cc"
+ac_unique_file="src/functions/sigma7Benpx.cc"
+ac_unique_file="src/functions/sfactor7Lipnx.cc"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -2496,6 +2500,10 @@ shift; shift
 host_os=$*
 IFS=$ac_save_IFS
 case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
+
+
+
+
 
 
 
