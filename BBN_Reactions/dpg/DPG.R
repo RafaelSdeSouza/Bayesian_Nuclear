@@ -102,8 +102,14 @@ Normfit <- jags(data = model.data,
                 model.file  = textConnection(Model),
                 n.thin = 5,
                 n.chains = 3,
-                n.burnin = 10000,
-                n.iter = 20000)
+                n.burnin = 1000,
+                n.iter = 2000)
+
+
+Sp <- ggs(as.mcmc(Normfit)[,c("a.scale", "y.norm[1]","y.norm[2]","y.norm[3]","y.norm[4]",
+                              "tau[1]","tau[2]","tau[3]","tau[4]")]) %>% as_tibble()
+
+pair_wise_plot(Sp)
 
 
 jagsresults(x=Normfit , params=c('tau',"a.scale", "y.norm"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))
@@ -153,8 +159,3 @@ ggplot(gobs,aes(x=obsx,y=obsy))+
 
 
 
-
-Sp <- ggs(as.mcmc(Normfit)[,c("a.scale", "y.norm[1]","y.norm[2]","y.norm[3]","y.norm[4]",
-                              "tau[1]","tau[2]","tau[3]","tau[4]")]) %>% as_tibble()
-
-pair_wise_plot(Sp)

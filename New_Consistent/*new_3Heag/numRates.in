@@ -1,0 +1,14 @@
+3He(a,g)            ! title
+2 2                 ! charge projectile and target
+3.01493216d0        ! mass projectile in u
+4.001506094         ! mass target in u
+5000                ! number of samples from MCMC output [5000]
+1                   ! output rate samples (0=no/1=yes) for plotting pdf's 
+0.0                 ! y_initial [y0]
+0.0                 ! E_min (MeV) [xi] *** low-E cutoff
+1.7                 ! E_max (MeV) [xf] *** high-E cutoff for Neff 
+1.0d-08             ! accuracy [eps]
+1.0d-10             ! initial step size (MeV) [h1] ***
+0.0                 ! minimum step size (MeV) [hmin]
+1.0d-03             ! maximum step size (MeV) [hmax]
+10.0                ! dx for intermediate output [dxsav]
