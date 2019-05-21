@@ -93,16 +93,16 @@ Model <- "model{
 # LIKELIHOOD informative
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], E0, Er, gd2, gp2, ad, ap, ue[ik[i]]), pow(tau, -2))
+y[i] ~ dnorm(scale[re[i]]*sfactor3Hedpx(obsx[i], E0,  gd2, gp2, ad, ap, ue[ik[i]]), pow(tau, -2))
 
 }
 
 
 # Residuals
 for (i in 1:N) {
-yy[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i], E0, Er, gd2, gp2, ad, ap, ue[ik[i]]), pow(tau, -2))
+yy[i] ~ dnorm(scale[re[i]]*sfactor3Hedpx(obsx[i], E0,  gd2, gp2, ad, ap, ue[ik[i]]), pow(tau, -2))
 res[i] <- obsy[i]-yy[i] 
-#res[i] <- obsy[i]-sfactor3Hedp(obsx[i], E0, Er, gd2, gp2, ad, ap,0)
+#res[i] <- obsy[i]-sfactor3Hedpx(obsx[i], E0,  gd2, gp2, ad, ap,0)
 nres[i] <- res[i]/obsy[i]
 
 }
@@ -111,7 +111,7 @@ nres[i] <- res[i]/obsy[i]
 # LIKELIHOOD broad
 for (i in 1:N) {
 obsy2[i] ~ dnorm(y_2[i], pow(erry[i], -2))
-y_2[i] ~ dnorm(scale[re[i]]*sfactor3Hedp(obsx[i],  E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b, ue[ik[i]]),pow(tau_2, -2))
+y_2[i] ~ dnorm(scale[re[i]]*sfactor3Hedpx(obsx[i],  E0_b,  gd2_b, gp2_b, ad_b, ap_b, ue[ik[i]]),pow(tau_2, -2))
 }
 RSS <- sum(res^2)
 
@@ -120,10 +120,10 @@ for (j in 1:M){
 
 # Bare...
 
-mux0[j] <- sfactor3Hedp(xx[j], E0, Er, gd2, gp2, ad, ap,0)
+mux0[j] <- sfactor3Hedpx(xx[j], E0,  gd2, gp2, ad, ap,0)
 
 
-mux0_2[j] <- sfactor3Hedp(xx[j], E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
+mux0_2[j] <- sfactor3Hedpx(xx[j], E0_b,  gd2_b, gp2_b, ad_b, ap_b,0)
 
 DeltaM[j] <- mux0[j]/mux0_2[j]
 
@@ -131,11 +131,11 @@ DeltaM[j] <- mux0[j]/mux0_2[j]
 
 # No inverse Kinematics
 
-mux1[j] <- sfactor3Hedp(xx[j], E0, Er, gd2, gp2, ad, ap,ue[1])
+mux1[j] <- sfactor3Hedpx(xx[j], E0,  gd2, gp2, ad, ap,ue[1])
 yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 # With inverse Kinematics
-mux2[j] <- sfactor3Hedp(xx[j], E0, Er, gd2, gp2, ad, ap,ue[2])
+mux2[j] <- sfactor3Hedpx(xx[j], E0,  gd2, gp2, ad, ap,ue[2])
 yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
 
 }
@@ -154,7 +154,6 @@ ue[z] ~ dnorm(0,pow(0.1,-2))T(0,)
 # Case I
 tau ~  dnorm(0, pow(1,-2))T(0,)
 E0  ~  dnorm(0, pow(1,-2))T(0,)
-Er <-  E0
 gd2 ~  dnorm(0, pow(1,-2))T(0,)
 gp2 ~  dnorm(0, pow(2,-2))T(0,)
 
@@ -165,7 +164,6 @@ ap  <- 5
 
 # Case II
 tau_2  ~  dnorm(0, pow(1,-2))T(0,)
-Er_b  ~   dnorm(0.6, pow(0.1,-2))T(0,)
 E0_b  ~   dnorm(0.2,pow(0.02,-2))T(0,)
 
 gd2_b  ~ dnorm(0.3, pow(0.05,-2))T(0,)
@@ -179,13 +177,13 @@ ap_b  ~  dnorm(5.5,pow(1,-2))T(0,)
 ue_ev[1] <-1e6*ue[1]
 ue_ev[2] <-1e6*ue[2]
 
-S_0   <- sfactor3Hedp(1e-4, E0, Er, gd2, gp2, ad, ap,0)
-S_0b  <- sfactor3Hedp(1e-4, E0_b, Er_b, gd2_b, gp2_b, ad_b, ap_b,0)
+S_0   <- sfactor3Hedpx(1e-4, E0,  gd2, gp2, ad, ap,0)
+S_0b  <- sfactor3Hedpx(1e-4, E0_b,  gd2_b, gp2_b, ad_b, ap_b,0)
 
 
 }"
 
-inits <- function(){ list(E0 = runif(1,0.3,0.35),E0_b = 0.2,Er_b = 0.5,gd2 = 1,
+inits <- function(){ list(E0 = runif(1,0.3,0.35),E0_b = 0.2,gd2 = 1,
                         gp2 = runif(1,0.01,0.06),gd2_b = 1) }
 
 
@@ -193,9 +191,9 @@ set.seed(24)
 # JAGS model with R2Jags;
 Normfit <- jags(data = model.data,
                 inits = inits,
-                parameters.to.save  = c("Er","E0","gd2", "gp2","ue_ev","tau", "ad","ap",
+                parameters.to.save  = c("E0","gd2", "gp2","ue_ev","tau", "ad","ap",
                                         "RSS","mux0","mux1","mux2","scale","DeltaM","S_0",
-                                        "S_0b","E0_b","Er_b","gd2_b",
+                                        "S_0b","E0_b","gd2_b",
                                         "gp2_b","tau_2","ad_b","ap_b","res","nres"),
                 model.file  = textConnection(Model),
                 n.thin = 10,
@@ -209,15 +207,27 @@ jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_
 temp <- Normfit
 temp <- update(temp, n.thin = 5, n.iter = 1000)
 
+
+plot_Sfactor(Normfit)
+
+
+
+
 getmcmc_var <- function(outjags=outjags,vars = vars){
 as.data.frame(do.call(rbind, as.mcmc(outjags)[,vars]))
   }
+
+
+plot_Sfactor(Normfit)
+
 
 
 sum(res[,"mean"]^2)/(N-1)
 res <- jagsresults(x = Normfit, params = c("res"),probs = c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
 res_data <- data.frame(x=obsx,sd=res[,"sd"], mean=res[,"50%"],lwr1=res[,"16%"],lwr2=res[,"2.5%"],lwr3=res[,"0.15%"],upr1=res[,"84%"],
                        upr2=res[,"97.5%"],upr3=res[,"99.85%"],set,lab)
+
+
 
 
 
