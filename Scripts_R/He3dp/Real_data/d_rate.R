@@ -11,7 +11,7 @@
    gdat <- vector('list',1000)
    for(i in 1:1000){
     y_I <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat_I[i,1],gi = mcdat_I[i,2],gf = mcdat_I[i,3],r_i=mcdat_I[i,4],r_f=mcdat_I[i,5] )
-    y_II <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat_II [i,1],gi = mcdat_II [i,2],gf = mcdat_II[i,3],r_i=mcdat_II[i,4],r_f=mcdat_II[i,5] )
+    y_II <- sapply(Tgrid,nuclear_rate3Hedp_5p,ER = mcdat_II [i,1],gi = mcdat_II [i,2],gf = mcdat_II[i,3],r_i=mcdat_II[i,4],r_f=mcdat_II[i,5])
     
     dd <- data.frame(y_I/y_II)
     gdat[[i]] <- dd

@@ -166,10 +166,18 @@ res[i] <- obsy[i]-yy[i]
 
 
 
-
-
-
 dream_dat <- read.table("He3dp_DREAM.dat",header=T)
+ssDat <- dream_dat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")]
+
+
+
+
+xx <- 1e-2
+S0 <- sfactor3Hedp_5p(xx,ssDat[,1],ssDat[,2],ssDat[,3],ssDat[,4],ssDat[,5],ssDat[,6],0)
+quantile(S0,prob=c(0.16, 0.5, 0.84))
+
+
+
 
 # Case II
 SpII <- ggs(as.mcmc(ssDat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")]))
