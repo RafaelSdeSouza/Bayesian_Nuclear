@@ -7,9 +7,13 @@
  *
  */
 #include <module/Module.h>
-#include <functions/sfactor3Hedp.h>
 #include <functions/sfactorTdn.h>
-#include <functions/sfactorTdn_old.h>
+#include <functions/sfactor3Hedp.h>
+#include <functions/sfactor3Hedpx.h>
+#include <functions/sfactorTdn2.h>
+#include <functions/sfactor3Hdnx.h>
+#include <functions/sigma7Benpx.h>
+#include <functions/sfactor7Lipnx.h>
 
 using std::vector;
 
@@ -24,9 +28,13 @@ class NUCLEARModule : public Module {
 
 NUCLEARModule::NUCLEARModule() : Module("nuclear"){
   //load functions
-  insert(new sfactor3Hedp);
-  insert(new sfactorTdn);
-  insert(new sfactorTdn_old);
+     insert(new sfactorTdn);
+     insert(new sfactor3Hedp);
+     insert(new sfactor3Hedpx);
+     insert(new sfactorTdn2);
+     insert(new sfactor3Hdnx);
+     insert(new  sigma7Benpx);
+     insert(new sfactor7Lipnx);
 }
 
 

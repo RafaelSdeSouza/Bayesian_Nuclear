@@ -10,7 +10,7 @@ namespace nuclear {
  * @short Astrophysical S Factors
  * sfactorTdn3 returns the astrophysical S-factor as a function of energy.
  * <pre>
- * obsy1 = sfactorTdn3(obsx1, e1, ex, gi, gf, ri, rf, ue)
+ * obsy1 = sfactorTdn(obsx1, e1, ex, gi, gf, ri, rf, ue)
  * </pre>
  */
 
