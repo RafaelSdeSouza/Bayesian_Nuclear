@@ -168,10 +168,6 @@ plot_Sfactor_DREAM(ssDat)
 
 
 
-<<<<<<< HEAD:Scripts_R/He3dp/Real_data/bayes_tools_He3dp_caseII.R
-yy[i] ~ dnorm(scale[re[i]]*sfactor3Hedp_5p(obsx[i], E0, Er, gd2, gp2, ad, ap, ue[ik[i]]), pow(tau, -2))
-res[i] <- obsy[i]-yy[i] 
-
 
 
 dream_dat <- read.table("He3dp_DREAM.dat",header=T)
@@ -183,15 +179,11 @@ ssDat <- dream_dat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")]
 xx <- 1e-2
 S0 <- sfactor3Hedp_5p(xx,ssDat[,1],ssDat[,2],ssDat[,3],ssDat[,4],ssDat[,5],ssDat[,6],0)
 quantile(S0,prob=c(0.16, 0.5, 0.84))
-=======
-# End Here #
->>>>>>> f6f267e5102b001ac0f25badedfdef2105239656:BBN_Reactions/He3dp/Real_data/He3dp_ApJ.R
 
 
 # Read chains 
 dream_dat <- read.table("data/He3dp_DREAM.dat",header=T)
 
-<<<<<<< HEAD:Scripts_R/He3dp/Real_data/bayes_tools_He3dp_caseII.R
 
 # Case II
 SpII <- ggs(as.mcmc(ssDat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")]))
@@ -200,8 +192,6 @@ Sp0II$Parameter <- ordered(Sp0II$Parameter, levels =c("e0","er","gd2","gp2","ad"
 levels(Sp0II$Parameter) <- as.factor(c("E[0]~(MeV)","E[r]~(MeV)","gamma[d]^2~(MeV)", "gamma[p]^2~(MeV)","a[d]~(fm)",
                                        "a[p]~(fm)","U[e1]~(eV)", "U[e2]~(eV)"))
 #
-=======
->>>>>>> f6f267e5102b001ac0f25badedfdef2105239656:BBN_Reactions/He3dp/Real_data/He3dp_ApJ.R
 
 # Corner plot
 Corr_chain <- ggs(as.mcmc(ssDat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")])) %>% 
