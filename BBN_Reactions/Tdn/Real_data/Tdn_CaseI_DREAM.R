@@ -202,15 +202,6 @@ write.matrix(short_mo,"BT_Tdn_caseI.dat")
 
 
 
->>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
-
-
-
-
-
-
-<<<<<<< HEAD
-=======
 bayesianSetup <- createBayesianSetup(likelihood = ll, prior = newPrior)
 
 settings = list(iterations = 1000,  message = FALSE)
@@ -218,25 +209,21 @@ out <- runMCMC(bayesianSetup = bayesianSetup, settings = settings)
 
 
 out2 <- DREAMzs(res,settings = settings)
->>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
-
 
 
 
 
 summary(res)
-<<<<<<< HEAD
+
 tracePlot(sampler = res, start = 100000, whichParameters = c(1,2,3,19))
 
 
-=======
 
 tracePlot(sampler = res, start = 100000, whichParameters = c(14:18))
 
 
 plot(mo$gd2,mo$gn2,type="l")
 
->>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
 
 correlationPlot(res )
 
@@ -245,10 +232,6 @@ tracePlot(sampler = res, thin = 10, start = 5000, whichParameters = c(1,2,3,4,5,
 
 
 
-
-
-<<<<<<< HEAD
-=======
 
 sampler = function(){
   d <- list()
@@ -267,7 +250,7 @@ sampler = function(){
 
 
 
->>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
+
 density = function(par){
   d1 = dnorm(par[1], 0.001,1, log =TRUE)
   d2 = dunif(par[2], 0.001,3, log =TRUE)
