@@ -163,7 +163,7 @@ CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in AUTHORS \
 	COPYING ChangeLog INSTALL NEWS README compile config.guess \
-	config.sub install-sh ltmain.sh missing
+	config.sub depcomp install-sh ltmain.sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -215,13 +215,13 @@ AUTOCONF = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/Bayesian_Nuclear/Modul
 AUTOHEADER = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/Bayesian_Nuclear/Modules/Nuclear/missing autoheader
 AUTOMAKE = ${SHELL} /Users/rafaeldesouza/Documents/GitHub/Bayesian_Nuclear/Modules/Nuclear/missing automake-1.15
 AWK = awk
-CC = clang
+CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
-CPP = clang -E
+CPP = gcc -E
 CPPFLAGS = 
-CXX = clang++
-CXXCPP = clang++ -E
+CXX = g++
+CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
@@ -294,8 +294,8 @@ abs_srcdir = /Users/rafaeldesouza/Documents/GitHub/Bayesian_Nuclear/Modules/Nucl
 abs_top_builddir = /Users/rafaeldesouza/Documents/GitHub/Bayesian_Nuclear/Modules/Nuclear
 abs_top_srcdir = /Users/rafaeldesouza/Documents/GitHub/Bayesian_Nuclear/Modules/Nuclear
 ac_ct_AR = ar
-ac_ct_CC = clang
-ac_ct_CXX = 
+ac_ct_CC = gcc
+ac_ct_CXX = g++
 ac_ct_DUMPBIN = 
 am__include = include
 am__leading_dot = .
