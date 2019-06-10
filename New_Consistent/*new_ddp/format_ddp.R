@@ -94,7 +94,7 @@ save(ddp, file = "ddp.RData")
 
 
 #pdf("plot/3Hedp_data.pdf",height = 7,width = 8)
-ggplot(ddp,aes(x=E,y=S,group=dat,shape=dat,color=dat))+
+ g <- ggplot(ddp,aes(x=E,y=S,group=dat,shape=dat,color=dat))+
   geom_point(size=2)+
   geom_errorbar(show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat),width=0.025)+
   scale_shape_stata(name="Dataset")+
