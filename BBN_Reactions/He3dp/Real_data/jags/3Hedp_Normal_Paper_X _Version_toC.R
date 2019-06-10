@@ -92,7 +92,7 @@ Model <- "model{
 # LIKELIHOOD informative
 for (i in 1:N) {
 obsy[i] ~ dnorm(y[i], pow(erry[i], -2))
-y[i] ~ dnorm(scale[re[i]]*sfactor3Hedpx(obsx[i], E0,  gd2, gp2, ad, ap, ue[ik[i]]), pow(tau, -2))
+y[i] ~ dt(scale[re[i]]*sfactor3Hedpx(obsx[i], E0,  gd2, gp2, ad, ap, ue[ik[i]]), pow(tau, -2),nu)
 
 }
 
@@ -131,11 +131,11 @@ DeltaM[j] <- mux0[j]/mux0_2[j]
 # No inverse Kinematics
 
 mux1[j] <- sfactor3Hedpx(xx[j], E0,  gd2, gp2, ad, ap,ue[1])
-yx1[j] ~ dnorm(mux1[j],pow(tau,-2))
+yx1[j] ~ dt(mux1[j],pow(tau,-2),nu)
 
 # With inverse Kinematics
 mux2[j] <- sfactor3Hedpx(xx[j], E0,  gd2, gp2, ad, ap,ue[2])
-yx2[j] ~ dnorm(mux1[j],pow(tau,-2))
+yx2[j] ~ dt(mux1[j],pow(tau,-2),nu)
 
 }
 
@@ -155,7 +155,8 @@ tau ~  dnorm(0, pow(1,-2))T(0,)
 E0  ~  dnorm(0, pow(1,-2))T(0,)
 gd2 ~  dnorm(0, pow(1,-2))T(0,)
 gp2 ~  dnorm(0, pow(2,-2))T(0,)
-
+nu <- nuMinusOne + 1
+nuMinusOne ~ dexp( 1/29 )
 ad  <- 6
 ap  <- 5
 
@@ -193,12 +194,12 @@ Normfit <- jags(data = model.data,
                 parameters.to.save  = c("E0","gd2", "gp2","ue_ev","tau", "ad","ap",
                                         "RSS","mux0","mux1","mux2","scale","DeltaM","S_0",
                                         "S_0b","E0_b","gd2_b",
-                                        "gp2_b","tau_2","ad_b","ap_b","res","nres"),
+                                        "gp2_b","tau_2","ad_b","ap_b","res","nres","nu"),
                 model.file  = textConnection(Model),
-                n.thin = 10,
+                n.thin = 5,
                 n.chains = 3,
-                n.burnin = 500,
-                n.iter = 1500)
+                n.burnin = 1000,
+                n.iter = 3500)
 jagsresults(x = Normfit, params = c("E0","gd2", "gp2","ue","tau", "ad","ap","ue_ev","S_0"),probs = c(0.16, 0.5, 0.84))
 
 

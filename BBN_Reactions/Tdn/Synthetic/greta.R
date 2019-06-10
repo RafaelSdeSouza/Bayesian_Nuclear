@@ -21,18 +21,9 @@ sd =  uniform(min = 0.001, max = 50)
 # operations
 
 
-muF <- function(obsx1,Er,gi,gf){
-if (is.na(as.matrix(Er)[[1]])){
-xx <- runif(1,0,1)
-mean = sfactorTdn_5p(obsx1,xx,gi,gf,6,5)
-}else{
-  mean = sfactorTdn_5p(obsx1,Er,gi,gf,6,5) 
-}
-return(mean)  
-}
 
   
-mean = muF(obsx1,Er,gi,gf) 
+mean = sfactorTdn_5p(obsx1,Er,gi,gf,6,5) 
 
 
 

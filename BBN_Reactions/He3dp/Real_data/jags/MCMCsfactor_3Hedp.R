@@ -33,8 +33,7 @@
 # preparation: remove all variables from the work space
 rm(list=ls())
 # import jags package
-library("rjags")
-library(magicaxis)
+library(rjags)
 ## for block updating [we do not need to center predictor variables]
 load.module("glm") 
 
@@ -308,10 +307,10 @@ cat('model {
 for (i in 1:length(obsx1)) {
   #
   # S-FACTOR
-  # ...subject to extrinsic scatter, if any:
-  obsy1[i] ~ dnorm(ya1[i], pow(yscat1, -2))    
   # ...subject to stat uncertainties:
-  ya1[i] ~ dnorm(ym1[i], pow(errobsy1[i], -2))
+  obsy1[i] ~ dnorm(ya1[i], pow(errobsy1[i], -2))    
+  # ...subject to extrinsic scatter, if any:
+  ya1[i] ~ dnorm(ym1[i], pow(yscat1, -2))
   # ...subject to syst uncertainties: 
   ym1[i] <- y.norm1 * yt1[i]
   # true S-factor [calculated from theory and then scaled]: 
@@ -321,10 +320,10 @@ for (i in 1:length(obsx1)) {
 for (i in 1:length(obsx2)) {
   #
   # S-FACTOR
-  # ...subject to extrinsic scatter, if any:
-  obsy2[i] ~ dnorm(ya2[i], pow(yscat2, -2))    
   # ...subject to stat uncertainties:
-  ya2[i] ~ dnorm(ym2[i], pow(errobsy2[i], -2))
+  obsy2[i] ~ dnorm(ya2[i], pow(errobsy2[i], -2))    
+  # ...subject to extrinsic scatter, if any:
+  ya2[i] ~ dnorm(ym2[i], pow(yscat2, -2))
   # ...subject to syst uncertainties: 
   ym2[i] <- y.norm2 * yt2[i]
   # true S-factor [calculated from theory and then scaled]: 
@@ -334,10 +333,10 @@ for (i in 1:length(obsx2)) {
 for (i in 1:length(obsx3)) {
   #
   # S-FACTOR
-  # ...subject to extrinsic scatter, if any:
-  obsy3[i] ~ dnorm(ya3[i], pow(yscat3, -2))    
   # ...subject to stat uncertainties:
-  ya3[i] ~ dnorm(ym3[i], pow(errobsy3[i], -2))
+  obsy3[i] ~ dnorm(ya3[i], pow(errobsy3[i], -2))    
+  # ...subject to extrinsic scatter, if any:
+  ya3[i] ~ dnorm(ym3[i], pow(yscat3, -2))
   # ...subject to syst uncertainties: 
   ym3[i] <- y.norm3 * yt3[i]
   # true S-factor [calculated from theory and then scaled]: 
@@ -347,10 +346,10 @@ for (i in 1:length(obsx3)) {
 for (i in 1:length(obsx4)) {
   #
   # S-FACTOR
-  # ...subject to extrinsic scatter, if any:
-  obsy4[i] ~ dnorm(ya4[i], pow(yscat4, -2))    
   # ...subject to stat uncertainties:
-  ya4[i] ~ dnorm(ym4[i], pow(errobsy4[i], -2))
+  obsy4[i] ~ dnorm(ya4[i], pow(errobsy4[i], -2))    
+  # ...subject to extrinsic scatter, if any:
+  ya4[i] ~ dnorm(ym4[i], pow(yscat4, -2))
   # ...subject to syst uncertainties: 
   ym4[i] <- y.norm4 * yt4[i]
   # true S-factor [calculated from theory and then scaled]: 
@@ -361,10 +360,10 @@ for (i in 1:length(obsx4)) {
 for (i in 1:length(obsx5)) {
   #
   # S-FACTOR
-  # ...subject to extrinsic scatter, if any:
-  obsy5[i] ~ dnorm(ya5[i], pow(yscat5, -2))    
   # ...subject to stat uncertainties:
-  ya5[i] ~ dnorm(ym5[i], pow(errobsy5[i], -2))
+  obsy5[i] ~ dnorm(ya5[i], pow(errobsy5[i], -2))    
+  # ...subject to extrinsic scatter, if any:
+  ya5[i] ~ dnorm(ym5[i], pow(yscat5, -2))
   # ...subject to syst uncertainties: 
   ym5[i] <- y.norm5 * yt5[i]
   # true S-factor [calculated from theory and then scaled]: 
@@ -375,10 +374,10 @@ for (i in 1:length(obsx5)) {
 for (i in 1:length(obsx6)) {
   #
   # S-FACTOR
-  # ...subject to extrinsic scatter, if any:
-  obsy6[i] ~ dnorm(ya6[i], pow(yscat6, -2))    
   # ...subject to stat uncertainties:
-  ya6[i] ~ dnorm(ym6[i], pow(errobsy6[i], -2))
+  obsy6[i] ~ dnorm(ya6[i], pow(errobsy6[i], -2))    
+  # ...subject to extrinsic scatter, if any:
+  ya6[i] ~ dnorm(ym6[i], pow(yscat6, -2))
   # ...subject to syst uncertainties: 
   ym6[i] <- y.norm6 * yt6[i]
   # true S-factor [calculated from theory and then scaled]: 
@@ -389,10 +388,10 @@ for (i in 1:length(obsx6)) {
 for (i in 1:length(obsx7)) {
   #
   # S-FACTOR
-  # ...subject to extrinsic scatter, if any:
-  obsy7[i] ~ dnorm(ya7[i], pow(yscat7, -2))    
   # ...subject to stat uncertainties:
-  ya7[i] ~ dnorm(ym7[i], pow(errobsy7[i], -2))
+  obsy7[i] ~ dnorm(ya7[i], pow(errobsy7[i], -2))    
+  # ...subject to extrinsic scatter, if any:
+  ya7[i] ~ dnorm(ym7[i], pow(yscat7, -2))
   # ...subject to syst uncertainties: 
   ym7[i] <- y.norm7 * yt7[i]
   # true S-factor [calculated from theory and then scaled]: 
@@ -415,7 +414,7 @@ for (i in 1:length(obsx7)) {
   wl_p <- 51.9461*pow(rb, -2)
 
 # energy eigenvalue
-  e0 ~ dnorm(0.0, pow(1, -2))T(0,)        # positive since we see sigma peak 
+  e0 ~ dnorm(0, pow(1, -2))T(0,)        # positive since we see sigma peak 
 
 # reduced widths
   ga ~ dnorm(0, pow(1,-2))T(0,)      
@@ -423,13 +422,13 @@ for (i in 1:length(obsx7)) {
 ##  ga ~ dnorm(0.0, pow(wl_d, -2))T(0,)      
 ##  gb ~ dnorm(0.0, pow(wl_p, -2))T(0,)      
 
-# channel radius included in sampling; 
+# channel radii 
 ##  ra ~ dunif(2.5, 8.0)
 ##  rb ~ dunif(2.5, 8.0)
 ###  ra ~ dnorm(3.25, pow(1.0, -2))T(0,)
 ###  rb ~ dnorm(5.77, pow(2.0, -2))T(0,)
-  ra ~ dnorm(6, pow(0.0001,-2))T(0,)
-  rb ~ dnorm(5, pow(0.0001,-2))T(0,)
+  ra ~ dnorm(6, pow(0.00000001,-2))T(0,)
+  rb ~ dnorm(5, pow(0.00000001,-2))T(0,)
 
 # screening potential:
   uea ~ dnorm(0.0, pow(0.1, -2))T(0,)     # certainly less than 10 keV
@@ -494,9 +493,9 @@ logsigma7 <- log(1.030)  # factor uncertainty is 1.030, i.e., 3.0% for Ali01_b
 # n.chains: number of mcmc chains
 
 n.chains = 3
-n.adapt = 1500 
-n.burn = 1500     
-n.iter = 1500  
+n.adapt = 1000 
+n.burn = 1000     
+n.iter = 1000  
 thin = 1
 
 # "f": is the model specification from above; 
@@ -511,8 +510,10 @@ ourmodel <- jags.model(f, data = list(          ## jags wants all data in a list
                 'obsx6' = obsx6, 'obsy6' = obsy6, 'errobsy6' = errobsy6,
                 'obsx7' = obsx7, 'obsy7' = obsy7, 'errobsy7' = errobsy7
                                     ),
-#                inits = list(e0 = 0.236, ga = 0.36, gb = 0.035, ra = 3.25, rb = 5.77, 
-#                             uea=2e-4, ueb=1e-4), 
+                inits = list( ga = 1.0, gb = 0.03, 
+                              ra = 3.25, rb = 5.77, 
+                              uea=2e-4, ueb=1e-4
+                            ), 
                 n.chains = n.chains, n.adapt = n.adapt)
 
 update(ourmodel, n.burn)
