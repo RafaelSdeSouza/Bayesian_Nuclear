@@ -36,6 +36,10 @@ ensamble <- read.csv("data/ensamble.csv",header = T) %>%
   mutate(Syst=replace(Syst,Syst==0.06,0.078))  %>% filter(E <= 0.5)
 
 
+
+He3dpdata <- read.csv("3Hedpdata.csv",header = T)
+
+
 re <- as.numeric(ensamble$dat)
 Nre <- length(unique(ensamble$dat))
 ik <- as.numeric(ensamble$invK)
@@ -70,7 +74,7 @@ likelihood <- function(par){
   ue = par[15:16]
   y = par[17:(N + 16)]
   nu = par[231]
-  
+
   llRandom = sum(dlnorm(scale,meanlog = log(1), sdlog = log(syst), log = T))
 #  lly <- sum(dst(y,mu = scale[re]*sfactor3Hedp_5p(obsx, e0,er,gd2, gp2,ad,ap,ue = ue[ik]),sigma = sigmax,nu = nu, log = T))
   lly <- sum(dnorm(y,mean = scale[re]*sfactor3Hedp_5p(obsx, e0,er,gd2, gp2,ad,ap,ue = ue[ik]),sd = sigmax, log = T))
@@ -168,18 +172,36 @@ plot_Sfactor_DREAM(ssDat)
 
 
 
-# End Here #
 
 
-# Read chains 
+dream_dat <- read.table("He3dp_DREAM.dat",header=T)
+ssDat <- dream_dat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")]
+
+
+
+
+xx <- 1e-2
+S0 <- sfactor3Hedp_5p(xx,ssDat[,1],ssDat[,2],ssDat[,3],ssDat[,4],ssDat[,5],ssDat[,6],0)
+quantile(S0,prob=c(0.16, 0.5, 0.84))
+
+
+# Read chains
 dream_dat <- read.table("data/He3dp_DREAM.dat",header=T)
 
 
+# Case II
+SpII <- ggs(as.mcmc(ssDat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")]))
+Sp0II <- SpII %>% as_tibble()
+Sp0II$Parameter <- ordered(Sp0II$Parameter, levels =c("e0","er","gd2","gp2","ad","ap","ue1","ue2"))
+levels(Sp0II$Parameter) <- as.factor(c("E[0]~(MeV)","E[r]~(MeV)","gamma[d]^2~(MeV)", "gamma[p]^2~(MeV)","a[d]~(fm)",
+                                       "a[p]~(fm)","U[e1]~(eV)", "U[e2]~(eV)"))
+#
+
 # Corner plot
-Corr_chain <- ggs(as.mcmc(ssDat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")])) %>% 
+Corr_chain <- ggs(as.mcmc(ssDat[,c("e0","er","gd2","gp2","ad","ap","ue1","ue2")])) %>%
 as_tibble() %>%
 mutate(Parameter = factor(Parameter, levels = c("e0","er","gd2","gp2","ad","ap","ue1","ue2"))) %>%
-mutate(Parameter  = factor(Parameter, labels = c("E[0]~(MeV)","E[r]~(MeV)","gamma[d]^2~(MeV)", 
+mutate(Parameter  = factor(Parameter, labels = c("E[0]~(MeV)","E[r]~(MeV)","gamma[d]^2~(MeV)",
                                                  "gamma[p]^2~(MeV)","a[d]~(fm)",
                                                  "a[p]~(fm)","U[e1]~(eV)", "U[e2]~(eV)")))
 
@@ -227,18 +249,18 @@ NAI <-  table_reaction_He3dp(ssDat, vars=c("e0","er","gd2","gp2","ad","ap"),N=50
 Norm <- NAI$mean
 
 
-NAI_new <- NAI[,c("T9","mean","lower","upper")]  %>%  
+NAI_new <- NAI[,c("T9","mean","lower","upper")]  %>%
   set_colnames(c("T9","Adopted","Lower","Upper")) %>%
-  mutate(Adopted = Adopted/Norm) %>% 
+  mutate(Adopted = Adopted/Norm) %>%
   mutate(Lower = Lower/Norm) %>%
-  mutate(Upper = Upper/Norm)  %>%  
-  mutate(data="presentI")  
+  mutate(Upper = Upper/Norm)  %>%
+  mutate(data="presentI")
 
 
-old <- read.csv("tabula-tab_he3dp.csv",header = TRUE) 
+old <- read.csv("tabula-tab_he3dp.csv",header = TRUE)
 old <- old[,c("T9","Adopted","Lower","Upper")]  %>%
-  mutate(data="previous") %>% 
-  mutate(Adopted = Adopted/Norm) %>% 
+  mutate(data="previous") %>%
+  mutate(Adopted = Adopted/Norm) %>%
   mutate(Lower = Lower/Norm) %>%
   mutate(Upper = Upper/Norm)
 
@@ -284,7 +306,7 @@ ggplot(jointf,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
         axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")),
         axis.ticks.length = unit(-3, "mm"),
         panel.border = element_rect(size = 0.5)
-  ) 
+  )
 dev.off()
 
 
