@@ -85,7 +85,7 @@ likelihood <- function(par){
 
 
 low <- c(0.02,1e-3,1e-3,1e-3, 2.5,2.5,  rep(1e-4,5),    rep(0.5,5), rep(0,5), -5*systx, 1e-3, obsy - 2*erry,obsx - errx)
-up <- c(0.08,1, rep(50,2), 8,8,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx, 100, obsy + 2*erry,obsx + errx)
+up <- c(0.08,1, rep(100,2), 8,8,   rep(1,5),  rep(1.5,5),   rep(1e-1,5), 5*systx, 100, obsy + 2*erry,obsx + errx)
 
 
 
@@ -118,7 +118,7 @@ Tdensity = function(par){
   d7 = sum(dlnorm(par[12:16],log(1),log(syst),log = TRUE))
   d8 = sum(dtnorm(par[17:21],0, 1e-3,log = TRUE))
   d9 = sum(dnorm(par[22:26],0,sd = systx,log = TRUE))
-  d10 = dgamma(par[27], 0.01, 0.01,log = TRUE)
+  d10 = dtnorm(par[27], 0, 50,log = TRUE)
   d11 = sum(dunif(par[28:(N + 27)],obsy - 2*erry,obsy + 2*erry,log = TRUE))
   d12 = sum(dunif(par[(N + 28):(2*N + 27)],obsx - errx,obsx + errx,log = TRUE))
   
@@ -153,21 +153,35 @@ names = c("e0","er","gd2","gn2","ad","an",to("yscat", 5),to("ynorm", 5),to("xsca
           to("xnorm", 5),"ue", to("y", N),to("x", N)))
 
  
-settings <- list(iterations = 5E6,
-                 burnin = 1E6, message = T,thin=100,nrChains = 1,adaptation=0.5)
+settings <- list(iterations = 1E6,
+                 burnin = 1E5, message = T,thin = 10,nrChains = 1)
 
 
-res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DREAMzs")
+res <- runMCMC(bayesianSetup = setup, settings = settings,sampler = "DEzs")
 
 
 
   
 sum_chain <- summary(res)
-tracePlot(sampler = res,  start = 5e3,thin=1, whichParameters = c(1,2,3,4,5,6,27))
+tracePlot(sampler = res,  start = 5e2,thin=1, whichParameters = c(1,2,3,4,5,6,27))
 
 
 
-codaObject = getSample(res, start = 5E3, coda = TRUE)
+codaObject = getSample(res, start = 2E4, coda = TRUE)
+effectiveSize(codaObject) 
+
+att <- getmcmc_var(codaObject,vars=c("e0","er","gd2","gn2","ad","an","ue"))
+
+pdf("auto.pdf")
+autocorr.plot(att,lag.max = 2500)
+dev.off()
+
+ts.corr <- arima.sim(model=list(ar=0.9),n=10000)
+pdf("auto2.pdf")
+autocorr.plot(ts.corr)
+dev.off()
+
+effectiveSize(ts.corr)
 
 getmcmc_var <- function(outjags=outjags,vars = vars){
   as.data.frame(do.call(rbind, outjags[,vars]))
@@ -281,4 +295,3 @@ getmcmc_var <- function(outjags=outjags,vars = vars){
 }
 getmcmc_var(codaObject,vars = c("par 1","par 2","par 3","par 4"))
 
->>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
