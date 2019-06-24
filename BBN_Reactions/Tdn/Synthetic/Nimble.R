@@ -48,19 +48,17 @@ obsy1 <- rnorm(N, Sfactor3(obsx1,0.0912,0.0912,2.93,0.0794,6,5,0),sd=sd)
 
 M <- 150
 xx <- seq(min(obsx1),max(obsx1),length.out = M)
-model.data <- list(obsy = obsy1,    # Response variable
+model.data <- list(obsy = obsy1,
+                   # Response variable
                    obsx =  obsx1,   # Predictors
-                   #                   erry = errobsy1,
-                   N = N, # Sample size
-                   M = M,
-                   xx = xx
+
 )
 #
 
 sfactorTdn <- nimbleRcall(function(obsx1 = double(1),
-                              e1 = double(1),ex = double(1),gin = double(1),
-                              gout = double(1),ri = double(1),rf = double(1),ue = double(1)){}, Rfun = 'Sfactor3',
-                     returnType = double(1), envir = .GlobalEnv)
+                              e1 = double(0),ex = double(0),gin = double(0),
+                              gout = double(0),ri = double(0),rf = double(0),ue = double(0)){}, Rfun = 'Sfactor3',
+                     returnType = double(0), envir = .GlobalEnv)
 
 
 model <- nimbleCode({
@@ -71,9 +69,10 @@ model <- nimbleCode({
   sd ~  dunif(0.01,1)
   e1 ~  dunif(0.01,1)
   gin ~  dunif(0.01,1)
-  gout ~ dunif(1,4)  
+  gout ~ dunif(1,4)
 })
-inits <- list(e1 = runif(1,0.01,1),gout=runif(1,0.01,1),gin=runif(1,0.01,1)) 
+inits <- list(e1 = runif(1,0.01,1),gout=runif(1,0.01,1),gin=runif(1,0.01,1),
+              sd = 1)
 
 Rmodel <- nimbleModel(model,data = model.data, inits = inits)
 mcmcConf <- configureMCMC(Rmodel, monitors = c("e1", "gin", "gout","sd"))
