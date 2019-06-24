@@ -46,18 +46,20 @@ model.data <- list(obsy = obsy1,    # Response variable
 )
 #
 
-sfactorHe3dpNimble <- nimbleRcall(function(obsx1 = double(1),
-                              e1 = double(0),gin = double(0),
-                              gout = double(0),ri = double(0),
+sfactorHe3dpNimble <- nimbleRcall(function(ecm = double(0),
+                              e0 = double(0),gi = double(0),
+                              gf = double(0),ri = double(0),
                               rf = double(0),ue = double(0)){},
                               Rfun = 'sfactorHe3dp',
-                              returnType = double(1))
+                              returnType = double(0))
 
 
 model <- nimbleCode({
    for (i in 1:150) {
-    obsy[i] ~ dnorm(sfactorHe3dpNimble(obsx[i], e1, gin, gout,6,5,0)[1],sd)
-  }
+    obsy[i] ~ dnorm(mu[i],sd)
+     mu[i] <- sfactorHe3dpNimble(obsx[i], e1, gin, gout,6,5,0)
+     
+      }
 
   sd ~  dunif(1e-3,10)
   e1 ~  dunif(1e-3,10)
@@ -67,8 +69,28 @@ model <- nimbleCode({
 inits <- list(e1 = runif(1,0.01,1),gout=0.01,gin=runif(1,0.01,1),
               sd = runif(1,0.01,1)) 
 
-Rmodel <- nimbleModel(model,data = model.data, inits = inits)
+Rmodel <- nimbleModel(code = model,data = model.data, inits = inits,check = FALSE)
 compileNimble(Rmodel)
+
+mcmcConf <- configureMCMC(Rmodel, monitors = c("e1", "gin", "gout","sd"))
+mcmc_CL <- buildMCMC(mcmcConf)
+CRmodel <- compileNimble(mcmc_CL,project = Rmodel)
+
+mcmcChain <- runMCMC(CRmodel ,niter = 10000, nchain = 3, nburnin = 5000,
+                     setSeed=15,samplesAsCodaMCMC = TRUE)
+
+
+S <- ggs(mcmcChain)
+
+ggs_histogram(S)
+ggs_traceplot(S)
+
+mcmc.output <- nimbleMCMC(Rmodel, data = model.data, inits = inits,
+                          monitors = c("e1", "gin", "gout","sd"), thin = 10,
+                          niter = 20000, nburnin = 1000, nchains = 3,
+                          summary = TRUE, WAIC = TRUE)
+
+
 
 
 
@@ -84,10 +106,6 @@ Cmcmc <- compileNimble(Rmcmc, project = Rmodel)
 
 
 
-mcmc.output <- nimbleMCMC(model, data = model.data, inits = inits,
-                          monitors = c("e1", "gin", "gout","sd"), thin = 10,
-                          niter = 20000, nburnin = 1000, nchains = 3,
-                          summary = TRUE, WAIC = TRUE)
 
 
 
