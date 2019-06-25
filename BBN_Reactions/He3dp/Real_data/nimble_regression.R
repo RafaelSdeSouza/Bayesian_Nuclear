@@ -16,19 +16,19 @@ model.data <- list(obsy = obsy1,    # Response variable
 
 model <- nimbleCode({
   for (i in 1:500) {
-    obsy[i] ~ dnorm(mu[i],tau)
+    obsy[i] ~ dnorm(mu[i],pow(sd,-2))
     mu[i] <- a + b*obsx[i]
-    
+
   }
-  
+
   tau ~  dunif(1e-3,10)
   a ~  dunif(1e-3,10)
   b ~  dunif(1e-3,10)
-  sd <- 1/sqrt(tau)  
-  
+  sd <- 1/sqrt(tau)
+
 })
   inits <- list(a = runif(1,0.01,1),b=1,
-              sd = runif(1,0.01,1)) 
+              sd = runif(1,0.01,1))
 
 Rmodel <- nimbleModel(code = model,data = model.data, inits = inits,check = FALSE)
 compileNimble(Rmodel)
