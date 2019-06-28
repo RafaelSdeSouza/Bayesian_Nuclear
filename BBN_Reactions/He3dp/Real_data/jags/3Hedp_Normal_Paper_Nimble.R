@@ -146,7 +146,10 @@ mcmcConf <- configureMCMC(Rmodel,
 mcmc_CL <- buildMCMC(mcmcConf)
 CRmodel <- compileNimble(mcmc_CL,project = Rmodel)
 
-mcmcChain <- runMCMC(CRmodel,niter = 30000, nchains = 3, nburnin = 10000,samplesAsCodaMCMC = TRUE)
+
+mcmcChain <- runMCMC(CRmodel,niter = 30000, nchains = 1, nburnin = 10000,samplesAsCodaMCMC = TRUE)
+
+
 
 
 S <- ggs(mcmcChain[,c("E0","gd2","gp2","ue[1]","ue[2]")])
