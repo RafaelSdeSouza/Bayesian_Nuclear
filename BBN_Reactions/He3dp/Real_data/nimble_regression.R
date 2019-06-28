@@ -21,10 +21,9 @@ model <- nimbleCode({
 
   }
 
-  tau ~  dunif(1e-3,10)
+  sd ~  dunif(1e-3,10)
   a ~  dunif(1e-3,10)
   b ~  dunif(1e-3,10)
-  sd <- 1/sqrt(tau)
 
 })
   inits <- list(a = runif(1,0.01,1),b=1,
