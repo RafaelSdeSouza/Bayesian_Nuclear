@@ -51,22 +51,37 @@ xx <- seq(min(obsx),max(obsx),length.out = M)
 model.data <- list(obsy = obsy,    # Response variable
                    obsx =  obsx,   # Predictors
                    erry = erry,
-                   N = N, # Sample size
                    syst = syst,
-                   Nre = Nre,
-                   re = re,
-                   Nik = Nik,
-                   ik  = ik,
-                   M = M,
                    xx = xx
 )
 
+samplerConst <- list(N = N, # Sample size
+                     M = M,
+                     Nre = Nre, 
+                     re = re, # This is used to "iterate"
+                     Nik = Nik,
+                     ik  = ik
+)
+
+
+library(compiler)
+sfactorHe3dpc <- cmpfun(sfactorHe3dp)
+
+  
 sfactorHe3dpNimble <- nimbleRcall(function(ecm = double(0),
                               e0 = double(0),gi = double(0),
                               gf = double(0),ri = double(0),
                               rf = double(0),ue = double(0)){},
-                              Rfun = 'sfactorHe3dp',
+                              Rfun = 'sfactorHe3dpc',
                               returnType = double(0))
+
+
+
+library(microbenchmark)
+res <- microbenchmark(sfactorHe3dpNimble(obsx,0.35,1,0.02,6,5,0),
+               sfactorHe3dpc(obsx,0.35,1,0.02,6,5,0),
+               sfactorHe3dp(obsx,0.35,1,0.02,6,5,0),times=1000L)
+
 
 
 model <- nimbleCode({
@@ -98,7 +113,7 @@ model <- nimbleCode({
   }
 
   for (z in 1:Nik){
-    ue[z] ~ T(dnorm(0,pow(0.1,-2)),0,Inf)
+    ue[z] ~ T(dnorm(0,pow(100,-2)),0,Inf)
   }
 
   # PRIORS
@@ -110,31 +125,39 @@ model <- nimbleCode({
   gp2 ~  dgamma(0.1,0.1)
   ad  ~ T(dnorm(3.5,pow(0.5,-2)),0,Inf)
   ap  ~ T(dnorm(5.5,pow(1,-2)),0,Inf)
-
-  ue_ev[1] <-1e6*ue[1]
-  ue_ev[2] <-1e6*ue[2]
+#  ue_ev[1] <-1e6*ue[1]
+#  ue_ev[2] <-1e6*ue[2]
 })
 inits <- list(E0  = runif(1,0.01,1),gd2=0.01,gp2=runif(1,0.01,1),
-              ad = 5, ap = 5, ue = c(0.001,0.001),scale = runif(7,0.9,1.1),
-              tau  = runif(1,0.01,1))
+              ad = 5, ap = 5, ue = c(100,100),scale = runif(7,0.9,1.1),
+              tau  = runif(1,0.01,1),
+              y =  sfactorHe3dp(obsx,0.35,1,0.02,6,5,0),
+              yx1 = sfactorHe3dp(xx,1,1,2,6,5,0.001),
+              yx2 = sfactorHe3dp(xx,2,6,5,0.001))
 
-Rmodel <- nimbleModel(code = model,data = model.data, inits = inits,check = FALSE)
+
+Rmodel <- nimbleModel(code = model,data = model.data,constants = samplerConst,
+                      inits = inits,check = FALSE)
 compileNimble(Rmodel)
 
 mcmcConf <- configureMCMC(Rmodel,
-                          monitors = c("E0","gd2", "gp2","ue_ev","tau", "ad","ap",
+                          monitors = c("E0","gd2", "gp2","ue","tau", "ad","ap",
                                                "mux0","mux1","mux2","scale"))
 mcmc_CL <- buildMCMC(mcmcConf)
 CRmodel <- compileNimble(mcmc_CL,project = Rmodel)
 
-mcmcChain <- runMCMC(CRmodel ,niter = 2000, nchains = 3, nburnin = 1000,
-                     setSeed=15,samplesAsCodaMCMC = TRUE)
+mcmcChain <- runMCMC(CRmodel,niter = 30000, nchains = 3, nburnin = 10000,samplesAsCodaMCMC = TRUE)
 
 
-S <- ggs(mcmcChain)
+S <- ggs(mcmcChain[,c("E0","gd2","gp2","ue[1]","ue[2]")])
 
 
 ggs_traceplot(S)
+
+
+
+
+
 
 mcmc.output <- nimbleMCMC(Rmodel, data = model.data, inits = inits,
                           monitors = c("e1", "gin", "gout","sd"), thin = 10,

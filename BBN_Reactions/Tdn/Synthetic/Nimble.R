@@ -50,7 +50,7 @@ M <- 150
 xx <- seq(min(obsx1),max(obsx1),length.out = M)
 model.data <- list(obsy = obsy1,
                    # Response variable
-                   obsx =  obsx1,   # Predictors
+                   obsx =  obsx1   # Predictors
 
 )
 #
@@ -58,18 +58,18 @@ model.data <- list(obsy = obsy1,
 sfactorTdn <- nimbleRcall(function(obsx1 = double(1),
                               e1 = double(0),ex = double(0),gin = double(0),
                               gout = double(0),ri = double(0),rf = double(0),ue = double(0)){}, Rfun = 'Sfactor3',
-                     returnType = double(0), envir = .GlobalEnv)
+                     returnType = double(0))
 
 
 model <- nimbleCode({
    for (i in 1:150) {
-    obsy[i] ~ dnorm(sfactorTdn(obsx[i], e1,0.0912, gin, gout,6,5,0),sd)
+    obsy[i] ~ dnorm(sfactorTdn(obsx1[i], e1,0.0912, gin, gout,6,5,0),sd)
   }
 
   sd ~  dunif(0.01,1)
   e1 ~  dunif(0.01,1)
-  gin ~  dunif(0.01,1)
-  gout ~ dunif(1,4)
+  gin ~  dunif(0.01,5)
+  gout ~ dunif(0.01,4)
 })
 inits <- list(e1 = runif(1,0.01,1),gout=runif(1,0.01,1),gin=runif(1,0.01,1),
               sd = 1)
@@ -77,11 +77,10 @@ inits <- list(e1 = runif(1,0.01,1),gout=runif(1,0.01,1),gin=runif(1,0.01,1),
 Rmodel <- nimbleModel(model,data = model.data, inits = inits)
 mcmcConf <- configureMCMC(Rmodel, monitors = c("e1", "gin", "gout","sd"))
 mcmc_CL <- buildMCMC(mcmcConf)
-samplesList <- runMCMC(mcmc_CL, niter = 5000, nchains = 3, inits = inits)
+samplesList <- runMCMC(mcmc_CL, niter = 50, nchains = 1, inits = inits)
 
 
-Rmcmc <- buildMCMC(model)
-Rmodel$setData(model.data)
+
 Cmodel <- compileNimble(Rmodel)
 Cmcmc <- compileNimble(Rmcmc, project = Rmodel)
 
@@ -89,7 +88,7 @@ Cmcmc <- compileNimble(Rmcmc, project = Rmodel)
 
 mcmc.output <- nimbleMCMC(model, data = model.data, inits = inits,
                           monitors = c("e1", "gin", "gout","sd"), thin = 10,
-                          niter = 20000, nburnin = 1000, nchains = 3,
+                          niter = 200, nburnin = 100, nchains = 3,
                           summary = TRUE, WAIC = TRUE)
 
 
