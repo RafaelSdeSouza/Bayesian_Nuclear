@@ -1,12 +1,11 @@
 #ifndef ARRAY_FUNCTION_H_
 #define ARRAY_FUNCTION_H_
 
-#include <Function.h>
+#include "Function.h"
 
 #include <string>
 #include <vector>
 
-namespace jags {
 
 /**
  * @short Matrix- or array-valued function
@@ -67,6 +66,5 @@ public:
 	    std::vector <double const *> const &values) const = 0;
 };
 
-} /* namespace jags */
 
 #endif /* ARRAY_FUNCTION_H_ */

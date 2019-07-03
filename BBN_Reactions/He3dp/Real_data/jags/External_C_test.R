@@ -2,7 +2,7 @@
 sink('sfactor3Hedp.h')
 cat('
     extern "C" {
-    #include </Users/Rafael/Documents/GitHub/UNC_Nuclear/JAGS-4.2.0/src/include/function/ArrayFunction.h>
+    #include "ArrayFunction.h"
     class sfactor3Hedp : public ArrayFunction {
     public:
     sfactor3Hedp();
@@ -16,14 +16,6 @@ cat('
 
     void coul(int, double, double, double&, double&) const;
 
-    bool checkParameterDim(std::vector<std::vector<unsigned int> > const &dims) const;
-
-    std::vector<unsigned int> dim(std::vector<std::vector<unsigned int> > const &dims,
-
-    std::vector<double const *> const &values) const;
-
-    bool checkParameterValue(std::vector<double const *> const &args,
-    std::vector<std::vector<unsigned int> > const &dims) const;
 };
     }
     ')
@@ -164,49 +156,6 @@ sfactor3Hedp::sfactor3Hedp() : ArrayFunction("sfactor3Hedp", 8)
     S = rho*( F_l * Fp.val + G_l * Gp.val)/(pow(F_l,2) + pow(G_l,2));
     return;
     }
-
-/**
-  * Checks whether dimensions of the function parameters are correct.
-*
-  * @param dims Vector of length npar denoting the dimensions of
-* the parameters, with any redundant dimensions dropped.
-*/
-  bool sfactor3Hedp::checkParameterDim(std::vector<std::vector<unsigned int> > const &dims) const {
-     /*the first argument should be a vector
-     /* the last three arguments should be scalars
-    return isScalar(dims[0]) && isScalar(dims[1]) && isScalar(dims[2]) && isScalar(dims[3])
-    && isScalar(dims[4]) && isScalar(dims[5]) && isScalar(dims[6])
-    && isScalar(dims[7]);
-  }
-/**
-  * Checks whether the parameter values lie in the domain of the
-* function. The default implementation returns true.
-*/
-  bool sfactor3Hedp::checkParameterValue(std::vector<double const *> const &args,
-                                         std::vector<std::vector<unsigned int> > const &dims) const{
-                                           // TODO: should any parameters be eg strictly positive?
-                                           return true;
-                                         }
-
-/**
-  * Calculates what the dimension of the return value should be,
-* based on the arguments.
-*
-  * @param dims Vector of Indices denoting the dimensions of the
-* parameters. This vector must return true when passed to
-* checkParameterDim.
-*
-  * @param values Vector of pointers to parameter values.
-*/
-  std::vector<unsigned int> sfactor3Hedp::dim(std::vector <std::vector<unsigned int> > const &dims,
-                                              std::vector <double const *> const &values) const {
-                                                // the size of the table that the fortran code calculates is length of E (input)
-                                                vector<unsigned int> ans(1);
-
-                                                ans[0] = 1;
-                                                return ans;
-                                              }
-
     ')
 sink()
 system('g++ sfactor3Hedp.cpp -c -o sfactor3Hedp.o')
