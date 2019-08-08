@@ -39,21 +39,21 @@ data(Be7np)
 
 
 sigma7Benp7mod <- function(ecm,
-                           e0_1, ga_1, gb_1, ra_1, rb_1, jr_1, la_1, lb_1, i_1,
-                           e0_2, ga_2, gb_2, ra_2, rb_2, jr_2, la_2, lb_2, i_2,
-                           e0_3, ga_3, gb_3, ra_3, rb_3, jr_3, la_3, lb_3, i_3,
-                           e0_4, ga_4, gb_4, ra_4, rb_4, jr_4, la_4, lb_4, i_4,
-                           e0_5, ga_5, gb_5, ra_5, rb_5, jr_5, la_5, lb_5, i_5,
-                           e0_6, ga_6, gb_6, ra_6, rb_6, jr_6, la_6, lb_6, i_6,
-                           e0_7, ga_7, gb_7, ra_7, rb_7, jr_7, la_7, lb_7, i_7){
+                           e0_1, ga_1, gb_1, ra_1, rb_1, 
+                           e0_2, ga_2, gb_2, ra_2, rb_2, 
+                           e0_3, ga_3, gb_3, ra_3, rb_3, 
+                           e0_4, ga_4, gb_4, ra_4, rb_4, 
+                           e0_5, ga_5, gb_5, ra_5, rb_5, 
+                           e0_6, ga_6, gb_6, ra_6, rb_6, 
+                           e0_7, ga_7, gb_7, ra_7, rb_7){
 
-  SF1 <- if(i_1 == 0) 0 else sigma7Benp(ecm, e0_1, ga_1, gb_1, ra_1, rb_1, jr_1, la_1, lb_1)
-  SF2 <- if(i_2 == 0) 0 else sigma7Benp(ecm, e0_2, ga_2, gb_2, ra_2, rb_2, jr_2, la_2, lb_2)
-  SF3 <- if(i_3 == 0) 0 else sigma7Benp(ecm, e0_3, ga_3, gb_3, ra_3, rb_3, jr_3, la_3, lb_3)
-  SF4 <- if(i_4 == 0) 0 else sigma7Benp(ecm, e0_4, ga_4, gb_4, ra_4, rb_4, jr_4, la_4, lb_4)
-  SF5 <- if(i_5 == 0) 0 else sigma7Benp(ecm, e0_5, ga_5, gb_5, ra_5, rb_5, jr_5, la_5, lb_5)
-  SF6 <- if(i_6 == 0) 0 else sigma7Benp(ecm, e0_6, ga_6, gb_6, ra_6, rb_6, jr_6, la_6, lb_6)
-  SF7 <- if(i_7 == 0) 0 else sigma7Benp(ecm, e0_7, ga_7, gb_7, ra_7, rb_7, jr_7, la_7, lb_7)
+  SF1 <-  sigma7Benp(ecm, e0_1, ga_1, gb_1, ra_1, rb_1, jr = 2, la = 0, lb = 0)
+  SF2 <- sigma7Benp(ecm, e0_2, ga_2, gb_2, ra_2, rb_2, jr = 3, la = 1, lb = 1)
+  SF3 <-  sigma7Benp(ecm, e0_3, ga_3, gb_3, ra_3, rb_3, jr = 3, la = 1, lb = 1)
+  SF4 <-  sigma7Benp(ecm, e0_4, ga_4, gb_4, ra_4, rb_4, jr = 1, la = 0, lb = 0)
+  SF5 <-  sigma7Benp(ecm, e0_5, ga_5, gb_5, ra_5, rb_5, jr = 4, la = 3, lb = 3)
+  SF6 <-  sigma7Benp(ecm, e0_6, ga_6, gb_6, ra_6, rb_6, jr = 2, la = 1, lb = 1)
+  SF7 <-   sigma7Benp(ecm, e0_7, ga_7, gb_7, ra_7, rb_7, jr = 0, la = 1, lb = 1)
   SF <- SF1 + SF2 + SF3 + SF4 + SF5 + SF6 + SF7
   return(SF = SF)
 }
@@ -61,26 +61,19 @@ sigma7Benp7mod <- function(ecm,
 # Vectorised sigma function
 sigmaBe7mod <- nimbleRcall(function(ecm = double(1),
                                     e0_1 = double(0), ga_1 = double(0), gb_1 = double(0),
-                                    ra_1 = double(0), rb_1 = double(0), jr_1 = double(0),
-                                    la_1 = double(0), lb_1 = double(0), i_1 = double(0),
+                                    ra_1 = double(0), rb_1 = double(0), 
                                     e0_2 = double(0), ga_2 = double(0), gb_2 = double(0),
-                                    ra_2 = double(0), rb_2 = double(0), jr_2 = double(0),
-                                    la_2 = double(0), lb_2 = double(0), i_2 = double(0),
+                                    ra_2 = double(0), rb_2 = double(0), 
                                     e0_3 = double(0), ga_3 = double(0), gb_3 = double(0),
-                                    ra_3 = double(0), rb_3 = double(0), jr_3 = double(0),
-                                    la_3 = double(0), lb_3 = double(0), i_3 = double(0),
+                                    ra_3 = double(0), rb_3 = double(0), 
                                     e0_4 = double(0), ga_4 = double(0), gb_4 = double(0),
-                                    ra_4 = double(0), rb_4 = double(0), jr_4 = double(0),
-                                    la_4 = double(0), lb_4 = double(0), i_4 = double(0),
+                                    ra_4 = double(0), rb_4 = double(0), 
                                     e0_5 = double(0), ga_5 = double(0), gb_5 = double(0),
-                                    ra_5 = double(0), rb_5 = double(0), jr_5 = double(0),
-                                    la_5 = double(0), lb_5 = double(0), i_5 = double(0),
+                                    ra_5 = double(0), rb_5 = double(0), 
                                     e0_6 = double(0), ga_6 = double(0), gb_6 = double(0),
-                                    ra_6 = double(0), rb_6 = double(0), jr_6 = double(0),
-                                    la_6 = double(0), lb_6 = double(0), i_6 = double(0),
+                                    ra_6 = double(0), rb_6 = double(0), 
                                     e0_7 = double(0), ga_7 = double(0), gb_7 = double(0),
-                                    ra_7 = double(0), rb_7 = double(0), jr_7 = double(0),
-                                    la_7 = double(0), lb_7 = double(0), i_7 = double(0)
+                                    ra_7 = double(0), rb_7 = double(0)
 ){},
 Rfun = "sigma7Benp7mod", returnType = double(1))
 
@@ -101,13 +94,13 @@ samplerCode <- nimbleCode({
   obsxall[1:tl] <- c(obsx1[1:l1],obsx2[1:l2],obsx3[1:l3],obsx4[1:l4],obsx10,obsx11,
                      obsx12,obsx13,obsx14,obsx15)
   sigmatemp[1:tl] <- sigmaBe7mod(obsxall[1:tl],
-                                 e0_1, ga_1, gb_1, ra, rb, xj_1, xla_1, xlb_1, i_1,
-                                 e0_2, ga_2, gb_2, ra, rb, xj_2, xla_2, xlb_2, i_2,
-                                 e0_3, ga_3, gb_3, ra, rb, xj_3, xla_3, xlb_3, i_3,
-                                 e0_4, ga_4, gb_4, ra, rb, xj_4, xla_4, xlb_4, i_4,
-                                 e0_5, ga_5, gb_5, ra, rb, xj_5, xla_5, xlb_5, i_5,
-                                 e0_6, ga_6, gb_6, ra, rb, xj_6, xla_6, xlb_6, i_6,
-                                 e0_7, ga_7, gb_7, ra, rb, xj_7, xla_7, xlb_7, i_7)
+                                 e0_1, ga_1, gb_1, ra, rb, 
+                                 e0_2, ga_2, gb_2, ra, rb, 
+                                 e0_3, ga_3, gb_3, ra, rb,
+                                 e0_4, ga_4, gb_4, ra, rb, 
+                                 e0_5, ga_5, gb_5, ra, rb, 
+                                 e0_6, ga_6, gb_6, ra, rb, 
+                                 e0_7, ga_7, gb_7, ra, rb)
 
   # Damone19
   for (i in 1:l1) {
@@ -337,16 +330,6 @@ samplerCode <- nimbleCode({
   logsigma15 <- log(1.032) # 3.2% for Tomandl
 
 
-  ############################################
-  # Indicator Priors
-  ############################################
-  i_1 ~ dbern(0.5)
-  i_2 ~ dbern(0.5)
-  i_3 ~ dbern(0.5)
-  i_4 ~ dbern(0.5)
-  i_5 ~ dbern(0.5)
-  i_6 ~ dbern(0.5)
-  i_7 ~ dbern(0.5)
   k ~ T(dnorm(0,sd=0.15),0,Inf)
   r_1 <- ga_1/gb_1
   r_4 <- ga_4/gb_4
