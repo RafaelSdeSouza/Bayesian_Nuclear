@@ -26,29 +26,18 @@ require(RcppGSL)
 library(emdbook)
 require(nuclear)
 
-######################################################################
-## DATA SETS
-######################################################################
-# data input; the input is of the form: obsx, obsy, errobsy, where the
-# latter is the individual statistical error of each datum [i];
-# energy is in MeV, sqrt(Ecm)*sigma is in sqrt(MeV)b
-
-data(Be7np)
-
-
-
 
 sigma7Benp7mod <- function(ecm,
-                           e0_1, ga_1, gb_1, ra_1, rb_1, 
-                           e0_2, ga_2, gb_2, ra_2, rb_2, 
-                           e0_3, ga_3, gb_3, ra_3, rb_3, 
-                           e0_4, ga_4, gb_4, ra_4, rb_4, 
-                           e0_5, ga_5, gb_5, ra_5, rb_5, 
-                           e0_6, ga_6, gb_6, ra_6, rb_6, 
+                           e0_1, ga_1, gb_1, ra_1, rb_1,
+                           e0_2, ga_2, gb_2, ra_2, rb_2,
+                           e0_3, ga_3, gb_3, ra_3, rb_3,
+                           e0_4, ga_4, gb_4, ra_4, rb_4,
+                           e0_5, ga_5, gb_5, ra_5, rb_5,
+                           e0_6, ga_6, gb_6, ra_6, rb_6,
                            e0_7, ga_7, gb_7, ra_7, rb_7){
 
   SF1 <-  sigma7Benp(ecm, e0_1, ga_1, gb_1, ra_1, rb_1, jr = 2, la = 0, lb = 0)
-  SF2 <- sigma7Benp(ecm, e0_2, ga_2, gb_2, ra_2, rb_2, jr = 3, la = 1, lb = 1)
+  SF2 <-  sigma7Benp(ecm, e0_2, ga_2, gb_2, ra_2, rb_2, jr = 3, la = 1, lb = 1)
   SF3 <-  sigma7Benp(ecm, e0_3, ga_3, gb_3, ra_3, rb_3, jr = 3, la = 1, lb = 1)
   SF4 <-  sigma7Benp(ecm, e0_4, ga_4, gb_4, ra_4, rb_4, jr = 1, la = 0, lb = 0)
   SF5 <-  sigma7Benp(ecm, e0_5, ga_5, gb_5, ra_5, rb_5, jr = 4, la = 3, lb = 3)
@@ -61,22 +50,41 @@ sigma7Benp7mod <- function(ecm,
 # Vectorised sigma function
 sigmaBe7mod <- nimbleRcall(function(ecm = double(1),
                                     e0_1 = double(0), ga_1 = double(0), gb_1 = double(0),
-                                    ra_1 = double(0), rb_1 = double(0), 
+                                    ra_1 = double(0), rb_1 = double(0),
                                     e0_2 = double(0), ga_2 = double(0), gb_2 = double(0),
-                                    ra_2 = double(0), rb_2 = double(0), 
+                                    ra_2 = double(0), rb_2 = double(0),
                                     e0_3 = double(0), ga_3 = double(0), gb_3 = double(0),
-                                    ra_3 = double(0), rb_3 = double(0), 
+                                    ra_3 = double(0), rb_3 = double(0),
                                     e0_4 = double(0), ga_4 = double(0), gb_4 = double(0),
-                                    ra_4 = double(0), rb_4 = double(0), 
+                                    ra_4 = double(0), rb_4 = double(0),
                                     e0_5 = double(0), ga_5 = double(0), gb_5 = double(0),
-                                    ra_5 = double(0), rb_5 = double(0), 
+                                    ra_5 = double(0), rb_5 = double(0),
                                     e0_6 = double(0), ga_6 = double(0), gb_6 = double(0),
-                                    ra_6 = double(0), rb_6 = double(0), 
+                                    ra_6 = double(0), rb_6 = double(0),
                                     e0_7 = double(0), ga_7 = double(0), gb_7 = double(0),
                                     ra_7 = double(0), rb_7 = double(0)
 ){},
 Rfun = "sigma7Benp7mod", returnType = double(1))
 
+######################################################################
+## DATA SETS
+######################################################################
+# data input; the input is of the form: obsx, obsy, errobsy, where the
+# latter is the individual statistical error of each datum [i];
+# energy is in MeV, sqrt(Ecm)*sigma is in sqrt(MeV)b
+
+data(Be7np)
+
+re <- as.numeric(as.factor(Be7np$dat))
+Nre <- length(unique(Be7np$dat))
+# Unique removes duplicated vector, we want to know how many groups of
+# data are there
+N <- nrow(Be7np) # Total No of data sets
+obsy <- Be7np$S    # Response variable in MeV
+obsx <-  Be7np$E   # Predictors
+erry <- Be7np$Stat # Error in MeV
+set <- Be7np$dat # Get the labels as a vector
+fu <- c(1.085,1.5,1.10,1.5,1.050,1.051,1.5,1.020,1.051,1.032)
 
 
 samplerCode <- nimbleCode({
@@ -91,79 +99,23 @@ samplerCode <- nimbleCode({
   # - systematic error as normalization factor y.norm...
 
   ## Calling sigmaBe7mod once!
-  obsxall[1:tl] <- c(obsx1[1:l1],obsx2[1:l2],obsx3[1:l3],obsx4[1:l4],obsx10,obsx11,
-                     obsx12,obsx13,obsx14,obsx15)
-  sigmatemp[1:tl] <- sigmaBe7mod(obsxall[1:tl],
-                                 e0_1, ga_1, gb_1, ra, rb, 
-                                 e0_2, ga_2, gb_2, ra, rb, 
+  sigmaBe7modT[1:N] <- sigmaBe7mod(obsx[1:N],
+                                 e0_1, ga_1, gb_1, ra, rb,
+                                 e0_2, ga_2, gb_2, ra, rb,
                                  e0_3, ga_3, gb_3, ra, rb,
-                                 e0_4, ga_4, gb_4, ra, rb, 
-                                 e0_5, ga_5, gb_5, ra, rb, 
-                                 e0_6, ga_6, gb_6, ra, rb, 
+                                 e0_4, ga_4, gb_4, ra, rb,
+                                 e0_5, ga_5, gb_5, ra, rb,
+                                 e0_6, ga_6, gb_6, ra, rb,
                                  e0_7, ga_7, gb_7, ra, rb)
 
-  # Damone19
-  for (i in 1:l1) {
-    #
-    # S-FACTOR
-    # ...subject to stat and syst uncertainties:
-    obsy1[i] ~ dnorm(ym1[i], pow(sqrt(errobsy1[i]^2 + yscat1^2), -2))
-  }
-  ym1[1:l1] <- y.norm1 * (sqrt(obsx1[1:l1]) * sigmatemp[1:l1] + k )
-
-  # Gibbons
-  for (i in 1:l2) {
-    #
-    # S-FACTOR
-    # ...subject to stat and syst uncertainties:
-    obsy2[i] ~ dnorm(ym2[i], pow(sqrt(errobsy2[i]^2+yscat2^2), -2))
-  }
-  ym2[1:l2] <- y.norm2 * (sqrt(obsx2[1:l2]) * sigmatemp[is2:ie2] + k)
+  for (i in 1:N){
+    obsy[i] ~ dnorm(ym[i], sd = erry[i])
+     ym[i] ~ dnorm(yt[i],sd = y.scat[re[i]])
+     yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
+     }
 
 
-  # Martin Hern
-  for (i in 1:l3) {
-    #
-    # S-FACTOR
-    # ...subject to stat and syst uncertainties:
-    obsy3[i] ~ dnorm(ym3[i], pow(sqrt(errobsy3[i]^2+yscat3^2), -2))
-  }
-  ym3[1:l3] <- y.norm3 * (sqrt(obsx3[1:l3]) * sigmatemp[is3:ie3] + k)
 
-  # Koehler
-
-  for (i in 1:l4) {
-    #
-    # S-FACTOR
-    # ...subject to stat and syst uncertainties:
-    obsy4[i] ~ dnorm(ym4[i], pow(sqrt(errobsy4[i]^2+yscat4^2), -2))
-  }
-  ym4[1:l4] <- y.norm4 * (sqrt(obsx4[1:l4]) * sigmatemp[is4:ie4] + k)
-
-  # Single data point, no extrinsic scatter
-  # Koehler 88
-  obsy10 ~ dnorm(ym10, sd = errobsy10)
-  ym10 <- y.norm10 * (sqrt(obsx10) * sigmatemp[is10] + k)
-
-  # Damone 18
-  obsy11 ~ dnorm(ym11, sd = errobsy11)
-  ym11 <- y.norm11 * (sqrt(obsx11) * sigmatemp[is11] + k)
-
-  # Gibbons 59
-  obsy12 ~ dnorm(ym12, sd = errobsy12)
-  ym12 <- y.norm12 * (sqrt(obsx12) * sigmatemp[is12] + k)
-
-  # Hern 19
-  obsy13 ~ dnorm(ym13, sd = errobsy13)
-  ym13 <- y.norm13 * (sqrt(obsx13) * sigmatemp[is13] + k)
-
-  # Cervena
-  obsy14 ~ dnorm(ym14, sd = errobsy14)
-  ym14 <- y.norm14 * (sqrt(obsx14) * sigmatemp[is14] + k)
-
-  #Tomandl
-  obsy15 ~ dnorm(ym15, sd = errobsy15)
-  ym15 <- y.norm15 * (sqrt(obsx15) * sigmatemp[is15] + k)
 
   ###################
   # PRIORS
@@ -185,11 +137,7 @@ samplerCode <- nimbleCode({
 
   ###################################################################
   # RESONANCE 1: e0=0 MeV
-  # resonance spin, orbital angular momenta
-  xj_1  <- 2      # 2-
-  xla_1 <- 0
-  xlb_1 <- 0
-
+  # resonance spin, orbital angular momenta   # 2-
   # energy eigenvalue
   e0_1 ~ T(dnorm(0.0, pow(0.1, -2)),0,Inf)
 
@@ -199,10 +147,8 @@ samplerCode <- nimbleCode({
 
   ##############
   # RESONANCE 2: e0=0.150 MeV
-  # resonance spin, orbital angular momenta
-  xj_2  <- 3      # 3+
-  xla_2 <- 1
-  xlb_2 <- 1
+  # resonance spin, orbital angular momenta # 3+
+
 
   # energy eigenvalue
   e0_2 ~ T(dnorm(0.15, pow(0.025, -2)),0,Inf)         # positive since we see sigma peak
@@ -214,10 +160,8 @@ samplerCode <- nimbleCode({
 
   ##############
   # RESONANCE 3: e0=0.336 MeV
-  # resonance spin, orbital angular momenta
-  xj_3  <- 3      # 3+
-  xla_3 <- 1
-  xlb_3 <- 1
+  # resonance spin, orbital angular momenta  # 3+
+
 
   # energy eigenvalue
   e0_3 ~ T(dnorm(0.336, pow(0.010, -2)),0,Inf)         # positive since we see sigma peak
@@ -228,10 +172,7 @@ samplerCode <- nimbleCode({
 
   ##############
   # RESONANCE 4: e0=0.510 MeV
-  # resonance spin, orbital angular momenta
-  xj_4  <- 1      # 1-
-  xla_4 <- 0
-  xlb_4 <- 0
+  # resonance spin, orbital angular momenta # 1-
 
   # energy eigenvalue
   e0_4 ~ T(dnorm(0.51, pow(0.1, -2)),0,Inf)         # positive since we see sigma peak
@@ -242,10 +183,7 @@ samplerCode <- nimbleCode({
 
   ##############
   # RESONANCE 5: e0=0.960 MeV
-  # resonance spin, orbital angular momenta
-  xj_5  <- 4      # 4+
-  xla_5 <- 3
-  xlb_5 <- 3
+  # resonance spin, orbital angular momenta # 4+
 
   # energy eigenvalue
   e0_5 ~ T(dnorm(0.96, pow(0.1, -2)),0,Inf)         # positive since we see sigma peak
@@ -256,10 +194,8 @@ samplerCode <- nimbleCode({
 
   ##############
   # RESONANCE 6: e0=1.23 MeV
-  # resonance spin, orbital angular momenta
-  xj_6  <- 2      # 2+
-  xla_6 <- 1
-  xlb_6 <- 1
+  # resonance spin, orbital angular momenta # 2+
+
 
   # energy eigenvalue
   e0_6 ~ T(dnorm(1.23, pow(0.1, -2)),0,Inf)         # positive since we see sigma peak
@@ -270,10 +206,8 @@ samplerCode <- nimbleCode({
 
   ##############
   # RESONANCE 7: e0 = 1.32 MeV
-  # resonance spin, orbital angular momenta
-  xj_7  <- 0      # 0+
-  xla_7 <- 1
-  xlb_7 <- 1
+  # resonance spin, orbital angular momenta # 0+
+
 
   # energy eigenvalue
   e0_7 ~ T(dnorm(1.32, pow(0.1, -2)),0,Inf)         # positive since we see sigma peak
@@ -282,84 +216,31 @@ samplerCode <- nimbleCode({
   gb_7 ~ T(dnorm(0.0, pow(wl_p/2, -2)),0,Inf)
   ##################################################################
 
-  # extrinsic scatter
-  yscat1 ~ T(dnorm(0.0, pow(2, -2)),0,Inf)     # 2 [sqrt(MeV)]b
-  yscat2 ~ T(dnorm(0.0, pow(2, -2)),0,Inf)
-  yscat3 ~ T(dnorm(0.0, pow(2, -2)),0,Inf)
-  yscat4 ~ T(dnorm(0.0, pow(2, -2)),0,Inf)
+  mt ~ dnorm(0.0,sd=1)
+  for (k in 1:Nre) {
+    # Systematic Uncertainty as a highly informative prior
+    y.norm[k] ~ dlnorm(log(1.0),sd = pow(fu[k], -2))
+    y.scat[k] ~ T(dnorm(mt,sd=2),0,Inf)
+  }
 
-  # Relative data
-  y.norm1f ~ dunif(-1,1)
-  y.norm1 <- 10^y.norm1f
-  y.norm2f ~ dunif(-1,1)
-  y.norm2 <- 10^y.norm2f
-  y.norm3f ~ dunif(-1,1)
-  y.norm3 <- 10^y.norm3f
-  y.norm4f ~ dunif(-1,1)
-  y.norm4 <- 10^y.norm4f
-
-  # Absolute Data
-  # Koehler
-  y.norm10 ~ dlnorm(logmu10, pow(logsigma10, -2))
-  logmu10 <- log(1.0)
-  logsigma10 <- log(1.020)   # 2.0% for Koe88
-
-  # Damone
-  y.norm11 ~ dlnorm(logmu11, pow(logsigma11, -2))
-  logmu11 <- log(1.0)
-  logsigma11 <- log(1.1)   # 10% for Dam18
-
-  # Gibb
-  y.norm12 ~ dlnorm(logmu12, pow(logsigma12, -2))
-  logmu12 <- log(1.0)
-  logsigma12 <- log(1.05) # 5% for Gib59
-
-  # Martin
-  y.norm13 ~ dlnorm(logmu13, pow(logsigma13, -2))
-  logmu13 <- log(1.0)
-  logsigma13 <- log(1.051)  # 5% for Her19
-
-  #Cervena
-  y.norm14 ~ dlnorm(logmu14, pow(logsigma14, -2))
-  logmu14 <- log(1.0)
-  logsigma14 <- log(1.085) # 8.5% for Cerv
-
-  #Tomandl
-  y.norm15 ~ dlnorm(logmu15, pow(logsigma15, -2))
-  logmu15 <- log(1.0)
-  logsigma15 <- log(1.032) # 3.2% for Tomandl
-
-
-  k ~ T(dnorm(0,sd=0.15),0,Inf)
+#  k ~ T(dnorm(0,sd=0.15),0,Inf)
   r_1 <- ga_1/gb_1
   r_4 <- ga_4/gb_4
 })
 
-samplerData <- list(obsy1 = obsy1, obsy2 = obsy2, obsy3 = obsy3, obsy4 = obsy4,
-                    obsy10 = obsy10, obsy11 = obsy11, obsy12 = obsy12, obsy13 = obsy13,
-                    obsy14 = obsy14, obsy15 = obsy15,
-                    obsx1 = obsx1, obsx2 = obsx2, obsx3 = obsx3, obsx4 = obsx4)
+samplerData <- list(obsy = obsy,
+                    re = re, # Sample size
+                    erry = erry,
+                    obsx = obsx,
+                    fu = fu )
 
-l1 <- length(obsx1)
-l2 <- length(obsx2)
-l3 <- length(obsx3)
-l4 <- length(obsx4)
 
-samplerConst <- list(obsx10 = obsx10, obsx11 = obsx11, obsx12 = obsx12, obsx13 = obsx13,
-                     obsx14 = obsx14, obsx15 = obsx15,
-                     errobsy1 = errobsy1, errobsy2 = errobsy2, errobsy3 = errobsy3, errobsy4 = errobsy4,
-                     errobsy10 = errobsy10, errobsy11 = errobsy11, errobsy12 = errobsy12, errobsy13 = errobsy13,
-                     errobsy14 = errobsy14, errobsy15 = errobsy15,
-                     l1 = l1, l2 = l2, l3 = l3, l4 = l4,
-                     tl = l1 + l2 + l3 + l4 + 6,
-                     is2 = l1+1, ie2 = l1+l2, is3 = l1+l2+1, ie3 = l1+l2+l3, is4 = l1+l2+l3+1,
-                     ie4 = l1+l2+l3+l4, is10 = l1+l2+l3+l4+1, is11 = l1+l2+l3+l4+2, is12 = l1+l2+l3+l4+3,
-                     is13 = l1+l2+l3+l4+4, is14 = l1+l2+l3+l4+5, is15 = l1+l2+l3+l4+6)
+samplerConst <- list(N = N,
+                     Nre = Nre)
 
-samplerInits <- list(y.norm1f = 0, y.norm2f = 0, y.norm3f = 0, y.norm4f = 0,
-                     y.norm10 = 1, y.norm11 = 1, y.norm12 = 1, y.norm13 = 1,
-                     y.norm14 = 1, y.norm15 = 1,
-                     yscat1 = 0.1, yscat2 = 0.1, yscat3 = 0.1, yscat4 = 0.1,
+
+samplerInits <- list(y.norm = rep(1,Nre),
+                     y.scat = rep(0.01,Nre),
                      e0_1 = 0.05, gb_1 = 0.6, ga_1 = 0.6,
                      e0_2 = 0.15, ga_2 = 0.6, gb_2 = 0.6,
                      e0_3 = 0.336, ga_3 = 0.6, gb_3 = 0.6,
@@ -367,9 +248,9 @@ samplerInits <- list(y.norm1f = 0, y.norm2f = 0, y.norm3f = 0, y.norm4f = 0,
                      e0_5 = 0.96, ga_5 = 0.6, gb_5 = 0.6,
                      e0_6 = 1.23, ga_6 = 0.6, gb_6 = 0.6,
                      e0_7 = 1.32, ga_7 = 0.6, gb_7 = 0.6,
-                     i_1 = 1, i_2 = 1, i_3 = 1, i_4 = 1,
-                     i_5 = 1, i_6 = 1, i_7 = 1, ra = 4, rb = 4,
-                     k = 0.1)
+                     ra = 4, rb = 4,mt=0,
+ #                    ,k = 0.1
+                     )
 
 
 ###############################################################
@@ -394,11 +275,8 @@ conf$addMonitors(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
                    'e0_5', 'ga_5', 'gb_5', 'e0_6', 'ga_6', 'gb_6',
                    'e0_7', 'ga_7', 'gb_7',
                    'r_1', 'r_4', 'ra', 'rb',
-                   'i_1', 'i_2', 'i_3', 'i_4', 'i_5', 'i_6', 'i_7',  'k',
-                   'y.norm1','y.norm2','y.norm3', 'y.norm4',
-                   'y.norm10', 'y.norm11', 'y.norm12', 'y.norm13', 'y.norm14',
-                   'y.norm15',
-                   'yscat1','yscat2','yscat3','yscat4'))
+                   'y.norm',
+                   'y.scat'))
 # Add the parameters to monitor throughout the MCMC process
 
 samplerMCMC <- buildMCMC(conf)
@@ -428,6 +306,28 @@ save(mcmcChain, file = "Final11.RData")
 pdf("Final11.pdf")
 plot(mcmcChain)
 dev.off()
+
+
+
+sigma7Benp(ecm, e0_1, ga_1, gb_1, ra_1, rb_1, jr = 2, la = 0, lb = 0)
+samp <- as.matrix(mcmcChain)
+xx <- exp(seq(log(1e-8),log(1),length.out = 200))
+df <- NULL
+for(j in 1:length(xx)){
+  mux <-  quantile(sqrt(xx[j])*sigma7Benp(xx[j],mcmcChain[,"e0_1"],mcmcChain[,"ga_1"],mcmcChain[,"gb_1"],
+                                          mcmcChain[,"ra"],
+                                          mcmcChain[,"rb"],jr = 2, la = 0, lb = 0),probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+  df  <- rbind(df,mux)
+}
+y <- df
+
+
+
+
+
+
+
+
 
 samplesmat = as.matrix(mcmcChain)
 nsamp = nrow(samplesmat)
