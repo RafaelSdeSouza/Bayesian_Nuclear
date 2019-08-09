@@ -84,8 +84,8 @@ obsy <- Be7np$S    # Response variable in MeV
 obsx <-  Be7np$E   # Predictors
 erry <- Be7np$Stat # Error in MeV
 set <- Be7np$dat # Get the labels as a vector
-fu <- c(1.085,2.25,1.10,2.25,1.050,1.051,2.25,1.020,1.051,1.032)
-
+fu <- log(c(1.085,2.25,1.10,2.25,1.050,1.051,2.25,1.020,1.051,1.032))
+scat <- c(1e-6,2,1e-6,2,1e-6,1e-6,2,1e-6,2,1e-6)
 
 samplerCode <- nimbleCode({
 
@@ -216,11 +216,11 @@ samplerCode <- nimbleCode({
   gb_7 ~ T(dnorm(0.0, pow(wl_p/2, -2)),0,Inf)
   ##################################################################
 
-  mt ~ dnorm(0.0,sd=1)
+
   for (k in 1:Nre) {
     # Systematic Uncertainty as a highly informative prior
-    y.norm[k] ~ dlnorm(log(1.0),sd = pow(fu[k], -2))
-    y.scat[k] ~ T(dnorm(mt,sd=2),0,Inf)
+    y.norm[k] ~ dlnorm(log(1.0), pow(fu[k], -2))
+    y.scat[k] ~ T(dnorm(0,sd=scat[k]),0,Inf)
   }
 
 #  k ~ T(dnorm(0,sd=0.15),0,Inf)
@@ -232,7 +232,8 @@ samplerData <- list(obsy = obsy,
                     re = re, # Sample size
                     erry = erry,
                     obsx = obsx,
-                    fu = fu )
+                    fu = fu,
+                    scat = scat)
 
 
 samplerConst <- list(N = N,
@@ -240,7 +241,7 @@ samplerConst <- list(N = N,
 
 
 samplerInits <- list(y.norm = rep(1,Nre),
-                     y.scat = rep(0.01,Nre),
+                     y.scat = rep(0.001,Nre),
                      e0_1 = 0.05, gb_1 = 0.6, ga_1 = 0.6,
                      e0_2 = 0.15, ga_2 = 0.6, gb_2 = 0.6,
                      e0_3 = 0.336, ga_3 = 0.6, gb_3 = 0.6,
@@ -293,8 +294,8 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 1
-n.iter = 3000
-n.burnin = 1500
+n.iter = 6000
+n.burnin = 2500
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchain = n.chains, nburnin = n.burnin,
