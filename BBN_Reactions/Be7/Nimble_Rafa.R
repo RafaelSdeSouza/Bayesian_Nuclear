@@ -84,7 +84,7 @@ obsy <- Be7np$S    # Response variable in MeV
 obsx <-  Be7np$E   # Predictors
 erry <- Be7np$Stat # Error in MeV
 set <- Be7np$dat # Get the labels as a vector
-fu <- c(1.085,1.5,1.10,1.5,1.050,1.051,1.5,1.020,1.051,1.032)
+fu <- c(1.085,2.25,1.10,2.25,1.050,1.051,2.25,1.020,1.051,1.032)
 
 
 samplerCode <- nimbleCode({
@@ -248,7 +248,7 @@ samplerInits <- list(y.norm = rep(1,Nre),
                      e0_5 = 0.96, ga_5 = 0.6, gb_5 = 0.6,
                      e0_6 = 1.23, ga_6 = 0.6, gb_6 = 0.6,
                      e0_7 = 1.32, ga_7 = 0.6, gb_7 = 0.6,
-                     ra = 4, rb = 4,mt=0,
+                     ra = 4, rb = 4,mt=0
  #                    ,k = 0.1
                      )
 
@@ -293,15 +293,15 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 1
-n.iter = 1000
-n.burnin = 100
+n.iter = 3000
+n.burnin = 1500
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchain = n.chains, nburnin = n.burnin,
                        setSeed=9,samplesAsCodaMCMC = TRUE)
 )
 
-save(mcmcChain, file = "Final11.RData")
+save(mcmcChain, file = "MCMCBe7.RData")
 
 pdf("Final11.pdf")
 plot(mcmcChain)
@@ -309,17 +309,188 @@ dev.off()
 
 
 
-sigma7Benp(ecm, e0_1, ga_1, gb_1, ra_1, rb_1, jr = 2, la = 0, lb = 0)
+
+
 samp <- as.matrix(mcmcChain)
-xx <- exp(seq(log(1e-8),log(1),length.out = 200))
-df <- NULL
+xx <- exp(seq(log(1e-8),log(2),length.out = 250))
+# resonance 1
+y1 <- NULL
 for(j in 1:length(xx)){
-  mux <-  quantile(sqrt(xx[j])*sigma7Benp(xx[j],mcmcChain[,"e0_1"],mcmcChain[,"ga_1"],mcmcChain[,"gb_1"],
-                                          mcmcChain[,"ra"],
-                                          mcmcChain[,"rb"],jr = 2, la = 0, lb = 0),probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
-  df  <- rbind(df,mux)
+  mux <-  quantile(sqrt(xx[j])*sigma7Benp(xx[j],samp[,"e0_1"],samp [,"ga_1"],samp [,"gb_1"],
+                                          samp [,"ra"],
+                                          samp [,"rb"],jr = 2, la = 0, lb = 0),probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+  y1 <- rbind(y1,mux)
 }
-y <- df
+gr1 <-  data.frame(x =xx, mean = y1[,"50%"],lwr1=y1[,"16%"],lwr2=y1[,"2.5%"],lwr3=y1[,"0.15%"],
+                   upr1=y1[,"84%"],
+                   upr2=y1[,"97.5%"],upr3=y1[,"99.85%"])
+# resonance 2
+y2 <- NULL
+for(j in 1:length(xx)){
+  mux <-  quantile(sqrt(xx[j])*sigma7Benp(xx[j],samp[,"e0_2"],samp[,"ga_2"],samp [,"gb_2"],
+                                          samp[,"ra"],
+                                          samp[,"rb"],jr = 3, la = 1, lb = 1),
+                                probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+y2 <- rbind(y2,mux)
+}
+
+gr2 <-  data.frame(x =xx, mean = y2[,"50%"],lwr1=y2[,"16%"],lwr2=y2[,"2.5%"],lwr3=y2[,"0.15%"],
+                   upr1=y2[,"84%"],
+                   upr2=y2[,"97.5%"],upr3=y2[,"99.85%"])
+
+# resonance 3
+y3 <- NULL
+for(j in 1:length(xx)){
+  mux <-  quantile(sqrt(xx[j])*sigma7Benp(xx[j],samp[,"e0_3"],samp[,"ga_3"],samp [,"gb_3"],
+                                          samp[,"ra"],
+                                          samp[,"rb"],jr = 3, la = 1, lb = 1),
+                   probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+  y3 <- rbind(y3,mux)
+}
+
+gr3 <-  data.frame(x =xx, mean = y3[,"50%"],lwr1=y3[,"16%"],lwr2=y3[,"2.5%"],lwr3=y3[,"0.15%"],
+                   upr1=y3[,"84%"],
+                   upr2=y3[,"97.5%"],upr3=y3[,"99.85%"])
+
+
+# resonance 4
+y4 <- NULL
+for(j in 1:length(xx)){
+  mux <-  quantile(sqrt(xx[j])*sigma7Benp(xx[j],samp[,"e0_4"],samp[,"ga_4"],samp [,"gb_4"],
+                                          samp[,"ra"],
+                                          samp[,"rb"],jr = 1, la = 0, lb = 0),
+                   probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+  y4 <- rbind(y4,mux)
+}
+
+gr4 <-  data.frame(x =xx, mean = y4[,"50%"],lwr1=y4[,"16%"],lwr2=y4[,"2.5%"],lwr3=y4[,"0.15%"],
+                   upr1=y4[,"84%"],
+                   upr2=y4[,"97.5%"],upr3=y4[,"99.85%"])
+
+# resonance 5
+y5 <- NULL
+for(j in 1:length(xx)){
+  mux <-  quantile(sqrt(xx[j])*sigma7Benp(xx[j],samp[,"e0_5"],samp[,"ga_5"],samp [,"gb_5"],
+                                          samp[,"ra"],
+                                          samp[,"rb"],jr = 4, la = 3, lb = 3),
+                   probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+  y5 <- rbind(y5,mux)
+}
+
+gr5 <-  data.frame(x =xx, mean = y5[,"50%"],lwr1=y5[,"16%"],lwr2=y5[,"2.5%"],lwr3=y5[,"0.15%"],
+                   upr1=y5[,"84%"],
+                   upr2=y5[,"97.5%"],upr3=y5[,"99.85%"])
+
+
+# resonance 6
+y6 <- NULL
+for(j in 1:length(xx)){
+  mux <-  quantile(sqrt(xx[j])*sigma7Benp(xx[j],samp[,"e0_6"],samp[,"ga_6"],samp [,"gb_6"],
+                                          samp[,"ra"],
+                                          samp[,"rb"],jr = 2, la = 1, lb = 1),
+                   probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+  y6  <- rbind(y6,mux)
+}
+
+gr6 <-  data.frame(x =xx, mean = y6[,"50%"],lwr1=y6[,"16%"],lwr2=y6[,"2.5%"],lwr3=y6[,"0.15%"],
+                   upr1=y6[,"84%"],
+                   upr2=y6[,"97.5%"],upr3=y6[,"99.85%"])
+
+
+
+yall <- NULL
+for(j in 1:length(xx)){
+  mux <-  quantile(sqrt(xx[j])*sigma7Benp7mod(xx[j],samp[,"e0_1"],samp[,"ga_1"],samp [,"gb_1"],
+                                          samp[,"ra"],samp[,"rb"],
+                                          samp[,"e0_2"],samp[,"ga_2"],samp [,"gb_2"],
+                                          samp[,"ra"],samp[,"rb"],
+                                          samp[,"e0_3"],samp[,"ga_3"],samp [,"gb_3"],
+                                          samp[,"ra"],samp[,"rb"],
+                                          samp[,"e0_4"],samp[,"ga_4"],samp [,"gb_4"],
+                                          samp[,"ra"],samp[,"rb"],
+                                          samp[,"e0_5"],samp[,"ga_5"],samp [,"gb_5"],
+                                          samp[,"ra"],samp[,"rb"],
+                                          samp[,"e0_6"],samp[,"ga_6"],samp [,"gb_6"],
+                                          samp[,"ra"],samp[,"rb"],
+                                          samp[,"e0_7"],samp[,"ga_7"],samp [,"gb_7"],
+                                          samp[,"ra"],samp[,"rb"]),
+                   probs=c(0.0015,0.025, 0.16, 0.5, 0.84, 0.975,0.9985))
+  yall <- rbind(yall,mux)
+}
+
+grall <-  data.frame(x =xx, mean = yall[,"50%"],lwr1=yall[,"16%"],lwr2=yall[,"2.5%"],lwr3=yall[,"0.15%"],
+                   upr1=yall[,"84%"],
+                   upr2=yall[,"97.5%"],upr3=yall[,"99.85%"])
+
+
+
+### plot Maxwell-Boltzmann "factor" at T=1 GK [arbitrary scale]
+#for ( i in round(runif(500, min=1, max=nsamp)) ) {
+#  lines(x1, 3e2*(x1*(2.718^(-x1/(0.086173*0.5)))))
+#}
+
+
+  
+# Plot all
+
+ggplot(Be7np,aes(x=E,y=S))+
+  
+  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("darkolivegreen4"),alpha=0.4,show.legend=FALSE) +
+  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("darkolivegreen4"),alpha=0.8,show.legend=FALSE) +
+  
+  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#9e9ac8"),alpha=0.4,show.legend=FALSE) +
+  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#984ea3"),alpha=0.8,show.legend=FALSE) +
+  
+  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("darkgoldenrod2"),alpha=0.4,show.legend=FALSE) +
+  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("darkgoldenrod2"),alpha=0.8,show.legend=FALSE) +
+  
+  
+  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("cyan3"),alpha=0.4,show.legend=FALSE) +
+  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("cyan3"),alpha=0.8,show.legend=FALSE) +
+  
+  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("chocolate1"),alpha=0.4,show.legend=FALSE) +
+  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("chocolate1"),alpha=0.8,show.legend=FALSE) +
+  
+  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("orange"),alpha=0.4,show.legend=FALSE) +
+  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("orange"),alpha=0.8,show.legend=FALSE) +
+  
+  geom_ribbon(data=grall,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("red3"),alpha=0.4,show.legend=FALSE) +
+  geom_ribbon(data=grall,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("red3"),alpha=0.8,show.legend=FALSE) +
+  
+  
+  
+  geom_point(data=Be7np,aes(x=obsx,y=obsy,group=dat,color=dat,shape=type),size=2.75,alpha=0.75)+
+  geom_errorbar(show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat,group=dat,color=dat),width=0.025)+
+  scale_shape_stata(name="Dataset")+
+  scale_color_stata(name="Dataset")+
+  scale_x_log10() +
+  #scale_y_log10() +
+  theme_bw() + ylab(expression(paste(sqrt(E), sigma, " (", sqrt(MeV), "b)"))) + 
+  xlab("Energy (MeV)") + 
+  theme(legend.position = "top",
+        legend.background = element_rect(colour = "white", fill = "white"),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="#666666", size=15),
+        axis.text  = element_text(size=12),
+        strip.text = element_text(size=10),
+        strip.background = element_rect("gray85")) +
+  coord_cartesian(xlim=c(1e-8,1),ylim=c(0,10))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

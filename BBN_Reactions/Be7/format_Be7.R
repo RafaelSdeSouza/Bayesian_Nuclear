@@ -179,7 +179,7 @@ errobsy10 <- c( 0.057 )
 
 Koe88b <- data.frame(obsx10 ,obsy10 ,errobsy10 ) %>%
   set_colnames(c("E","S","Stat")) %>%
-  mutate(.,dat="Koe88")  %>%
+  mutate(.,dat="Koe88b")  %>%
   mutate(.,type="abs")
 
 ## DATA SET 11: damone 2018; thermal cross section
@@ -190,7 +190,7 @@ errobsy11 <- c( 0.078 )
 
 Dam18b <- data.frame(obsx11 ,obsy11,errobsy11) %>%
   set_colnames(c("E","S","Stat")) %>%
-  mutate(.,dat="Dam18") %>%
+  mutate(.,dat="Dam18b") %>%
   mutate(.,type="abs")
 
 
@@ -203,7 +203,7 @@ errobsy12 <- c( 3.688387E-02 )
 
 Gib59b <- data.frame(obsx12,obsy12,errobsy12) %>%
   set_colnames(c("E","S","Stat")) %>%
-  mutate(.,dat="Gib59")  %>%
+  mutate(.,dat="Gib59b")  %>%
   mutate(.,type="abs")
 
 
