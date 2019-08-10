@@ -318,7 +318,7 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # resetFunctions = TRUE; if you would want to reset all the previously created functions
 # in order to addd the new MCMC
 
-n.chains = 3
+n.chains = 2
 n.iter = 10000
 n.burnin = 5000
 
@@ -493,10 +493,10 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   geom_ribbon(data=gr1,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#238b45"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr1,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#238b45"),alpha=0.9,show.legend=FALSE) +
-  annotate("segment", x = 0.015, xend = 0.015, y = 10, yend = 9.5,size=1,
+  annotate("segment", x = 0.4, xend = 0.7, y = 5, yend = 5,size=1.5,
            colour = "#238b45") +
-  annotate(geom="text", x = 0.015,  y = 9.25,
-           label=expression(2^"-"),size=3.25) +
+  annotate(geom="text", x = 1,  y = 5,
+           label=expression(2^"-"),size=5) +
 
   geom_ribbon(data=gr2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#dd3497"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#dd3497"),alpha=0.9,show.legend=FALSE) +
@@ -564,9 +564,9 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   xlab("Energy (MeV)") + 
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = c(0.9,0.635),
+        legend.position = c(0.9,0.875),
         legend.text = element_text(size=14),
-        legend.background = element_rect(colour = "white", fill = "white"),
+        legend.background = element_rect(colour = "white", fill = "none"),
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
