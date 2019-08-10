@@ -323,8 +323,8 @@ n.iter = 10000
 n.burnin = 5000
 
 system.time(
-  mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchain = n.chains, nburnin = n.burnin,
-                       setSeed=9,samplesAsCodaMCMC = TRUE)
+  mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
+                       samplesAsCodaMCMC = TRUE)
 )
 
 save(mcmcChain, file = "MCMCBe7.RData")
@@ -338,7 +338,7 @@ dev.off()
 
 
 samp <- as.matrix(mcmcChain)
-xx <- exp(seq(log(1e-9),log(2),length.out = 300))
+xx <- exp(seq(log(1e-9),log(2),length.out = 3000))
 # resonance 1
 y1 <- NULL
 for(j in 1:length(xx)){
@@ -477,7 +477,12 @@ Be7npG <-  Be7np
 library(plyr)
 Be7npG$dat <- revalue(Be7npG$dat, c("Koe88b"="Koe88","Dam18b"="Dam18",Gib59b="Gib59"))
 
- 
+# Ressonances
+
+dr=data.frame(x=c(0,0.15,0.34,0.51,0.96,1.23,1.32), 
+             y=rep(10,7), 
+             vy=rep(9.5,7))
+
 # Plot all
 pdf("MCMC_7Benp.pdf", width=7.5, height=5)
 ggplot(Be7npG,aes(x=E,y=S)) +
@@ -486,33 +491,66 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   geom_area(data=MBD,aes(x=x,y=y),color="#a6cee3",fill="#a6cee3",
             size=0,alpha=0.4) +
   
-  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fb9a99"),alpha=0.5,show.legend=FALSE) +
-  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#fb9a99"),alpha=0.9,show.legend=FALSE) +
+  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#238b45"),alpha=0.5,show.legend=FALSE) +
+  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#238b45"),alpha=0.9,show.legend=FALSE) +
+  annotate("segment", x = 0.015, xend = 0.015, y = 10, yend = 9.5,size=1,
+           colour = "#238b45") +
+  annotate(geom="text", x = 0.015,  y = 9.25,
+           label=expression(2^"-"),size=3.25) +
+
+  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#dd3497"),alpha=0.5,show.legend=FALSE) +
+  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#dd3497"),alpha=0.9,show.legend=FALSE) +
+  annotate("segment", x = 0.15, xend = 0.15, y = 10, yend = 9.5,size=1,
+           colour = "#dd3497") +
+  annotate(geom="text", x = 0.15,  y = 9.25,
+           label=expression(3^"+"),size=3.25) +
   
-  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#7fc97f"),alpha=0.5,show.legend=FALSE) +
-  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#7fc97f"),alpha=0.9,show.legend=FALSE) +
   
-  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#4E1A3D"),alpha=0.5,show.legend=FALSE) +
-  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#4E1A3D"),alpha=0.9,show.legend=FALSE) +
+  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#e6ab02"),alpha=0.5,show.legend=FALSE) +
+  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#e6ab02"),alpha=0.9,show.legend=FALSE) +
+  annotate("segment", x = 0.34, xend = 0.34, y = 10, yend = 9.5,size=1,
+           colour = "#e6ab02") +
+  annotate(geom="text", x = 0.34,  y = 9.25,
+           label=expression(3^"+"),size=3.25) +
   
   
-  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#0292B7"),alpha=0.5,show.legend=FALSE) +
-  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#0292B7"),alpha=0.9,show.legend=FALSE) +
+  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#ec7014"),alpha=0.5,show.legend=FALSE) +
+  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#ec7014"),alpha=0.9,show.legend=FALSE) +
+  annotate("segment", x = 0.51, xend = 0.51, y = 10, yend = 9.5,size=1,
+           colour = "#ec7014") +
+  annotate(geom="text", x = 0.53,  y = 9.25,
+           label=expression(1^"-"),size=3.25) +
   
-  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#FEB06A"),alpha=0.5,show.legend=FALSE) +
-  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#FEB06A"),alpha=0.9,show.legend=FALSE) +
+  
+  
+  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#0570b0"),alpha=0.5,show.legend=FALSE) +
+  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#0570b0"),alpha=0.9,show.legend=FALSE) +
+  annotate("segment", x = 0.96, xend = 0.96, y = 10, yend = 9.5,size=1,
+           colour = "#0570b0") +
+  annotate(geom="text", x = 0.9,  y = 9.25,
+           label=expression(4^"+"),size=3.25) +
+  
+  
   
   geom_ribbon(data=gr6,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#C6D830"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr6,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#C6D830"),alpha=0.9,show.legend=FALSE) +
+  annotate("segment", x = 1.23, xend = 1.23, y = 10, yend = 9.5,size=1,
+           colour = "#C6D830") +
+  annotate(geom="text", x = 1.3,  y = 9.25,
+           label=expression(2^"+"),size=3.25) +
+  
   
   geom_ribbon(data=gr7,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#ffff99"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr7,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#ffff99"),alpha=0.9,show.legend=FALSE) +
-  
+#  annotate("segment", x = 1.32, xend = 1.32, y = 10, yend = 9.5,size=1,
+#           colour = "#ffff99") +
+#  annotate(geom="text", x = 1.5,  y = 9.25,
+#           label=expression(0^"+"),size=3.25) +
   
   geom_ribbon(data=grall,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#e31a1c"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=grall,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#e31a1c"),alpha=0.9,show.legend=FALSE) +
   
-  
+ 
    
   geom_errorbar(show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat,group=dat),color="gray65",alpha=0.75,width=0.025)+
   geom_point(data=Be7npG,aes(x=obsx,y=obsy,group=dat,shape=dat,color=type),size=2)+
@@ -522,12 +560,11 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   scale_alpha_manual(name="",values=c(1,0.5),guide="none")+
   scale_x_log10(breaks = c(1e-6,1e-3,1),
                 labels=c(expression(10^-6),expression(10^-3),"1")) +
-  #scale_y_log10() +
   theme_economist_white() + ylab(expression(paste(sqrt(E), sigma, " (", sqrt(MeV), "b)"))) + 
   xlab("Energy (MeV)") + 
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = c(0.9,0.825),
+        legend.position = c(0.9,0.635),
         legend.text = element_text(size=14),
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
@@ -540,7 +577,7 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   coord_cartesian(xlim=c(1e-8,2.5),ylim=c(0.175,9.75)) +
   annotate(geom="text",1e-7, 1,
            label=expression(paste(NULL^"7","Be(n,p)",NULL^"7","Li")),
-           size=7.5)
+           size=7.25)
 dev.off()
 
 
