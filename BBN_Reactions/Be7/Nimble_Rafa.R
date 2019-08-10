@@ -514,11 +514,11 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   
    
-  geom_errorbar(show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat,group=dat),color="gray85",alpha=0.75,width=0.025)+
+  geom_errorbar(show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat,group=dat),color="gray65",alpha=0.75,width=0.025)+
   geom_point(data=Be7npG,aes(x=obsx,y=obsy,group=dat,shape=dat,color=type),size=2)+
   
   scale_shape_manual(values=c(15,4,5,17,8,3,11),name="")+
-  scale_color_manual(name="",values=c("black","gray85"),guide="none")+
+  scale_color_manual(name="",values=c("black","gray65"),guide="none")+
   scale_alpha_manual(name="",values=c(1,0.5),guide="none")+
   scale_x_log10(breaks = c(1e-6,1e-3,1),
                 labels=c(expression(10^-6),expression(10^-3),"1")) +
@@ -527,7 +527,7 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   xlab("Energy (MeV)") + 
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = c(0.9,0.65),
+        legend.position = c(0.9,0.825),
         legend.text = element_text(size=14),
         legend.background = element_rect(colour = "white", fill = "white"),
         plot.background = element_rect(colour = "white", fill = "white"),
