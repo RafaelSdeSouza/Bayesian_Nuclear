@@ -123,7 +123,7 @@ samplerCode <- nimbleCode({
 
  for (i in 1:N){
      obsy[i] ~ dnorm(ym[i], sd = erry[i])
-       ym[i] ~ dnorm(yt[i],sd = y.scat)
+       ym[i] ~ dnorm(yt[i],sd = y.scat[re[i]])
        yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
        }
   
@@ -228,13 +228,15 @@ samplerCode <- nimbleCode({
   gb_7 ~ T(dnorm(0.0, pow(wl_p/2, -2)),0,Inf)
   ##################################################################
 
-  y.scat  ~ T(dnorm(0, pow(2,-2)),0,Inf)
-#  for (k in 1:4) {
-#  y.scat[k] ~ T(dnorm(0,sd = 2),0,Inf)
-#  }
-#  for (k in 5:10) {
-#  y.scat[k] <- 1E-5
- # }
+# y.scat  ~ T(dnorm(0, pow(2,-2)),0,Inf)
+ 
+  sdscat ~ T(dnorm(1, pow(0.5,-2)),0,Inf)
+  for (k in 1:4) {
+  y.scat[k] ~ T(dnorm(0,pow(sdscat,-2)),0,Inf)
+  }
+ for (k in 5:10) {
+  y.scat[k] ~ T(dnorm(0, pow(0.1*sdscat,-2)),0,Inf)
+  }
   
   for (k in 1:4) {
     # Systematic Uncertainty as a highly informative prior
@@ -266,7 +268,7 @@ samplerConst <- list(N = N,
 
 
 samplerInits <- list(y.norm = rep(1,Nre),
-                     y.scat = 0.1,
+                     y.scat = rep(0.1,Nre),
                      e0_1 = 0.05, gb_1 = 0.6, ga_1 = 0.6,
                      e0_2 = 0.15, ga_2 = 0.6, gb_2 = 0.6,
                      e0_3 = 0.336, ga_3 = 0.6, gb_3 = 0.6,
@@ -278,6 +280,10 @@ samplerInits <- list(y.norm = rep(1,Nre),
  #                    ,k = 0.1
                      )
 
+
+
+nimbleOptions(oldConjugacyChecking = FALSE) 
+nimbleOptions(useNewConfigureMCMC = TRUE)
 
 ###############################################################
 # (Alternative) If invoking Nimble MCMC stepwise (but more customisable)
@@ -319,8 +325,8 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 1
-n.iter = 10000
-n.burnin = 5000
+n.iter = 2500
+n.burnin = 1500
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
@@ -338,7 +344,7 @@ dev.off()
 
 
 samp <- as.matrix(mcmcChain)
-xx <- exp(seq(log(1e-9),log(3),length.out = 500))
+xx <- exp(seq(log(1e-9),log(3),length.out = 100))
 # resonance 1
 y1 <- NULL
 for(j in 1:length(xx)){
@@ -493,59 +499,59 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   geom_ribbon(data=gr1,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#238b45"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr1,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#238b45"),alpha=0.9,show.legend=FALSE) +
-  annotate("segment", x = 0.2, xend = 0.375, y = 5.75+2, yend = 5.75+2,size=1.5,
+  annotate("segment", x = 0.2, xend = 0.35, y = 5.75+2, yend = 5.75+2,size=1.5,
            colour = "#238b45") +
   annotate(geom="text", x = 1.25,  y = 5.75+2,
-           label=expression(2^"-"*", 0.00"),size=5) +
+           label=expression(2^"-"*", 0.00"),size=4) +
 
   geom_ribbon(data=gr2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#dd3497"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#dd3497"),alpha=0.9,show.legend=FALSE) +
-  annotate("segment",  x = 0.2, xend = 0.375, y = 5.25+2, yend = 5.25+2,size=1.5,
+  annotate("segment",  x = 0.2, xend = 0.35, y = 5.25+2, yend = 5.25+2,size=1.5,
            colour = "#dd3497") +
   annotate(geom="text", x = 1.25,  y = 5.25+2,
-           label=expression(3^"+"*", 0.15"),size=5) +
+           label=expression(3^"+"*", 0.15"),size=4) +
   
   
   geom_ribbon(data=gr3,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#e6ab02"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr3,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#e6ab02"),alpha=0.9,show.legend=FALSE) +
-  annotate("segment", x = 0.2, xend = 0.375, y = 4.75+2, yend = 4.75+2,size=1.5,
+  annotate("segment", x = 0.2, xend = 0.35, y = 4.75+2, yend = 4.75+2,size=1.5,
            colour = "#e6ab02") +
   annotate(geom="text", x = 1.25,  y = 4.75+2,
-           label=expression(3^"+"*", 0.34"),size=5) +
+           label=expression(3^"+"*", 0.34"),size=4) +
   
   
   geom_ribbon(data=gr4,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#ec7014"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr4,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#ec7014"),alpha=0.9,show.legend=FALSE) +
-  annotate("segment", x = 0.2, xend = 0.375, y = 4.25+2, yend = 4.25+2,size=1.5,
+  annotate("segment", x = 0.2, xend = 0.35, y = 4.25+2, yend = 4.25+2,size=1.5,
            colour = "#ec7014") +
   annotate(geom="text", x = 1.25,  y = 4.25+2,
-           label=expression(1^"-"*", 0.51"),size=5) +
+           label=expression(1^"-"*", 0.51"),size=4) +
   
   
   
   geom_ribbon(data=gr5,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#0570b0"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr5,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#0570b0"),alpha=0.9,show.legend=FALSE) +
-  annotate("segment", x = 0.2, xend = 0.375, y = 3.75+2, yend = 3.75+2,size=1.5,
+  annotate("segment", x = 0.2, xend = 0.35, y = 3.75+2, yend = 3.75+2,size=1.5,
            colour = "#0570b0") +
   annotate(geom="text", x = 1.25,  y = 3.75+2,
-           label=expression(4^"+"*", 0.96"),size=5) +
+           label=expression(4^"+"*", 0.96"),size=4) +
   
   
   
   geom_ribbon(data=gr6,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#C6D830"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr6,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#C6D830"),alpha=0.9,show.legend=FALSE) +
-  annotate("segment", x = 0.2, xend = 0.325, y = 3.25+2, yend = 3.25+2,size=1.5,
+  annotate("segment", x = 0.2, xend = 0.35, y = 3.25+2, yend = 3.25+2,size=1.5,
            colour = "#C6D830") +
   annotate(geom="text",  x = 1.25,  y = 3.25+2,
-           label=expression(2^"+"*", 1.23"),size=5) +
+           label=expression(2^"+"*", 1.23"),size=4) +
   
   
   geom_ribbon(data=gr7,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#ffff99"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=gr7,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#ffff99"),alpha=0.9,show.legend=FALSE) +
-  annotate("segment",x = 0.2, xend = 0.325, y = 2.75+2, yend = 2.75+2,size=1.5,
+  annotate("segment",x = 0.2, xend = 0.35, y = 2.75+2, yend = 2.75+2,size=1.5,
            colour = "#ffff99") +
   annotate(geom="text",  x = 1.25,  y = 2.75+2,
-           label=expression(0^"+"*", 1.32"),size=5) +
+           label=expression(0^"+"*", 1.32"),size=4) +
   
   geom_ribbon(data=grall,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#e31a1c"),alpha=0.5,show.legend=FALSE) +
   geom_ribbon(data=grall,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#e31a1c"),alpha=0.9,show.legend=FALSE) +
@@ -566,21 +572,21 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = c(0.45,0.95),
-        legend.text = element_text(size=14),
+        legend.text = element_text(size=10),
         legend.text.align = 1,
         
         legend.background = element_rect(colour = "white",fill=NA),
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="black", size=15),
+        axis.title = element_text(color="black", size=17.5),
         axis.text  = element_text(size=12),
         strip.text = element_text(size=10),
         strip.background = element_rect("gray85")) +
   coord_cartesian(xlim=c(1e-8,2.25),ylim=c(0.175,9.75)) +
   annotate(geom="text",1e-7, 1,
            label=expression(paste(NULL^"7","Be(n,p)",NULL^"7","Li")),
-           size=7.25) 
+           size=6) 
 dev.off()
 
 
