@@ -230,12 +230,12 @@ samplerCode <- nimbleCode({
 
 # y.scat  ~ T(dnorm(0, pow(2,-2)),0,Inf)
  
-  sdscat ~ T(dnorm(1, pow(0.5,-2)),0,Inf)
+#  sdscat ~ T(dnorm(0.5, pow(0.1,-2)),0,Inf)
   for (k in 1:4) {
-  y.scat[k] ~ T(dnorm(0,pow(sdscat,-2)),0,Inf)
+  y.scat[k] ~ dunif(0,1)
   }
  for (k in 5:10) {
-  y.scat[k] ~ T(dnorm(0, pow(0.1*sdscat,-2)),0,Inf)
+  y.scat[k] <- 1e-3
   }
   
   for (k in 1:4) {
@@ -282,8 +282,8 @@ samplerInits <- list(y.norm = rep(1,Nre),
 
 
 
-nimbleOptions(oldConjugacyChecking = FALSE) 
-nimbleOptions(useNewConfigureMCMC = TRUE)
+#nimbleOptions(oldConjugacyChecking = FALSE) 
+#nimbleOptions(useNewConfigureMCMC = TRUE)
 
 ###############################################################
 # (Alternative) If invoking Nimble MCMC stepwise (but more customisable)
@@ -325,8 +325,8 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 1
-n.iter = 2500
-n.burnin = 1500
+n.iter = 15000
+n.burnin = 5000
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
