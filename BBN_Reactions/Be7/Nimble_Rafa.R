@@ -336,14 +336,14 @@ system.time(
 save(mcmcChain, file = "MCMCBe7.RData")
 
 pdf("Final11.pdf")
-plot(mcmcChain)
+plot(mcmcChain[5000:10000,])
 dev.off()
 
 
 
 
 
-samp <- as.matrix(mcmcChain)
+samp <- as.matrix(mcmcChain)[5000:10000,]
 xx <- exp(seq(log(1e-9),log(3),length.out = 100))
 # resonance 1
 y1 <- NULL
