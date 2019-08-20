@@ -1,4 +1,5 @@
 ## Integration Script
+require(dplyr)
 
 ## Load your mcmcChain here
 mat <- read.table("7Benp_SAMP",header = T)
@@ -93,8 +94,11 @@ NumRate7Benp   <- function(x, T9){
   #     Integrand
   #     ----------------------------------------------------
 
-  integrand <- function(E,T9) {(sqrt(E) * sigma7Benp7mod(E,x) + x["hbg"])*
-      exp(-E/(0.086173324*T9))}
+  integrand <- function(E,T9) {
+    E * (sigma7Benp7mod(E,x) + x["hbg"]/sqrt(E)) * exp(-11.605*E/T9)
+#    (sqrt(E) * sigma7Benp7mod(E,x) + x["hbg"])*
+#      exp(-E/(0.086173324*T9))
+    }
 
   # CALCULATE Nuclear rate
 
@@ -102,7 +106,7 @@ NumRate7Benp   <- function(x, T9){
   m2 = 1.0086649158   # masses (amu) of 7Be and n
   mue = (m1*m2)/(m1+m2)
 
-  Nasv <- function(Temp){(3.7318e10/Temp^{3/2})*sqrt(1/mue)*integrate(integrand, lower = 1e-10, upper = 2,
+  Nasv <- function(Temp){(3.7318e10/Temp^{3/2})*sqrt(1/mue)*integrate(integrand, lower = 1e-10, upper = Inf,
                                                                       abs.tol = 0L,
                                                                       T9 = Temp)$value}
 
@@ -116,13 +120,10 @@ NumRate7Benp   <- function(x, T9){
 
 
 NumRate7BenpTable <- function(mat, N = 1000,T9){
-
-  index <- sample(1:nrow(mat),size=N,replace=FALSE)
-  mcdat_I  <- mat[index,]
-
-  gdat <-  sapply(Tgrid,function(Tgrid){apply(mcdat_I,1,NumRate7Benp,T9=Tgrid)})
-
-  gg <-  as.data.frame(gdat)
+  
+  Mat <- sample_n(mat,N, replace = FALSE)
+           
+  Mat2 <-  sapply(Tgrid,function(Tgrid){apply(Mat,1,NumRate7Benp,T9=Tgrid)}) %>% as.data.frame()
 
   gg2 <- apply(gg, 2, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
 
@@ -130,7 +131,7 @@ NumRate7BenpTable <- function(mat, N = 1000,T9){
 
   fu_I<-apply(gg, 2, fu)
 
-  gg2data <- data.frame(T9 =T9, lower = gg2["16%",], mean = gg2["50%",], upper = gg2["84%",] )
+  gg2data <- data.frame(T9 =T9, lower = gg2["16%",], median = gg2["50%",], upper = gg2["84%",] )
   gg2data$fu <- fu_I
   rownames(gg2data) <- c()
   return(gg2data)
@@ -144,7 +145,7 @@ Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.01
           2.5,3,3.5,4,5,6,7,8,9,10)
 
 
-NRate <- NumRate7BenpTable(mat,N=20,T9=Tgrid)
+NRate <- NumRate7BenpTable(mat,N=50,T9=Tgrid )
 
 ## Latex Table Output
 
