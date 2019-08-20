@@ -1,6 +1,14 @@
 ## Integration Script
 require(dplyr)
 
+## Auxiliar Function
+
+fu <- function(x){exp(sqrt(log(1+var(x)/mean(x)^2)))}
+
+##
+
+
+
 ## Load your mcmcChain here
 mat <- read.table("7Benp_SAMP",header = T)
 
@@ -118,21 +126,23 @@ NumRate7Benp   <- function(x, T9){
   return(Nasv=out)
 }
 
+NumRate7Benp<- cmpfun(NumRate7Benp)
+
 
 NumRate7BenpTable <- function(mat, N = 1000,T9){
   
-  Mat <- sample_n(mat,N, replace = FALSE)
+  Mat <- as.matrix(sample_n(mat,N, replace = FALSE))
            
-  Mat2 <-  sapply(Tgrid,function(Tgrid){apply(Mat,1,NumRate7Benp,T9=Tgrid)}) %>% as.data.frame()
 
-  gg2 <- apply(gg, 2, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
+  Mat2 <-  sapply(Tgrid,function(Tgrid){apply(Mat,1,NumRate7Benp,T9=Tgrid)}) 
 
-  fu <- function(x){exp(sqrt(log(1+var(x)/mean(x)^2)))}
 
-  fu_I<-apply(gg, 2, fu)
+  gg2 <- apply(Mat2, 2, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
+  fu_I <-apply(Mat2, 2, fu)
 
-  gg2data <- data.frame(T9 =T9, lower = gg2["16%",], median = gg2["50%",], upper = gg2["84%",] )
-  gg2data$fu <- fu_I
+  gg2data <- data.frame(T9 =T9, lower = gg2["16%",], median = gg2["50%",], upper = gg2["84%",],
+                        fu =  fu_I)
+#  gg2data$fu <- fu_I
   rownames(gg2data) <- c()
   return(gg2data)
 }
@@ -145,7 +155,7 @@ Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.01
           2.5,3,3.5,4,5,6,7,8,9,10)
 
 
-NRate <- NumRate7BenpTable(mat,N=50,T9=Tgrid )
+NRate <- NumRate7BenpTable(mat,N=50,T9=Tgrid[1:10])
 
 ## Latex Table Output
 
