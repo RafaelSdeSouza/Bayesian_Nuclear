@@ -1,32 +1,43 @@
-## Integration Script
-require(xtable)
-## Auxiliar Function
+require(gsl) 
+##################################################################################
+# numRates.R
+##################################################################################
+#
+# script for numerical integration of 7Be(n,p)7Li reaction rates
+#
+#
 
-fu <- function(x){exp(sqrt(log(1+var(x)/mean(x)^2)))}
+##################################################################################
+## USER INPUT
+##################################################################################
+# number of cross section samples to take into account from input file
+nsamp = 100
 
-##
 
-
-
+##################################################################################
+## READ INPUT FROM MCMC
+##################################################################################
+#mat <- read.table("7Benp_SAMP",header = T)
 ## Load your mcmcChain here
-mat <- read.table("7Benp_SAMP",header = T)
+ load(file = "MCMCBe7.RData")
 
-
-## Functions to be used to calculate rate at a given temperature
-
+mat <- unlist(mcmcChain)
+##################################################################################
+## FUNCTION TO CALCULATE CROSS SECTION OF SINGLE RESONANCE
+##################################################################################
 sigma7Benp  <-  function(ecm, e0, ga, gb, ra, rb, jr, la, lb){
   # input masses, charges, angular momenta
-  m1_i = 7.0147344
-  m2_i = 1.0086649158   # masses (amu) of 7Be and n
-  m1_f = 7.014357697
-  m2_f = 1.007276452    # masses (amu) of 7Li and p
-  z1_i = 4
+  m1_i = 7.01473482886 
+  m2_i = 1.00866491582  # masses (amu) of 7Be and n
+  m1_f = 7.01435791572
+  m2_f = 1.00727646658  # masses (amu) of 7Li and p
+  z1_i = 4 
   z2_i = 0              # charges of 7Be and n
-  z1_f = 3
+  z1_f = 3 
   z2_f = 1              # charges of 7Li and p
   jt = 1.5              # spins of target, projectile
-  jp = 0.5
-  Q = 1.6442402         # reaction Q-value (MeV)
+  jp = 0.5 
+  Q = 1.644425          # reaction Q-value (MeV) [from nuclear masses]
 
   # reduced masses
   mue_i <- (m1_i*m2_i)/(m1_i+m2_i)
@@ -80,7 +91,9 @@ sigma7Benp  <-  function(ecm, e0, ga, gb, ra, rb, jr, la, lb){
   return(SG = SG)
 }
 
-
+##################################################################################
+# FUNCTION TO CALCULATE CROSS SECTION SUM
+##################################################################################
 sigma7Benp7mod <- function(ecm,M){
 
   SF1 <-  sigma7Benp(ecm, e0 = M[["e0_1"]], ga = M[["ga_1"]], gb = M[["gb_1"]], ra = M[["ra"]], rb = M[["rb"]], jr = 2, la = 0, lb = 0)
@@ -94,74 +107,77 @@ sigma7Benp7mod <- function(ecm,M){
   return(SF = SF)
 }
 
-NumRate7Benp   <- function(x, T9){
+##################################################################################
+# FUNCTION TO INTEGRATE CROSS SECTION
+##################################################################################
+
+### Rafa - I do not understand how all those functions below have been set up;
+### could you please annotate a bit?
 
 
-  #     ----------------------------------------------------
-  #     Integrand
-  #     ----------------------------------------------------
-
-  integrand <- function(E,T9) {
-    E * (sigma7Benp7mod(E,x) + x["hbg"]/sqrt(E)) * exp(-11.605*E/T9)
-#    (sqrt(E) * sigma7Benp7mod(E,x) + x["hbg"])*
-#      exp(-E/(0.086173324*T9))
+# the background term has dimensions of sqrt(E) x sigma
+NumRate7Benp <- function(x, T9)
+{ 
+    integrand <- function(E, T9) 
+    {
+      E * (sigma7Benp7mod(E,x) + x["hbg"]/sqrt(E)) * exp(-11.605*E/T9)
     }
 
-  # CALCULATE Nuclear rate
+    # masses
+    m1 = 7.01473482886
+    m2 = 1.00866491582   # masses (amu) of 7Be and n
+    mue = (m1*m2)/(m1+m2)
 
-  m1 = 7.0147344
-  m2 = 1.0086649158   # masses (amu) of 7Be and n
-  mue = (m1*m2)/(m1+m2)
-
-  Nasv <- function(Temp){(3.7318e10/Temp^{3/2})*sqrt(1/mue)*integrate(integrand, lower = 1e-10, upper = Inf,
-                                                                      abs.tol = 0L,
-                                                                      T9 = Temp)$value}
+    Nasv <- function(Temp)
+      {
+        (3.7318e10/Temp^{3/2})*sqrt(1/mue)*
+            integrate(integrand, lower = 1e-10, upper = 2, T9 = Temp)$value
+      }
 
   # Note to self, the limits of integration, in some sense, the scale should be appropriate.
   # From HELP, the first argument MUST BE integrated. The optional argument T9 is used to be substituted in
   # Nasv <-> N A <sigma v >
 
-  out <- Nasv(T9)
-  return(Nasv=out)
+     out <- Nasv(T9)
+     return(Nasv=out)
 }
 
 
+NumRate7BenpTable <- function(mat, N = nsamp, T9){
 
-NumRate7BenpTable <- function(mat, N = 1000,T9){
-  
   index <- sample(1:nrow(mat),size=N,replace=FALSE)
-  Mat  <- mat[index,]
-  
+  mcdat_I  <- mat[index,]
 
-  Mat2 <-  as.data.frame(sapply(T9,function(Tgrid){apply(Mat,1,NumRate7Benp,T9=Tgrid)}))
+  gdat <-  sapply(Tgrid,function(Tgrid){apply(mcdat_I,1,NumRate7Benp,T9=Tgrid)})
 
+  gg <-  as.data.frame(gdat)
 
-  gg2 <- apply(Mat2, 2, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
-  fu_I <- apply(Mat2, 2, fu)
+  gg2 <- apply(gg, 2, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
 
-  gg2data <- data.frame(T9 =T9, lower = gg2["16%",], median = gg2["50%",], upper = gg2["84%",],
-                        fu = fu_I)
-#  gg2data$fu <- fu_I
+  fu <- function(x){exp(sqrt(log(1+var(x)/mean(x)^2)))}
+
+  fu_I<-apply(gg, 2, fu)
+
+  gg2data <- data.frame(T9 =T9, lower = gg2["16%",], mean = gg2["50%",], upper = gg2["84%",] )
+  gg2data$fu <- fu_I
   rownames(gg2data) <- c()
   return(gg2data)
 }
 
-# Chain reduction to 2000 iterations (randomly sampled) if needed
-Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.012,
-          0.013,0.014,0.015,0.016,0.018,0.020,0.025,0.030,0.040,0.050,0.060,0.070,
-          0.080,0.090,0.100,0.110,0.120,0.130,0.140,0.150,0.160,0.180,0.200,0.250,0.300,
-          0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000,1.250,1.5,1.75,2,
-          2.5,3,3.5,4,5,6,7,8,9,10)
+Tgrid <- c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.012,
+           0.013,0.014,0.015,0.016,0.018,0.020,0.025,0.030,0.040,0.050,0.060,0.070,
+           0.080,0.090,0.100,0.110,0.120,0.130,0.140,0.150,0.160,0.180,0.200,0.250,
+           0.300,0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000,1.250,1.500,
+           1.750,2.000,2.500,3.000,3.500,4.000,5.000,6.000,7.000,8.000,9.000,10.000)
 
 
-NRate <- NumRate7BenpTable(mat,N=25,T9=Tgrid)
+NRate <- NumRate7BenpTable(mat, N=200, T9=c(0.001,0.002))
 
 ## Latex Table Output
 
-
+require(xtable)
 #write.csv(Nrate,"rates_dpg.csv",row.names = F)
-print(xtable(NRate, type = "latex",display=c("e","g","E","E","E",
-                                             "g"),
+print(xtable(NRate, type = "latex",display=c("e", "g", "E", "E", "E", "g"),
              digits=4), include.rownames = FALSE)
 
 

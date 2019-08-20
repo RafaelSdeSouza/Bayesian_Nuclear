@@ -201,7 +201,7 @@ numRates_7Benp_table <- function(mcmcobj, N = 1000){
   
   gg2 <- apply(gg, 2, quantile, probs=c(0.16, 0.5, 0.84), na.rm=TRUE)
   
-  gg2data <- data.frame(T9 = Tgrid, mean = gg2["50%",],lower = gg2["16%",], 
+  gg2data <- data.frame(T9 = Tgrid, median = gg2["50%",],lower = gg2["16%",], 
                         upper = gg2["84%",])
   return(gg2data)
 }
