@@ -17,8 +17,11 @@ nsamp = 100
 ##################################################################################
 ## READ INPUT FROM MCMC
 ##################################################################################
-mat <- read.table("7Benp_SAMP",header = T)
+#mat <- read.table("7Benp_SAMP",header = T)
+## Load your mcmcChain here
+ load(file = "MCMCBe7.RData")
 
+mat <- unlist(mcmcChain)
 ##################################################################################
 ## FUNCTION TO CALCULATE CROSS SECTION OF SINGLE RESONANCE
 ##################################################################################
@@ -128,7 +131,7 @@ NumRate7Benp <- function(x, T9)
     Nasv <- function(Temp)
       {
         (3.7318e10/Temp^{3/2})*sqrt(1/mue)*
-            integrate(integrand, lower = 1e-10, upper = Inf, abs.tol = 0L, T9 = Temp)$value
+            integrate(integrand, lower = 1e-10, upper = 2, T9 = Temp)$value
       }
 
   # Note to self, the limits of integration, in some sense, the scale should be appropriate.
@@ -168,7 +171,7 @@ Tgrid <- c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.0
            1.750,2.000,2.500,3.000,3.500,4.000,5.000,6.000,7.000,8.000,9.000,10.000)
 
 
-NRate <- NumRate7BenpTable(mat, N=20, T9=Tgrid)
+NRate <- NumRate7BenpTable(mat, N=200, T9=c(0.001,0.002))
 
 ## Latex Table Output
 
