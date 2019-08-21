@@ -123,7 +123,7 @@ samplerCode <- nimbleCode({
 
  for (i in 1:N){
      obsy[i] ~ dnorm(ym[i], sd = erry[i])
-       ym[i] ~ dnorm(yt[i],sd = y.scat[re[i]])
+       ym[i] ~ dnorm(yt[i],sd = y.scat)
        yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
        }
   
@@ -228,15 +228,17 @@ samplerCode <- nimbleCode({
   gb_7 ~ T(dnorm(0.0, pow(wl_p/2, -2)),0,Inf)
   ##################################################################
 
-# y.scat  ~ T(dnorm(0, pow(2,-2)),0,Inf)
+ y.scat  ~ T(dnorm(0, pow(2,-2)),0,Inf)
  
 #  sdscat ~ T(dnorm(0.5, pow(0.1,-2)),0,Inf)
-  for (k in 1:4) {
-  y.scat[k] ~ dunif(0,1)
-  }
- for (k in 5:10) {
-  y.scat[k] <- 1e-3
-  }
+#  for (k in 1:4) {
+#  y.scat[k] ~ dunif(0,1)
+#  }
+# for (k in 5:10) {
+#  y.scat[k] <- 1e-3
+#  }
+  
+  
   
   for (k in 1:4) {
     # Systematic Uncertainty as a highly informative prior
@@ -268,14 +270,15 @@ samplerConst <- list(N = N,
 
 
 samplerInits <- list(y.norm = rep(1,Nre),
-                     y.scat = rep(0.1,Nre),
-                     e0_1 = 0.05, gb_1 = 0.6, ga_1 = 0.6,
-                     e0_2 = 0.15, ga_2 = 0.6, gb_2 = 0.6,
-                     e0_3 = 0.336, ga_3 = 0.6, gb_3 = 0.6,
-                     e0_4 = 0.51, ga_4 = 0.6, gb_4 = 0.6,
-                     e0_5 = 0.96, ga_5 = 0.6, gb_5 = 0.6,
-                     e0_6 = 1.23, ga_6 = 0.6, gb_6 = 0.6,
-                     e0_7 = 1.32, ga_7 = 0.6, gb_7 = 0.6,
+ #                    y.scat = rep(0.1,Nre),
+                      y.scat = 0.1,
+                     e0_1 = 0.05, gb_1 = 0.1, ga_1 = 0.1,
+                     e0_2 = 0.15, ga_2 = 0.1, gb_2 = 0.1,
+                     e0_3 = 0.336, ga_3 = 0.1, gb_3 = 0.1,
+                     e0_4 = 0.51, ga_4 = 0.1, gb_4 = 0.1,
+                     e0_5 = 0.96, ga_5 = 0.1,  gb_5 = 0.6,
+                     e0_6 = 1.23, ga_6 = 0.1, gb_6 = 0.1,
+                     e0_7 = 1.32, ga_7 = 0.1, gb_7 = 0.1,
                      ra = 4, rb = 4
  #                    ,k = 0.1
                      )
@@ -309,6 +312,22 @@ conf$addMonitors(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
                    'r_1', 'r_4', 'ra', 'rb',
                    'y.norm',
                    'y.scat'))
+
+
+conf$removeSampler(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
+                     'e0_3', 'ga_3', 'gb_3', 'e0_4', 'ga_4', 'gb_4',
+                     'e0_5', 'ga_5', 'gb_5', 'e0_6', 'ga_6', 'gb_6',
+                     'e0_7', 'ga_7', 'gb_7',
+                    'ra', 'rb'))
+
+conf$addSampler(target = c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
+                           'e0_3', 'ga_3', 'gb_3', 'e0_4', 'ga_4', 'gb_4',
+                           'e0_5', 'ga_5', 'gb_5', 'e0_6', 'ga_6', 'gb_6',
+                           'e0_7', 'ga_7', 'gb_7',
+                           'ra', 'rb'),
+                type = "AF_slice")
+
+
 # Add the parameters to monitor throughout the MCMC process
 
 samplerMCMC <- buildMCMC(conf)
@@ -325,8 +344,8 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 1
-n.iter = 15000
-n.burnin = 5000
+n.iter = 25000
+n.burnin = 15000
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
@@ -335,16 +354,16 @@ system.time(
 
 save(mcmcChain, file = "MCMCBe7.RData")
 
-pdf("Final11.pdf")
-plot(mcmcChain[5000:10000,])
+pdf("MCMCBe7.pdf")
+plot(mcmcChain)
 dev.off()
 
 
 
 
 
-samp <- as.matrix(mcmcChain)[5000:10000,]
-xx <- exp(seq(log(1e-9),log(3),length.out = 100))
+samp <- as.matrix(mcmcChain)
+xx <- exp(seq(log(1e-9),log(3),length.out = 400))
 # resonance 1
 y1 <- NULL
 for(j in 1:length(xx)){
