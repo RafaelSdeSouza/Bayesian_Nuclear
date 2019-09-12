@@ -9,8 +9,8 @@ fu <- function(x){exp(sqrt(log(1+var(x)/mean(x)^2)))}
 
 
 ## Load your mcmcChain here
-mat <- read.table("7Benp_SAMP",header = T)
-
+mat <- read.csv("Be7MCMC.csv",header = T)
+mat$hbg <- 0
 
 ## Functions to be used to calculate rate at a given temperature
 
@@ -154,7 +154,7 @@ Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.01
           2.5,3,3.5,4,5,6,7,8,9,10)
 
 
-NRate <- NumRate7BenpTable(mat,N=25,T9=Tgrid)
+NRate <- NumRate7BenpTable(mat,N=25,T9=Tgrid[1:3])
 
 ## Latex Table Output
 

@@ -323,9 +323,9 @@ conf$removeSampler(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
 conf$addSampler(target = c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
                            'e0_3', 'ga_3', 'gb_3', 'e0_4', 'ga_4', 'gb_4',
                            'e0_5', 'ga_5', 'gb_5', 'e0_6', 'ga_6', 'gb_6',
-                           'e0_7', 'ga_7', 'gb_7',
+                          'e0_7', 'ga_7', 'gb_7',
                            'ra', 'rb'),
-                type = "AF_slice")
+               type = "AF_slice")
 
 
 # Add the parameters to monitor throughout the MCMC process
@@ -344,8 +344,8 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 1
-n.iter = 25000
-n.burnin = 15000
+n.iter = 5000
+n.burnin = 2500
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
@@ -353,6 +353,9 @@ system.time(
 )
 
 save(mcmcChain, file = "MCMCBe7.RData")
+
+
+
 
 pdf("MCMCBe7.pdf")
 plot(mcmcChain)
