@@ -1,21 +1,3 @@
-######################################################################
-# Author: Christian Iliadis (05/13/2019) and HK
-######################################################################
-#
-# this script splits each data sets into two parts: a "relative cross
-# section" part, and an "absolute cross section" part; the relative
-# part is modeled with a normalization factor [e.g., y.norm1] for which
-# the prior is sampled from a very broad density; the absolute part
-# consists of just one data point. It does have a statistical uncertainty.
-# It is modeled with anormalization factor [e.g., y.norm11] for which
-# the prior is sampled from a highly informative lognormal density, where
-# the lognormal parameters mu and sigma a chosen according to the
-# systematic uncertainty reported for a given experiment;
-#
-# In the plot of the reduced cross section, the red data points show
-# the "absolute" cross section of each data set
-#
-######################################################################
 # preparation: remove all variables from the work space
 rm(list=ls())
 # import jags package
@@ -114,17 +96,17 @@ samplerCode <- nimbleCode({
                                  e0_6, ga_6, gb_6, ra, rb,
                                  e0_7, ga_7, gb_7, ra, rb)
 
-#  for (i in 1:N){
-#    obsy[i] ~ dnorm(ym[i], sd = erry[i])
-#     ym[i] ~ dnorm(yt[i],sd = y.scat[re[i]])
-#     yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
-#     }
-
- for (i in 1:N){
-     obsy[i] ~ dnorm(ym[i], sd = erry[i])
-       ym[i] ~ dnorm(yt[i],sd = y.scat)
-       yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
-       }
+ #for (i in 1:N){
+ #    obsy[i] ~ dnorm(ym[i], sd = erry[i])
+#       ym[i] ~ dnorm(yt[i], sd = y.scat)
+#       yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
+ #      }
+  
+  for (i in 1:N){
+#    obsy[i] ~ dnorm(yt[i], sd = sqrt(erry[i]^2 + y.scat[re[i]]^2))
+    obsy[i] ~ dnorm(yt[i], sd = sqrt(erry[i]^2 + y.scat^2))
+    yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
+  }
   
 
 
@@ -227,20 +209,21 @@ samplerCode <- nimbleCode({
   gb_7 ~ T(dnorm(0.0, pow(wl_p/2, -2)),0,Inf)
   ##################################################################
 
- y.scat  ~ T(dnorm(0, pow(2,-2)),0,Inf)
+
  
-#  sdscat ~ T(dnorm(0.5, pow(0.1,-2)),0,Inf)
-#  for (k in 1:4) {
-#  y.scat[k] ~ dunif(0,1)
+  y.scat ~ dgamma(0.1,0.1)
+
+# for (k in 1:4) {
+#  y.scat[k]  <- 0
 #  }
 # for (k in 5:10) {
-#  y.scat[k] <- 1e-3
+#  y.scat[k] ~ dgamma(0.1,0.1)
 #  }
   
   
   
   for (k in 1:4) {
-    # Systematic Uncertainty as a highly informative prior
+    # Systematic Uncertainty as a weakly informative prior
     nf[k] ~ dunif(-1,1)
     y.norm[k] <- 10^nf[k]
   }
@@ -269,8 +252,7 @@ samplerConst <- list(N = N,
 
 
 samplerInits <- list(y.norm = rep(1,Nre),
- #                    y.scat = rep(0.1,Nre),
-                      y.scat = 0.1,
+                     y.scat = 0.1,
                      e0_1 = 0.05, gb_1 = 0.1, ga_1 = 0.1,
                      e0_2 = 0.15, ga_2 = 0.1, gb_2 = 0.1,
                      e0_3 = 0.336, ga_3 = 0.1, gb_3 = 0.1,
@@ -293,6 +275,10 @@ samplerInits <- list(y.norm = rep(1,Nre),
 ourmodel <- nimbleModel(code = samplerCode, constants = samplerConst,
                         data = samplerData, inits = samplerInits, check = FALSE
 )
+
+nimbleOptions(oldConjugacyChecking = FALSE)
+nimbleOptions(useNewConfigureMCMC = TRUE)
+
 compileNimble(ourmodel)
 # Always compile the model after you are done setting up with it
 
@@ -343,8 +329,8 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 1
-n.iter = 500
-n.burnin = 250
+n.iter = 2000
+n.burnin = 1500
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
