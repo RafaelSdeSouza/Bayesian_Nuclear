@@ -113,7 +113,7 @@ NumRate7Benp   <- function(x, T9){
   m2 = 1.0086649158   # masses (amu) of 7Be and n
   mue = (m1*m2)/(m1+m2)
 
-  Nasv <- function(Temp){(3.7318e10/Temp^{3/2})*sqrt(1/mue)*integrate(integrand, lower = 1e-10, upper = Inf,
+  Nasv <- function(Temp){(3.7318e10/Temp^{3/2})*sqrt(1/mue)*integrate(integrand, lower = 1e-10, upper = 2,
                                                                       abs.tol = 0L,
                                                                       T9 = Temp)$value}
 

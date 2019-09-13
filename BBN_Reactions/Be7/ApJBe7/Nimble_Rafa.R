@@ -23,7 +23,6 @@ library(nimble)
 library(magicaxis)
 require(gsl)
 require(RcppGSL)
-library(emdbook)
 require(nuclear)
 require(forcats)
 require(ggplot2)
@@ -344,15 +343,15 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 1
-n.iter = 5000
-n.burnin = 2500
+n.iter = 500
+n.burnin = 250
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
                        samplesAsCodaMCMC = TRUE)
 )
 
-save(mcmcChain, file = "MCMCBe7.RData")
+#save(mcmcChain, file = "MCMCBe7.RData")
 
 
 
@@ -366,6 +365,8 @@ dev.off()
 
 
 samp <- as.matrix(mcmcChain)
+write.csv(samp,"Be7MCMC.csv")
+
 xx <- exp(seq(log(1e-9),log(3),length.out = 400))
 # resonance 1
 y1 <- NULL
