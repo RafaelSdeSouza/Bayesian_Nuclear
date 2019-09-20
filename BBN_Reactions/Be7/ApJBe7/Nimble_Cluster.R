@@ -6,6 +6,9 @@ require(gsl)
 require(RcppGSL)
 require(nuclear)
 require(forcats)
+require(utils)
+require(stats)
+require(methods)
 
 path <- getwd()
 setwd(path)
@@ -300,16 +303,14 @@ conf$addMonitors(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
                    'y.scat'))
 
 
-conf$removeSampler(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
-                     'e0_3', 'ga_3', 'gb_3', 'e0_4', 'ga_4', 'gb_4',
-                     'e0_5', 'ga_5', 'gb_5', 'e0_6', 'ga_6', 'gb_6',
-                     'e0_7', 'ga_7', 'gb_7',
+conf$removeSampler(c('ga_1','gb_1','e0_4', 'ga_4', 'gb_4',
+                     'e0_5', 'e0_6', 
+                     'e0_7', 'ga_7', 
                     'ra', 'rb'))
 
-conf$addSampler(target = c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
-                           'e0_3', 'ga_3', 'gb_3', 'e0_4', 'ga_4', 'gb_4',
-                           'e0_5', 'ga_5', 'gb_5', 'e0_6', 'ga_6', 'gb_6',
-                          'e0_7', 'ga_7', 'gb_7',
+conf$addSampler(target = c('ga_1','gb_1','e0_4', 'ga_4', 'gb_4',
+                           'e0_5', 'e0_6', 
+                           'e0_7', 'ga_7', 
                            'ra', 'rb'),
                type = "AF_slice")
 
@@ -330,8 +331,8 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 1
-n.iter =   2500
-n.burnin = 1000
+n.iter =   250
+n.burnin = 100
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
