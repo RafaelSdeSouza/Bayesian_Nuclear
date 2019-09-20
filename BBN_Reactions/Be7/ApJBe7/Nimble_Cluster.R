@@ -5,7 +5,7 @@ library(nimble)
 require(gsl)
 require(RcppGSL)
 require(nuclear)
-
+require(forcats)
 
 path <- getwd()
 setwd(path)
@@ -55,7 +55,9 @@ Rfun = "sigma7Benp7mod", returnType = double(1))
 # latter is the individual statistical error of each datum [i];
 # energy is in MeV, sqrt(Ecm)*sigma is in sqrt(MeV)b
 
-data(Be7np) 
+
+Be7np <- read.csv("Be7np.csv")
+
 
 Be7np$dat <- as.factor(Be7np$dat)
 Be7np$dat <- fct_relevel(Be7np$dat, "Dam18","Gib59","Mar19","Koe88","Koe88b","Dam18b","Gib59b",
@@ -96,8 +98,8 @@ samplerCode <- nimbleCode({
                                  e0_7, ga_7, gb_7, ra, rb)
 
   for (i in 1:N){
-      obsy[i] ~ dnorm(ym[i], sd = erry[i])
-       ym[i] ~ dnorm(yt[i], sd = y.scat)
+       obsy[i] ~ dnorm(ym[i],  pow(erry[i],-2))
+       ym[i] ~ dnorm(yt[i],  pow(y.scat,-2))
        yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
        }
   
@@ -327,9 +329,9 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # resetFunctions = TRUE; if you would want to reset all the previously created functions
 # in order to addd the new MCMC
 
-n.chains = 3
-n.iter =   40000
-n.burnin = 25000
+n.chains = 1
+n.iter =   2500
+n.burnin = 1000
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
@@ -337,6 +339,8 @@ system.time(
 )
 
 samp <- as.matrix(mcmcChain)
+
+
 write.csv(samp,"Be7MCMC.csv")
 
 
