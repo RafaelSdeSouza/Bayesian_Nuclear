@@ -102,7 +102,7 @@ samplerCode <- nimbleCode({
 
   for (i in 1:N){
        obsy[i] ~ dnorm(yt[i], pow(sqrt(erry[i]^2+y.scat[re[i]]^2),-2))
-        yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
+        yt[i] <- y.norm[re[i]]*(sqrt(obsx[i])*sigmaBe7modT[i] + hbg )
        }
   
  # for (i in 1:N){
@@ -214,7 +214,7 @@ samplerCode <- nimbleCode({
 
 
  
-#   y.scat ~ dgamma(0.1,0.1)
+  hbg ~ dgamma(0.1,0.1)
 
   for (k in 1:4) {
     y.scat[k]  <- 0
@@ -266,7 +266,8 @@ samplerInits <- list(y.norm = rep(1,Nre),
                      e0_6 = 1.23, ga_6 = 0.1, gb_6 = 0.1,
                      e0_7 = 1.32, ga_7 = 0.1, gb_7 = 0.1,
                      ra = 4, rb = 4,
-                     yt = rep(1,N)
+                     yt = rep(1,N),
+                     hbg = 0.01
                      )
 
 
@@ -301,7 +302,7 @@ conf$addMonitors(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
                    'e0_7', 'ga_7', 'gb_7',
                    'r_1', 'r_4', 'ra', 'rb',
                    'y.norm',
-                   'y.scat'))
+                   'y.scat','hbg'))
 
 
 conf$removeSampler(c('ga_1','gb_1','e0_4', 'ga_4', 'gb_4',
@@ -331,9 +332,9 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # resetFunctions = TRUE; if you would want to reset all the previously created functions
 # in order to addd the new MCMC
 
-n.chains = 3
-n.iter =   80000
-n.burnin = 50000
+n.chains = 1
+n.iter =   75000
+n.burnin = 2000
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,

@@ -98,7 +98,7 @@ samplerCode <- nimbleCode({
   for (i in 1:N){
       obsy[i] ~ dnorm(ym[i], sd = erry[i])
        ym[i] ~ dnorm(yt[i], sd = y.scat)
-       yt[i] <- y.norm[re[i]]*sqrt(obsx[i])*sigmaBe7modT[i]
+       yt[i] <- y.norm[re[i]]*(sqrt(obsx[i])*sigmaBe7modT[i] + k)
        }
   
  # for (i in 1:N){
@@ -210,7 +210,8 @@ samplerCode <- nimbleCode({
 
 
  
-   y.scat ~ dgamma(0.1,0.1)
+   y.scat ~ dgamma(1,1)
+   k ~ dgamma(1,1)
 
  # for (k in 1:4) {
  # y.scat[k]  <- mean(y.scat[5:10])
@@ -259,8 +260,8 @@ samplerInits <- list(y.norm = rep(1,Nre),
                      e0_5 = 0.96, ga_5 = 0.1,  gb_5 = 0.6,
                      e0_6 = 1.23, ga_6 = 0.1, gb_6 = 0.1,
                      e0_7 = 1.32, ga_7 = 0.1, gb_7 = 0.1,
-                     ra = 4, rb = 4
- #                    ,k = 0.1
+                     ra = 4, rb = 4,
+                     k = 0.1
                      )
 
 
@@ -275,8 +276,8 @@ ourmodel <- nimbleModel(code = samplerCode, constants = samplerConst,
                         data = samplerData, inits = samplerInits, check = FALSE
 )
 
-nimbleOptions(oldConjugacyChecking = FALSE)
-nimbleOptions(useNewConfigureMCMC = TRUE)
+#nimbleOptions(oldConjugacyChecking = FALSE)
+#nimbleOptions(useNewConfigureMCMC = TRUE)
 
 compileNimble(ourmodel)
 # Always compile the model after you are done setting up with it
@@ -295,7 +296,7 @@ conf$addMonitors(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
                    'e0_7', 'ga_7', 'gb_7',
                    'r_1', 'r_4', 'ra', 'rb',
                    'y.norm',
-                   'y.scat'))
+                   'y.scat',"k"))
 
 
 #conf$removeSampler(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
@@ -327,9 +328,9 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # resetFunctions = TRUE; if you would want to reset all the previously created functions
 # in order to addd the new MCMC
 
-n.chains = 3
-n.iter =   60000
-n.burnin = 40000
+n.chains = 1
+n.iter =   2000
+n.burnin = 1000
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
@@ -347,7 +348,7 @@ write.csv(samp,"Be7MCMC.csv")
 
 
 pdf("MCMCBe7.pdf")
-plot(mcmcChain)
+plot(mcmcChain[1500:2000,])
 dev.off()
 
 
