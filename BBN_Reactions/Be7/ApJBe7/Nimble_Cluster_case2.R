@@ -333,8 +333,8 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # in order to addd the new MCMC
 
 n.chains = 3
-n.iter =   150000
-n.burnin = 100000
+n.iter =   15000
+n.burnin = 10000
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
