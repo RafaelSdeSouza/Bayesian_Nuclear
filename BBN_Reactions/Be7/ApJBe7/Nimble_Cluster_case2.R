@@ -293,7 +293,7 @@ ourmodel$calculate()
 # we have successfully initialised the model (FULLY)
 # One iteration: simulate -> new values -> calculate
 
-conf <- configureMCMC(ourmodel,print=TRUE)
+conf <- configureMCMC(ourmodel,print=TRUE,thin = 5)
 # print = TRUE tells you what kind of samplers are being used for each stochastic node
 
 conf$addMonitors(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
@@ -332,9 +332,9 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # resetFunctions = TRUE; if you would want to reset all the previously created functions
 # in order to addd the new MCMC
 
-n.chains = 1
-n.iter =   75000
-n.burnin = 2000
+n.chains = 3
+n.iter =   150000
+n.burnin = 100000
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
