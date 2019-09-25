@@ -3,20 +3,26 @@ require(mcmcplots)
 require(coda)
 require(ggridges)
 require(nuclear)
+require(dplyr)
 source("pair_wise_plot.R")
 source("plot_normfactors_DREAM.R")
 
 # Plotting routines
-samp <- read.csv("Be7MCMC_case2.csv",header = T)
+samp <- read.csv("Be7MCMC_case2.csv",header = T) %>% slice(10000:n()) 
+en <- samp[,c('e0_1','e0_2',
+              'e0_3', 'e0_4',
+              'e0_5', 'e0_6', 
+              'e0_7')]
+SE <- ggs(as.mcmc(en))
+ggs_histogram(SE)
 
+gan <- samp[,c('ga_1','ga_2', 'ga_3', 'ga_4', 'ga_5', 'ga_6', 'ga_7')]
+Sa <- ggs(as.mcmc(gan))
+ggs_density(Sa)
 
-
-
-pdf("MCMCBe7.pdf")
-plot(mcmcChain)
-dev.off()
-
-
+gbn <- samp[,c('gb_1','gb_2', 'gb_3', 'gb_4', 'gb_5', 'gb_6', 'gb_7')]
+Sb <- ggs(as.mcmc(gbn))
+ggs_density(Sb)
 
 
 
@@ -125,7 +131,7 @@ gr7 <-  data.frame(x =xx, mean = y7[,"50%"],lwr1=y7[,"25%"],lwr2=y7[,"2.5%"],
 
 yall <- NULL
 for(j in 1:length(xx)){
-  mux <-  quantile(sqrt(xx[j])*sigma7Benp7mod(xx[j],samp[,"e0_1"],samp[,"ga_1"],samp [,"gb_1"],
+mux <-  quantile(sqrt(xx[j])*sigma7Benp7mod(xx[j],samp[,"e0_1"],samp[,"ga_1"],samp [,"gb_1"],
                                               samp[,"ra"],samp[,"rb"],
                                               samp[,"e0_2"],samp[,"ga_2"],samp [,"gb_2"],
                                               samp[,"ra"],samp[,"rb"],
@@ -138,7 +144,7 @@ for(j in 1:length(xx)){
                                               samp[,"e0_6"],samp[,"ga_6"],samp [,"gb_6"],
                                               samp[,"ra"],samp[,"rb"],
                                               samp[,"e0_7"],samp[,"ga_7"],samp [,"gb_7"],
-                                              samp[,"ra"],samp[,"rb"]),
+                                              samp[,"ra"],samp[,"rb"]) + samp[,"hbg"],
                    probs=c(0.025, 0.25, 0.5, 0.75, 0.975))
   yall <- rbind(yall,mux)
 }
