@@ -6,6 +6,28 @@ require(nuclear)
 require(dplyr)
 source("pair_wise_plot.R")
 source("plot_normfactors_DREAM.R")
+source("sigma7Benp7mod.R")
+
+Be7np <- read.csv("Be7np.csv")
+
+
+Be7np$dat <- as.factor(Be7np$dat)
+Be7np$dat <- fct_relevel(Be7np$dat, "Dam18","Gib59","Mar19","Koe88","Koe88b","Dam18b","Gib59b",
+                         "Her19","Cer89","Tom19")  
+
+Be7np$type <- as.factor(Be7np$type)
+
+re <- as.numeric(Be7np$dat) 
+Nre <- length(unique(Be7np$dat))
+# Unique removes duplicated vector, we want to know how many groups of
+# data are there
+N <- nrow(Be7np) # Total No of data sets
+obsy <- Be7np$S    # Response variable in MeV
+obsx <-  Be7np$E   # Predictors
+erry <- Be7np$Stat # Error in MeV
+set <- Be7np$dat # Get the labels as a vector
+fu <- log(c(1.020,1.10,1.050,1.051,1.085,1.032))
+
 
 # Plotting routines
 samp <- read.csv("Be7MCMC_case2.csv",header = T) %>% slice(10000:n()) 
@@ -14,17 +36,15 @@ en <- samp[,c('e0_1','e0_2',
               'e0_5', 'e0_6', 
               'e0_7')]
 SE <- ggs(as.mcmc(en))
-ggs_histogram(SE)
+ggs_traceplot(SE)
 
 gan <- samp[,c('ga_1','ga_2', 'ga_3', 'ga_4', 'ga_5', 'ga_6', 'ga_7')]
 Sa <- ggs(as.mcmc(gan))
-ggs_density(Sa)
+ggs_traceplot(Sa)
 
 gbn <- samp[,c('gb_1','gb_2', 'gb_3', 'gb_4', 'gb_5', 'gb_6', 'gb_7')]
 Sb <- ggs(as.mcmc(gbn))
-ggs_density(Sb)
-
-
+ggs_traceplot(Sb)
 
 
 
@@ -131,34 +151,21 @@ gr7 <-  data.frame(x =xx, mean = y7[,"50%"],lwr1=y7[,"25%"],lwr2=y7[,"2.5%"],
 
 yall <- NULL
 for(j in 1:length(xx)){
-mux <-  quantile(sqrt(xx[j])*sigma7Benp7mod(xx[j],samp[,"e0_1"],samp[,"ga_1"],samp [,"gb_1"],
-                                              samp[,"ra"],samp[,"rb"],
-                                              samp[,"e0_2"],samp[,"ga_2"],samp [,"gb_2"],
-                                              samp[,"ra"],samp[,"rb"],
-                                              samp[,"e0_3"],samp[,"ga_3"],samp [,"gb_3"],
-                                              samp[,"ra"],samp[,"rb"],
-                                              samp[,"e0_4"],samp[,"ga_4"],samp [,"gb_4"],
-                                              samp[,"ra"],samp[,"rb"],
-                                              samp[,"e0_5"],samp[,"ga_5"],samp [,"gb_5"],
-                                              samp[,"ra"],samp[,"rb"],
-                                              samp[,"e0_6"],samp[,"ga_6"],samp [,"gb_6"],
-                                              samp[,"ra"],samp[,"rb"],
-                                              samp[,"e0_7"],samp[,"ga_7"],samp [,"gb_7"],
-                                              samp[,"ra"],samp[,"rb"]) + samp[,"hbg"],
-                   probs=c(0.025, 0.25, 0.5, 0.75, 0.975))
-  yall <- rbind(yall,mux)
-}
+  mux <-  quantile(sqrt(xx[j])*sigma7Benp7mod(xx[j],
+                                              samp[,"e0_1"],samp[,"ga_1"],samp[,"gb_1"],samp[,"ra"],samp[,"rb"],
+                                              samp[,"e0_2"],samp[,"ga_2"],samp[,"gb_2"],samp[,"ra"],samp[,"rb"],
+                                              samp[,"e0_3"],samp[,"ga_3"],samp[,"gb_3"],samp[,"ra"],samp[,"rb"],
+                                              samp[,"e0_4"],samp[,"ga_4"],samp[,"gb_4"],samp[,"ra"],samp[,"rb"],
+                                              samp[,"e0_5"],samp[,"ga_5"],samp[,"gb_5"],samp[,"ra"],samp[,"rb"],
+                                              samp[,"e0_6"],samp[,"ga_6"],samp[,"gb_6"],samp[,"ra"],samp[,"rb"],
+                                              samp[,"e0_7"],samp[,"ga_7"],samp[,"gb_7"],samp[,"ra"],samp[,"rb"]),
+                                              probs=c(0.025, 0.25, 0.5, 0.75, 0.975))
+     yall <- rbind(yall,mux)
+     }
 
-grall <-  data.frame(x =xx, mean = yall[,"50%"],lwr1=yall[,"25%"],lwr2=yall[,"2.5%"],
+grall <-  data.frame(x = xx, mean = yall[,"50%"],lwr1=yall[,"25%"],lwr2=yall[,"2.5%"],
                      upr1=yall[,"75%"],
                      upr2=yall[,"97.5%"])
-
-
-
-### plot Maxwell-Boltzmann "factor" at T=1 GK [arbitrary scale]
-#for ( i in round(runif(500, min=1, max=nsamp)) ) {
-#  lines(x1, 3e2*(x1*(2.718^(-x1/(0.086173*0.5)))))
-#}
 
 MB <- function(x1){3e2*(x1*(2.718^(-x1/(0.086173*0.5))))}
 MBD <- data.frame(x=xx,y=MB(xx))
@@ -174,7 +181,7 @@ dr=data.frame(x=c(0,0.15,0.34,0.51,0.96,1.23,1.32),
               vy=rep(9.5,7))
 
 # Plot all
-pdf("MCMC_7Benp.pdf", width=7.5, height=5)
+pdf("Be7_temp.pdf", width=7.5, height=5)
 ggplot(Be7npG,aes(x=E,y=S)) +
   
   
@@ -244,13 +251,15 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   
   geom_errorbar(show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat,group=dat,color=type),alpha=0.75,width=0.025)+
-  geom_point(data=Be7npG,aes(x=obsx,y=obsy,group=dat,shape=dat,color=type,fill=type),size=2)+
+  geom_point(data=Be7npG,aes(x=obsx,y=obsy,group=dat,shape=dat,color=type,fill=type,size=type))+
   
   scale_shape_manual(values=c(22,4,3,24,25,23,21),name="",
                      guide = guide_legend(nrow = 2))+
-  scale_color_manual(name="",values=c("red","cyan3"),guide="none")+
+  scale_size_manual(values=c(2.5,2),name="",
+                    ,guide="none")+
+  scale_color_manual(name="",values=c("#e41a1c","#66c2a5"),guide="none")+
   scale_alpha_manual(name="",values=c(1,0.5),guide="none")+
-  scale_fill_manual(values=c("red","cyan3"),name="",guide="none") +
+  scale_fill_manual(values=c("#e41a1c","white"),name="",guide="none") +
   scale_x_log10(breaks = c(1e-6,1e-3,1),
                 labels=c(expression(10^-6),expression(10^-3),"1")) +
   theme_economist_white() + ylab(expression(paste(sqrt(E), sigma, " (", sqrt(MeV), "b)"))) + 
@@ -260,7 +269,6 @@ ggplot(Be7npG,aes(x=E,y=S)) +
         legend.position = c(0.45,0.95),
         legend.text = element_text(size=13),
         legend.text.align = 1,
-        
         legend.background = element_rect(colour = "white",fill=NA),
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
@@ -274,7 +282,6 @@ ggplot(Be7npG,aes(x=E,y=S)) +
            label=expression(paste(NULL^"7","Be(n,p)",NULL^"7","Li")),
            size=6) 
 dev.off()
-
 
 
 
