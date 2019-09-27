@@ -30,7 +30,7 @@ fu <- log(c(1.020,1.10,1.050,1.051,1.085,1.032))
 
 
 # Plotting routines
-samp <- read.csv("Be7MCMC_case2.csv",header = T) %>% slice(10000:n()) 
+samp <- read.csv("MCMC_ApJ_slice.csv",header = T) %>% slice(10000:n()) 
 en <- samp[,c('e0_1','e0_2',
               'e0_3', 'e0_4',
               'e0_5', 'e0_6', 
@@ -181,7 +181,7 @@ dr=data.frame(x=c(0,0.15,0.34,0.51,0.96,1.23,1.32),
               vy=rep(9.5,7))
 
 # Plot all
-pdf("Be7_temp.pdf", width=7.5, height=5)
+pdf("Be7_slice.pdf", width=7.5, height=5)
 ggplot(Be7npG,aes(x=E,y=S)) +
   
   
