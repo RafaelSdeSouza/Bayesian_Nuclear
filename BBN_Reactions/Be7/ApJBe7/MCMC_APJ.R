@@ -305,10 +305,10 @@ conf$addMonitors(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
                    'y.norm','y.scat','hbg'))
 
 
-conf$removeSampler(c('ga_1','gb_1','ga_4', 'gb_4',
+conf$removeSampler(c('e0_1','e0_4','ga_1','ga_2','ga_3','gb_1','gb_2','ga_4','gb_3', 'gb_4',
                      'ra', 'rb'))
 
-conf$addSampler(target = c('ga_1','gb_1','ga_4', 'gb_4',
+conf$addSampler(target = c('e0_1','e0_4','ga_1','ga_2','ga_3','gb_1','gb_2','ga_4','gb_3', 'gb_4',
                            'ra', 'rb'),
                type = "AF_slice")
 
@@ -340,9 +340,9 @@ system.time(
 samp <- as.matrix(mcmcChain)
 
 
-write.csv(samp,"MCMC_ApJ_slice.csv")
+write.csv(samp,"MCMC_ApJ_slice2.csv")
 
-pdf("Chains.pdf")
+pdf("Chains_slice2.pdf")
 plot(mcmcChain)
 dev.off()
 
@@ -495,7 +495,7 @@ dr=data.frame(x=c(0,0.15,0.34,0.51,0.96,1.23,1.32),
               vy=rep(9.5,7))
 
 # Plot all
-pdf("Be7_ApJ_slice.pdf", width=7.5, height=5)
+pdf("Be7_ApJ_slice2.pdf", width=7.5, height=5)
 ggplot(Be7npG,aes(x=E,y=S)) +
   
   
