@@ -4,6 +4,10 @@ require(coda)
 require(ggridges)
 require(nuclear)
 require(dplyr)
+require(ggplot2)
+require(ggthemes)
+require(forcats)
+
 source("pair_wise_plot.R")
 source("plot_normfactors_DREAM.R")
 source("sigma7Benp7mod.R")
@@ -30,7 +34,7 @@ fu <- log(c(1.020,1.10,1.050,1.051,1.085,1.032))
 
 
 # Plotting routines
-samp <- read.csv("MCMC_ApJ_slice.csv",header = T) %>% slice(10000:n()) 
+samp <- read.csv("MCMC_ApJ_slice2.csv",header = T) 
 en <- samp[,c('e0_1','e0_2',
               'e0_3', 'e0_4',
               'e0_5', 'e0_6', 
