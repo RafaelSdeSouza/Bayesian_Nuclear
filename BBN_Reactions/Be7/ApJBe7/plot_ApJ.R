@@ -259,9 +259,9 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   scale_shape_manual(values=c(22,4,3,24,25,23,21),name="",
                      guide = guide_legend(nrow = 2))+
-  scale_size_manual(values=c(2.5,2),name="",
+  scale_size_manual(values=c(2.75,2.25),name="",
                     ,guide="none")+
-  scale_color_manual(name="",values=c("#e41a1c","#66c2a5"),guide="none")+
+  scale_color_manual(name="",values=c("#e41a1c","gray35"),guide="none")+
   scale_alpha_manual(name="",values=c(1,0.5),guide="none")+
   scale_fill_manual(values=c("#e41a1c","white"),name="",guide="none") +
   scale_x_log10(breaks = c(1e-6,1e-3,1),
