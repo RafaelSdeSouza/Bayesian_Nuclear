@@ -1,5 +1,7 @@
 ## Integration Script
 require(xtable)
+require(gsl)
+require(RcppGSL)
 ## Auxiliar Function
 
 fu <- function(x){exp(sqrt(log(1+var(x)/mean(x)^2)))}
@@ -9,8 +11,8 @@ fu <- function(x){exp(sqrt(log(1+var(x)/mean(x)^2)))}
 
 
 ## Load your mcmcChain here
-mat <- read.csv("Be7MCMC.csv",header = T)
-mat$hbg <- 0
+mat <- read.csv("MCMC_ApJ_ultimaterun.csv",header = T) 
+#mat$hbg <- 0
 
 ## Functions to be used to calculate rate at a given temperature
 
@@ -150,19 +152,24 @@ NumRate7BenpTable <- function(mat, N = 1000,T9){
 Tgrid = c(0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.010,0.011,0.012,
           0.013,0.014,0.015,0.016,0.018,0.020,0.025,0.030,0.040,0.050,0.060,0.070,
           0.080,0.090,0.100,0.110,0.120,0.130,0.140,0.150,0.160,0.180,0.200,0.250,0.300,
-          0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000,1.250,1.5,1.75,2,
-          2.5,3,3.5,4,5,6,7,8,9,10)
+          0.350,0.400,0.450,0.500,0.600,0.700,0.800,0.900,1.000)
+          #,1.250,1.5,1.75,2,
+ #         2.5,3,3.5,4,5,6,7,8,9,10)
 
 
-NRate <- NumRate7BenpTable(mat,N=25,T9=Tgrid[1:3])
+NRate <- NumRate7BenpTable(mat,N = 1e3,T9=Tgrid)
+
+df1 = data.frame(NRate[1:23,c(1,3,2,4,5)])
+df2 = data.frame(NRate[24:46,c(1,3,2,4,5)])
+dfFull = data.frame(df1,df2)
 
 ## Latex Table Output
 
 
-#write.csv(Nrate,"rates_dpg.csv",row.names = F)
-print(xtable(NRate, type = "latex",display=c("e","g","E","E","E",
-                                             "g"),
-             digits=4), include.rownames = FALSE)
+write.csv(NRate,"MCMCrates_Be7.csv",row.names = F)
+print(xtable(dfFull[,c(1,2,5,6,7,10)],
+             type = "latex",display=c("e","g","E","g","g","E","g"),
+             digits=4),include.rownames = FALSE)
 
 
 

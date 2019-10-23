@@ -1,5 +1,4 @@
 require(ggmcmc)
-require(mcmcplots)
 require(coda)
 require(ggridges)
 require(nuclear)
@@ -9,7 +8,7 @@ require(ggthemes)
 require(forcats)
 
 source("pair_wise_plot.R")
-source("plot_normfactors_DREAM.R")
+source("plot_normfactors_II.R")
 source("sigma7Benp7mod.R")
 
 Be7np <- read.csv("Be7np.csv")
@@ -34,11 +33,28 @@ fu <- log(c(1.020,1.10,1.050,1.051,1.085,1.032))
 
 
 # Plotting routines
-samp <- read.csv("MCMC_ApJ_slice2.csv",header = T) 
+samp <- read.csv("MCMC_ApJ_ultimaterun.csv",header = T) 
 en <- samp[,c('e0_1','e0_2',
               'e0_3', 'e0_4',
               'e0_5', 'e0_6', 
               'e0_7')]
+
+pdf("Be7_norm.pdf", width=4, height=5.5)
+plot_normfactors(samp)
+dev.off()
+
+pdf("Be7_Er.pdf", width=18.25, height=3.5)
+plot_Er(samp)
+dev.off()
+
+pdf("Be7_ga.pdf", width=18.25, height=3.5)
+plot_ga(samp)
+dev.off()
+
+pdf("Be7_gb.pdf", width=18.25, height=3.5)
+plot_gb(samp)
+dev.off()
+
 SE <- ggs(as.mcmc(en))
 ggs_traceplot(SE)
 
@@ -189,81 +205,84 @@ pdf("Be7_slice.pdf", width=7.5, height=5)
 ggplot(Be7npG,aes(x=E,y=S)) +
   
   
-  geom_area(data=MBD,aes(x=x,y=y),color="#a6cee3",fill="#a6cee3",
-            size=0,alpha=0.4) +
+#  geom_area(data=MBD,aes(x=x,y=y),color="#a6cee3",fill="#a6cee3",
+#            size=0,alpha=0.4) +
   
-  #
-  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#739a43"),alpha=0.6,show.legend=FALSE) +
-  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#739a43"),alpha=0.95,show.legend=FALSE) +
+#
+#  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#6baed6"),show.legend=FALSE) +
+  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#411BEA"),show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 5.75+2, yend = 5.75+2,size=1.5,
-           colour = "#739a43") +
+           colour = "#411BEA") +
   annotate(geom="text", x = 1.25,  y = 5.75+2,
            label=expression(2^"-"*", 0.00"),size=4) +
   
-  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#6780d8"),alpha=0.6,show.legend=FALSE) +
-  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#6780d8"),alpha=0.95,show.legend=FALSE) +
+#  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#74c476"),show.legend=FALSE) +
+  geom_ribbon(data=gr2,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#008000"),show.legend=FALSE) +
   annotate("segment",  x = 0.2, xend = 0.35, y = 5.25+2, yend = 5.25+2,size=1.5,
-           colour = "#6780d8") +
+           colour = "#008000") +
   annotate(geom="text", x = 1.25,  y = 5.25+2,
            label=expression(3^"+"*", 0.15"),size=4) +
   
   
-  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#b84c7d"),alpha=0.6,show.legend=FALSE) +
-  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#b84c7d"),alpha=0.95,show.legend=FALSE) +
+#  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#BF40BF"),alpha=0.7,show.legend=FALSE) +
+  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#BF40BF"),alpha=0.95,show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 4.75+2, yend = 4.75+2,size=1.5,
-           colour = "#b84c7d") +
+           colour = "#BF40BF") +
   annotate(geom="text", x = 1.25,  y = 4.75+2,
            label=expression(3^"+"*", 0.34"),size=4) +
   
   
-  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#df7357"),alpha=0.6,show.legend=FALSE) +
-  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#df7357"),alpha=0.95,show.legend=FALSE) +
+#  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#E6AB02"),show.legend=FALSE) +
+  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#A6761D"),show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 4.25+2, yend = 4.25+2,size=1.5,
-           colour = "#df7357") +
+           colour = "#A6761D") +
   annotate(geom="text", x = 1.25,  y = 4.25+2,
            label=expression(1^"-"*", 0.51"),size=4) +
   
   
   
-  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#c1bd5c"),alpha=0.6,show.legend=FALSE) +
-  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#c1bd5c"),alpha=0.95,show.legend=FALSE) +
+#  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fccde5"),show.legend=FALSE) +
+  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#f781bf"),show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 3.25+2, yend = 3.25+2,size=1.5,
-           colour = "#c1bd5c") +
+           colour = "#f781bf") +
   annotate(geom="text",  x = 1.25,  y = 3.25+2,
            label=expression(2^"+"*", 1.23"),size=4) +
   
   
-  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#5d398d"),alpha=0.6,show.legend=FALSE) +
-  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#5d398d"),alpha=0.95,show.legend=FALSE) +
+
+  
+  
+#  geom_ribbon(data=gr7,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("cyan"),show.legend=FALSE) +
+  geom_ribbon(data=gr7,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("cyan3"),show.legend=FALSE) +
+  annotate("segment",x = 0.2, xend = 0.35, y = 2.75+2, yend = 2.75+2,size=1.5,
+           colour = "cyan3") +
+  annotate(geom="text",  x = 1.25,  y = 2.75+2,
+           label=expression(0^"+"*", 1.32"),size=4) +
+  
+#  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fdb462"),show.legend=FALSE) +
+  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#ff7f00"),show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 3.75+2, yend = 3.75+2,size=1.5,
-           colour = "#5d398d") +
+           colour = "#ff7f00") +
   annotate(geom="text", x = 1.25,  y = 3.75+2,
            label=expression(4^"+"*", 0.96"),size=4) +
   
   
-  
-  geom_ribbon(data=gr7,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#c19c3c"),alpha=0.6,show.legend=FALSE) +
-  geom_ribbon(data=gr7,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#c19c3c"),alpha=0.95,show.legend=FALSE) +
-  annotate("segment",x = 0.2, xend = 0.35, y = 2.75+2, yend = 2.75+2,size=1.5,
-           colour = "#c19c3c") +
-  annotate(geom="text",  x = 1.25,  y = 2.75+2,
-           label=expression(0^"+"*", 1.32"),size=4) +
-  
-  geom_ribbon(data=grall,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("black"),alpha=0.5,show.legend=FALSE) +
-  geom_ribbon(data=grall,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("black"),alpha=0.85,show.legend=FALSE) +
+ # geom_ribbon(data=grall,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fb6a4a"),show.legend=FALSE) +
+  geom_ribbon(data=grall,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#99000d"),show.legend=FALSE) +
   
   
   
-  geom_errorbar(show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat,group=dat,color=type),alpha=0.75,width=0.025)+
-  geom_point(data=Be7npG,aes(x=obsx,y=obsy,group=dat,shape=dat,color=type,fill=type,size=type))+
+  geom_errorbar(show.legend = FALSE,aes(x=E,ymin=S-Stat,ymax=S+Stat,group=dat,color=type),alpha=0.75,width=0.025)+
+  geom_point(data=Be7npG,aes(x=obsx,y=obsy,group=dat,shape=dat,color=type,fill=type,size=type,alpha=type)
+             )+
   
-  scale_shape_manual(values=c(22,4,3,24,25,23,21),name="",
-                     guide = guide_legend(nrow = 2))+
-  scale_size_manual(values=c(2.75,2.25),name="",
-                    ,guide="none")+
-  scale_color_manual(name="",values=c("#e41a1c","gray35"),guide="none")+
-  scale_alpha_manual(name="",values=c(1,0.5),guide="none")+
-  scale_fill_manual(values=c("#e41a1c","white"),name="",guide="none") +
+  scale_shape_manual(guide = guide_legend(nrow = 2,
+                    override.aes = list(size = 2.5)),
+                    values=c(22,24,21,4,25,8,23),name="")+
+  scale_size_manual(values=c(2.7,2.5),name="",guide="none")+
+  scale_color_manual(name="",values=c("black","gray45"),guide="none")+
+  scale_alpha_manual(name="",values=c(1,0.75),guide="none")+
+  scale_fill_manual(values=c("black","white"),name="",guide="none") +
   scale_x_log10(breaks = c(1e-6,1e-3,1),
                 labels=c(expression(10^-6),expression(10^-3),"1")) +
   theme_economist_white() + ylab(expression(paste(sqrt(E), sigma, " (", sqrt(MeV), "b)"))) + 
@@ -287,6 +306,55 @@ ggplot(Be7npG,aes(x=E,y=S)) +
            size=6) 
 dev.off()
 
+
+
+Be7npG2 <- Be7npG %>% unite(comb, c(dat,type),remove=F) %>%
+  mutate(comb =as.factor(comb))
+
+# Plot all
+pdf("data.pdf", width=7.5, height=5)
+ggplot(Be7npG,aes(x=E,y=S)) +
+  
+  
+  geom_area(data=MBD,aes(x=x,y=y),color="#a6cee3",fill="#a6cee3",
+            size=0,alpha=0.4) +
+  
+ 
+  geom_errorbar(data=Be7npG2,show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat,group=dat,color=comb),width=0.025)+
+  geom_point(data=Be7npG2,aes(x=obsx,y=obsy,group=dat,shape=dat,color=comb,fill=type,size=type))+
+  
+  scale_shape_manual(values=c(22,24,21,4,25,8,23),name="",
+                     guide = guide_legend(ncol = 1,
+                             override.aes = list(size = 2.5))) +
+  scale_size_manual(values=c(2.75,2.5),name="",guide="none")+
+#  scale_color_discrete_qualitative(name="",guide="none") +
+  scale_color_manual(name="",guide="none",
+  values=c("#e41a1c","black","#d95f02","black","#377eb8","black",
+           "#e41a1c","#4daf4a","#984ea3","black")) +
+  scale_alpha_manual(name="",values=c(1,0.5),guide="none")+
+  scale_fill_manual(values=c("#e41a1c","white"),name="",guide="none") +
+  scale_x_log10(breaks = c(1e-6,1e-3,1),
+                labels=c(expression(10^-6),expression(10^-3),"1")) +
+  theme_economist_white() + ylab(expression(paste(sqrt(E), sigma, " (", sqrt(MeV), "b)"))) + 
+  xlab("Energy (MeV)") + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = c(0.875,0.75),
+        legend.text = element_text(size=13),
+        legend.text.align = 1,
+        legend.background = element_rect(colour = "white",fill=NA),
+        plot.background = element_rect(colour = "white", fill = "white"),
+        panel.background = element_rect(colour = "white", fill = "white"),
+        legend.key = element_rect(colour = "white", fill = "white"),
+        axis.title = element_text(color="black", size=17.5),
+        axis.text  = element_text(size=16),
+        strip.text = element_text(size=10),
+        strip.background = element_rect("gray85")) +
+  coord_cartesian(xlim=c(1e-8,2.25),ylim=c(0.175,9.75)) +
+  annotate(geom="text",1e-7, 1,
+           label=expression(paste(NULL^"7","Be(n,p)",NULL^"7","Li")),
+           size=6) 
+dev.off()
 
 
 
