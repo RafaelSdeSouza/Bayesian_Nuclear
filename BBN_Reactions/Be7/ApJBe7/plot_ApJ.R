@@ -8,7 +8,7 @@ require(ggthemes)
 require(forcats)
 
 source("pair_wise_plot.R")
-source("plot_normfactors_II.R")
+source("plot_normfactor_II.R")
 source("sigma7Benp7mod.R")
 
 Be7np <- read.csv("Be7np.csv")
