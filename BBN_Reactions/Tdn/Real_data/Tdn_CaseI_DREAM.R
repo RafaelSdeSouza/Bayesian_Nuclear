@@ -17,7 +17,6 @@ library(dplyr);require(lessR);library(BayesianTools);
 require(truncnorm)
 =======
 require(truncnorm);require(msm)
->>>>>>> 7c4af3852c31f00a2772024f14ddd603fd901fc5
 source("SfacTdn.R")
 
 
