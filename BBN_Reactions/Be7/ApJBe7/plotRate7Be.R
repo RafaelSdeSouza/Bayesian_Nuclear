@@ -2,6 +2,9 @@ require(purrr)
 require(forcats)
 require(dplyr)
 require(tidyverse)
+require(ggplot2)
+require(ggthemes)
+require(colorspace)
 NABe7 <- read.csv("MCMCrates_Be7.csv",header = TRUE)
 Norm <- NABe7$median
 
@@ -16,7 +19,7 @@ NAI_new <- NABe7[,c("T9","median","lower","upper")]  %>%
 old <- read.csv("Be7Li.csv",header = TRUE) 
 old <- old[,c("T.9","Adopted","Lower","Upper")]  %>%
   set_names(c("T9","Adopted","Lower","Upper"))  %>%
-  filter(T9 <=1) %>%
+#  filter(T9 <=1) %>%
   mutate(data="previous") %>%
   mutate(Adopted = Adopted/Norm) %>%
   mutate(Lower = Lower/Norm) %>%
@@ -33,10 +36,10 @@ ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper,alpha=data),show.legend=FALSE) +
   scale_alpha_manual(values=c(1,0.375))+
   geom_line(size=0.5) +
-  coord_cartesian(ylim=c(0.85,1.05),xlim=c(0.00125,1)) +
+  coord_cartesian(ylim=c(0.85,1.05),xlim=c(0.00125,10)) +
   theme_economist_white() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
   scale_fill_discrete_qualitative(name="") +
-  scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c("0.001","0.01","0.1","1"))  +
+  scale_x_log10(breaks = c(0.001,0.01,0.1,1,10),labels=c("0.001","0.01","0.1","1","10"))  +
   #  annotation_logticks(base=2.875,sides = "l") +
   scale_linetype_manual(guide=F,values=c("dashed","solid"),name="") +
   theme(panel.grid.major = element_blank(),

@@ -6,11 +6,17 @@ require(dplyr)
 require(ggplot2)
 require(ggthemes)
 require(forcats)
+require(tidybayes)
+require(truncnorm)
+require(nuclear)
+require(gsl)
 
 source("pair_wise_plot.R")
-source("plot_normfactors_II.R")
+source("plot_normfactor_II.R")
 source("sigma7Benp7mod.R")
-
+source('plot_Er.R')
+source('plot_gb.R')
+source('plot_ga.R')
 Be7np <- read.csv("Be7np.csv")
 
 
