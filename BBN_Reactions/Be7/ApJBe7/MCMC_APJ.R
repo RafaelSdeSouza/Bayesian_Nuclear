@@ -218,10 +218,10 @@ samplerCode <- nimbleCode({
   hbg ~ dgamma(0.1,0.1)
 
   for (k in 1:4) {
-    y.scat[k]  <- 0
+    y.scat[k] ~ dgamma(1,20)  
   }
   for (k in 5:10) {
-   y.scat[k] ~ dgamma(1,20)
+   y.scat[k] <- 0
   }
 
   
@@ -305,10 +305,10 @@ conf$addMonitors(c('e0_1','ga_1','gb_1','e0_2','ga_2','gb_2',
                    'y.norm','y.scat','hbg'))
 
 
-conf$removeSampler(c('e0_1','e0_4','ga_1','ga_2','ga_3','gb_1','gb_2','ga_4','gb_3', 'gb_4',
+conf$removeSampler(c('e0_1','ga_1','ga_2','ga_3','gb_1','gb_2','ga_4','gb_3', 'gb_4',
                      'ra', 'rb'))
 
-conf$addSampler(target = c('e0_1','e0_4','ga_1','ga_2','ga_3','gb_1','gb_2','ga_4','gb_3', 'gb_4',
+conf$addSampler(target = c('e0_1','ga_1','ga_2','ga_3','gb_1','gb_2','ga_4','gb_3', 'gb_4',
                            'ra', 'rb'),
                type = "AF_slice")
 
@@ -328,9 +328,9 @@ compiledMCMC <- compileNimble(samplerMCMC,project = ourmodel,showCompilerOutput 
 # resetFunctions = TRUE; if you would want to reset all the previously created functions
 # in order to addd the new MCMC
 
-n.chains = 3
-n.iter =   200000
-n.burnin = 175000
+n.chains = 1
+n.iter =   500
+n.burnin = 100
 
 system.time(
   mcmcChain <- runMCMC(compiledMCMC,niter = n.iter, nchains = n.chains, nburnin = n.burnin,
