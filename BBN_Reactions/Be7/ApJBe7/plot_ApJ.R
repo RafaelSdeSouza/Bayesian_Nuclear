@@ -10,6 +10,7 @@ require(tidybayes)
 require(truncnorm)
 require(nuclear)
 require(gsl)
+require(cowplot)
 
 source("pair_wise_plot.R")
 source("plot_normfactor_II.R")
@@ -49,17 +50,19 @@ pdf("Be7_norm.pdf", width=4, height=5.5)
 plot_normfactors(samp)
 dev.off()
 
-pdf("Be7_Er.pdf", width=18.25, height=3.5)
-plot_Er(samp)
+theta1 <- plot_Er(samp)
+theta2 <- plot_ga(samp)
+theta3 <- plot_gb(samp)
+
+pdf("Be7_Rmatrix.pdf", width=18, height=3*3)
+plot_grid(
+  theta1,theta2,theta3 ,
+  align = "h", axis = "tb",
+  nrow = 3)  
 dev.off()
 
-pdf("Be7_ga.pdf", width=18.25, height=3.5)
-plot_ga(samp)
-dev.off()
 
-pdf("Be7_gb.pdf", width=18.25, height=3.5)
-plot_gb(samp)
-dev.off()
+
 
 SE <- ggs(as.mcmc(en))
 ggs_traceplot(SE)
