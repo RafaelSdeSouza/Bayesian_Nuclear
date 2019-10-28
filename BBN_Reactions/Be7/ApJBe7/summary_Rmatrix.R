@@ -30,6 +30,7 @@ sigscat <- samp[,c("y.scat.1.","y.scat.2.",
 tabEr <- apply(en,2,probBe7)
  tabga <- apply(gan,2,probBe7)
  tabgb <- apply(gbn,2,probBe7)
+ an <- apply(samp[,c("ra","rb")],2,probBe7)
  
  formtab <- function(tab){
  low <-  tab[2,] - tab[1,]
@@ -39,12 +40,12 @@ tabEr <- apply(en,2,probBe7)
  return(out)
  }
  
- 
- round(formtab(tabEr),5)
- round(formtab( tabga ),5)
- round(formtab( tabgb ),5)
+ round(formtab( an ),2)
+ round(formtab(tabEr),4)
+ round(formtab( tabga ),4)
+ round(formtab( tabgb ),4)
  round(formtab(apply(norm,2,probBe7)),2)
- round(formtab(apply(sigscat,2,probBe7)),2)
+ round(formtab(apply(sigscat,2,probBe7)),3)
  
 tab2 <- as.data.frame(tab2)
 tab2$low <- tab2[,4] - tab2[,3]
