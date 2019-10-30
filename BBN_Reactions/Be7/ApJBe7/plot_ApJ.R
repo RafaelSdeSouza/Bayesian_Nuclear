@@ -196,6 +196,8 @@ grall <-  data.frame(x = xx, mean = yall[,"50%"],lwr1=yall[,"25%"],lwr2=yall[,"2
                      upr1=yall[,"75%"],
                      upr2=yall[,"97.5%"])
 
+MB <- function(x1){3e2*(x1*(2.718^(-x1/(0.086173*0.5))))}
+MBD <- data.frame(x=xx,y=MB(xx))
 
 Be7npG <-  Be7np 
 library(plyr)
@@ -312,9 +314,6 @@ ggplot(Be7npG,aes(x=E,y=S)) +
            label=expression(paste(NULL^"7","Be(n,p)",NULL^"7","Li")),
            size=6) 
 dev.off()
-
-
-
 
 
 

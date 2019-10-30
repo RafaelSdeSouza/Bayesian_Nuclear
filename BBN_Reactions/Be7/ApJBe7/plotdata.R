@@ -58,10 +58,10 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   geom_errorbar(data=Be7npG2,show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat,group=dat,color=comb),width=0.05)+
   
-  
-  geom_point(data=Be7npG2,aes(x=obsx,y=obsy,group=dat,shape=dat,color=comb,fill=type,size=type))+
   geom_errorbar(data=absdat,show.legend = FALSE,aes(x=E,y=S,ymin=S-syst,ymax=S+syst),color="#e41a1c",width=0.1)+
   
+  geom_point(data=Be7npG2,aes(x=obsx,y=obsy,group=dat,shape=dat,color=comb,fill=type,size=type))+
+ 
   scale_shape_manual(values=c(22,24,21,4,25,8,23),name="",
                      guide = guide_legend(ncol = 1,
                                           override.aes = list(size = 2.5))) +
