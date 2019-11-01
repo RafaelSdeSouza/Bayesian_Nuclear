@@ -9,6 +9,7 @@ require(gsl)
 require(cowplot)
 library(plyr)
 require(tidyr)
+require(emojifont)
 
 Be7np <- read.csv("Be7np.csv")
 
@@ -70,7 +71,7 @@ ggplot(Be7npG2,aes(x=E,y=S)) +
   
   geom_point(data=Be7npG2,aes(x=E,y=S,group=dat,shape=dat,color=comb,fill=type,size=type))+
  
-  scale_shape_manual(values=c(22,24,21,4,25,8,23),name="",
+  scale_shape_manual(values=c(22,24,21,35,25,8,23),name="",
                      guide = guide_legend(ncol = 1,
                                           override.aes = list(size = 2.5))) +
   scale_size_manual(values=c(2.75,2.5),name="",guide="none")+
