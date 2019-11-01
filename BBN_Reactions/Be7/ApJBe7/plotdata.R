@@ -44,23 +44,31 @@ Be7npG$dat <- revalue(Be7npG$dat, c("Koe88b"="Koe88","Dam18b"="Dam18",Gib59b="Gi
 Be7npG2 <- Be7npG %>% unite(comb, c(dat,type),remove=F) %>%
   mutate(comb =as.factor(comb))
 
+
+
+#Be7npG2 <- Be7npG2 %>% mutate_cond(type == "abs", E = E + runif(6,-1e-5,1e-5))
+
 absdat <- filter(Be7npG2, type=="abs") %>% mutate(syst = exp(fu)*S-S)
+
+
+Be7npG2$E[155:160] <- Be7npG2$E[155:160]*runif(6,0.8,1.2)
+absdat$E <- Be7npG2$E[155:160] 
 
 
 # Plot all
 pdf("data.pdf", width=7.5, height=5)
-ggplot(Be7npG,aes(x=E,y=S)) +
+ggplot(Be7npG2,aes(x=E,y=S)) +
   
   
   geom_area(data=MBD,aes(x=x,y=y),color="#a6cee3",fill="#a6cee3",
             size=0,alpha=0.4) +
   
   
-  geom_errorbar(data=Be7npG2,show.legend = FALSE,aes(x=E,y=S,ymin=S-Stat,ymax=S+Stat,group=dat,color=comb),width=0.05)+
+  geom_errorbar(data=filter(Be7npG2,type=="rel"),show.legend = FALSE,aes(x=E,ymin=S-Stat,ymax=S+Stat,group=dat,color=comb),width=0.01)+
   
-  geom_errorbar(data=absdat,show.legend = FALSE,aes(x=E,y=S,ymin=S-syst,ymax=S+syst),color="#e41a1c",width=0.1)+
+  geom_errorbar(data=absdat,show.legend = FALSE,aes(x=E,ymin=S-syst,ymax=S+syst),color="#e41a1c",width=0.01)+
   
-  geom_point(data=Be7npG2,aes(x=obsx,y=obsy,group=dat,shape=dat,color=comb,fill=type,size=type))+
+  geom_point(data=Be7npG2,aes(x=E,y=S,group=dat,shape=dat,color=comb,fill=type,size=type))+
  
   scale_shape_manual(values=c(22,24,21,4,25,8,23),name="",
                      guide = guide_legend(ncol = 1,
@@ -74,8 +82,9 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   scale_fill_manual(values=c("#e41a1c","white"),name="",guide="none") +
   scale_x_log10(breaks = c(1e-6,1e-3,1),
                 labels=c(expression(10^-6),expression(10^-3),"1")) +
-  theme_economist_white() + ylab(expression(paste(sqrt(E), sigma, " (", sqrt(MeV), "b)"))) + 
+  ylab(expression(paste(sqrt(E), sigma, " (", sqrt(MeV), "b)"))) + 
   xlab("Energy (MeV)") + 
+ theme_cowplot() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = c(0.875,0.75),

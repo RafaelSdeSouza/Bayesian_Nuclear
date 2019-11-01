@@ -41,39 +41,10 @@ fu <- log(c(1.020,1.10,1.050,1.051,1.085,1.032))
 
 # Plotting routines
 samp <- read.csv("MCMC_ApJ_ultimaterun.csv",header = T) 
-en <- samp[,c('e0_1','e0_2',
-              'e0_3', 'e0_4',
-              'e0_5', 'e0_6', 
-              'e0_7')]
-
-pdf("Be7_norm.pdf", width=4, height=5.5)
-plot_normfactors(samp)
-dev.off()
-
-theta1 <- plot_Er(samp)
-theta2 <- plot_ga(samp)
-theta3 <- plot_gb(samp)
-
-pdf("Be7_Rmatrix.pdf", width=18, height=3*3)
-plot_grid(
-  theta1,theta2,theta3 ,
-  align = "h", axis = "tb",
-  nrow = 3)  
-dev.off()
-
-
-
-
-SE <- ggs(as.mcmc(en))
-ggs_traceplot(SE)
-
-gan <- samp[,c('ga_1','ga_2', 'ga_3', 'ga_4', 'ga_5', 'ga_6', 'ga_7')]
-Sa <- ggs(as.mcmc(gan))
-ggs_traceplot(Sa)
-
-gbn <- samp[,c('gb_1','gb_2', 'gb_3', 'gb_4', 'gb_5', 'gb_6', 'gb_7')]
-Sb <- ggs(as.mcmc(gbn))
-ggs_traceplot(Sb)
+#en <- samp[,c('e0_1','e0_2',
+#              'e0_3', 'e0_4',
+#              'e0_5', 'e0_6', 
+#              'e0_7')]
 
 
 
@@ -316,6 +287,39 @@ ggplot(Be7npG,aes(x=E,y=S)) +
 dev.off()
 
 
+
+
+
+
+
+pdf("Be7_norm.pdf", width=4, height=5.5)
+plot_normfactors(samp)
+dev.off()
+
+theta1 <- plot_Er(samp)
+theta2 <- plot_ga(samp)
+theta3 <- plot_gb(samp)
+
+pdf("Be7_Rmatrix.pdf", width=18, height=3*3)
+plot_grid(
+  theta1,theta2,theta3 ,
+  align = "h", axis = "tb",
+  nrow = 3)  
+dev.off()
+
+
+
+
+SE <- ggs(as.mcmc(en))
+ggs_traceplot(SE)
+
+gan <- samp[,c('ga_1','ga_2', 'ga_3', 'ga_4', 'ga_5', 'ga_6', 'ga_7')]
+Sa <- ggs(as.mcmc(gan))
+ggs_traceplot(Sa)
+
+gbn <- samp[,c('gb_1','gb_2', 'gb_3', 'gb_4', 'gb_5', 'gb_6', 'gb_7')]
+Sb <- ggs(as.mcmc(gbn))
+ggs_traceplot(Sb)
 
 
 
