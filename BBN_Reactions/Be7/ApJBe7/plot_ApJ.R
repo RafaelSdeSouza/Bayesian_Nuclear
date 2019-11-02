@@ -252,7 +252,7 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   
   
-  geom_errorbar(show.legend = FALSE,aes(x=E,ymin=S-Stat,ymax=S+Stat,group=dat,color=type),alpha=0.75,width=0.025)+
+  geom_errorbar(show.legend = FALSE,aes(x=E,ymin=S-Stat,ymax=S+Stat,group=dat,color=type),alpha=0.75,size=0.2,width=0.01)+
   geom_point(data=Be7npG,aes(x=obsx,y=obsy,group=dat,shape=dat,color=type,fill=type,size=type,alpha=type)
              )+
   
@@ -263,13 +263,18 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   scale_color_manual(name="",values=c("black","gray45"),guide="none")+
   scale_alpha_manual(name="",values=c(1,0.75),guide="none")+
   scale_fill_manual(values=c("black","white"),name="",guide="none") +
-  scale_x_log10(breaks = c(1e-6,1e-3,1),
-                labels=c(expression(10^-6),expression(10^-3),"1")) +
-  theme_economist_white() + ylab(expression(paste(sqrt(E), sigma, " (", sqrt(MeV), "b)"))) + 
-  xlab("Energy (MeV)") + 
+  scale_x_log10(breaks = c(1e-8,1e-7,1e-6,1e-5,1e-4,1e-3,1e-2,1e-1,1),
+                labels=c(expression(10^-8),expression(10^-7),expression(10^-6),
+                         expression(10^-5),expression(10^-4),
+                         expression(10^-3),expression(10^-2),
+                         expression(10^-1),"1")) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8)) +
+  ylab(expression(paste(sqrt(E["c.m."]), sigma["np"], " (", sqrt(MeV), "b)"))) + 
+  xlab(expression(paste(E["c.m."]," (MeV)"))) + 
+  theme_cowplot() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = c(0.45,0.95),
+        legend.position = c(0.25,0.95),
         legend.text = element_text(size=13),
         legend.text.align = 1,
         legend.background = element_rect(colour = "white",fill=NA),
