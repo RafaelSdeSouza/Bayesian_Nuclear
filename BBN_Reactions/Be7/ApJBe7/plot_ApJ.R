@@ -180,6 +180,10 @@ dr=data.frame(x=c(0,0.15,0.34,0.51,0.96,1.23,1.32),
               y=rep(10,7), 
               vy=rep(9.5,7))
 
+
+Be7npG$E[155:160] <- c(1.672947e-08, 2.569022e-08, 1.247648e-02, 1.790060e-03, 2.416324e-08, 1.833538e-08)
+absdat <- filter(Be7npG, type=="abs") %>% mutate(syst = exp(fu)*S-S)
+
 # Plot all
 pdf("Be7_slice.pdf", width=7.5, height=5)
 ggplot(Be7npG,aes(x=E,y=S)) +
@@ -190,9 +194,9 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
 #
 #  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#6baed6"),show.legend=FALSE) +
-  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#411BEA"),show.legend=FALSE) +
+  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#e31a1c"),show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 5.75+2, yend = 5.75+2,size=1.5,
-           colour = "#411BEA") +
+           colour = "#e31a1c") +
   annotate(geom="text", x = 1.25,  y = 5.75+2,
            label=expression(2^"-"*", 0.00"),size=4) +
   
@@ -205,26 +209,26 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   
 #  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#BF40BF"),alpha=0.7,show.legend=FALSE) +
-  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#BF40BF"),alpha=0.95,show.legend=FALSE) +
+  geom_ribbon(data=gr3,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#1f78b4"),alpha=0.95,show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 4.75+2, yend = 4.75+2,size=1.5,
-           colour = "#BF40BF") +
+           colour = "#1f78b4") +
   annotate(geom="text", x = 1.25,  y = 4.75+2,
            label=expression(3^"+"*", 0.34"),size=4) +
   
   
 #  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#E6AB02"),show.legend=FALSE) +
-  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#A6761D"),show.legend=FALSE) +
+  geom_ribbon(data=gr4,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#b15928"),show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 4.25+2, yend = 4.25+2,size=1.5,
-           colour = "#A6761D") +
+           colour = "#b15928") +
   annotate(geom="text", x = 1.25,  y = 4.25+2,
            label=expression(1^"-"*", 0.51"),size=4) +
   
   
   
 #  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fccde5"),show.legend=FALSE) +
-  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#f781bf"),show.legend=FALSE) +
+  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#fdbf6f"),show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 3.25+2, yend = 3.25+2,size=1.5,
-           colour = "#f781bf") +
+           colour = "#fdbf6f") +
   annotate(geom="text",  x = 1.25,  y = 3.25+2,
            label=expression(2^"+"*", 1.23"),size=4) +
   
@@ -233,9 +237,9 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   
 #  geom_ribbon(data=gr7,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("cyan"),show.legend=FALSE) +
-  geom_ribbon(data=gr7,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("cyan3"),show.legend=FALSE) +
+  geom_ribbon(data=gr7,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#6a3d9a"),show.legend=FALSE) +
   annotate("segment",x = 0.2, xend = 0.35, y = 2.75+2, yend = 2.75+2,size=1.5,
-           colour = "cyan3") +
+           colour = "#6a3d9a") +
   annotate(geom="text",  x = 1.25,  y = 2.75+2,
            label=expression(0^"+"*", 1.32"),size=4) +
   
@@ -248,13 +252,14 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   
  # geom_ribbon(data=grall,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fb6a4a"),show.legend=FALSE) +
-  geom_ribbon(data=grall,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#99000d"),show.legend=FALSE) +
+  geom_ribbon(data=grall,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("black"),show.legend=FALSE) +
   
   
   
   geom_errorbar(show.legend = FALSE,aes(x=E,ymin=S-Stat,ymax=S+Stat,group=dat,color=type),alpha=0.75,size=0.2,width=0.01)+
-  geom_point(data=Be7npG,aes(x=obsx,y=obsy,group=dat,shape=dat,color=type,fill=type,size=type,alpha=type)
-             )+
+  geom_errorbar(data=absdat,show.legend = FALSE,aes(x=E,ymin=S-syst,ymax=S+syst),color="black",size=0.2,width=0.01)+
+  geom_point(data=Be7npG,aes(x=E,y=S,group=dat,shape=dat,color=type,fill=type,size=type,alpha=type)
+             ) +
   
   scale_shape_manual(guide = guide_legend(nrow = 2,
                     override.aes = list(size = 2.5)),
