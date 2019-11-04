@@ -2,29 +2,30 @@ require(plyr)
 require(ggridges)
 plot_normfactors <- function(Normfit){
 
-  Sa <- ggs(as.mcmc(Normfit[,c("y.norm.1.","y.norm.2.",
-                               "y.norm.3.","y.norm.4.",
-                               "y.norm.5.","y.norm.6.",
-                               "y.norm.7.",
-                               "y.norm.8.",
-                               "y.norm.9.","y.norm.10.")]))
+#  Sa <- ggs(as.mcmc(Normfit[,c("y.norm.1.","y.norm.2.",
+#                               "y.norm.3.","y.norm.4.",
+#                               "y.norm.5.","y.norm.6.",
+#                               "y.norm.7.",
+#                               "y.norm.8.",
+#                               "y.norm.9.","y.norm.10.")]))
+  
+ Sa <- ggs(as.mcmc(Normfit[,c("y.norm.5.","y.norm.6.",
+                                 "y.norm.7.",
+                                 "y.norm.8.",
+                                 "y.norm.9.","y.norm.10.")]))
+  
   
  Sa$Parameter <- revalue(Sa$Parameter,
-                          c("y.norm.1." = "Dam18",
-                            "y.norm.2." = "Gib59",
-                            "y.norm.3." = "Mar19",
-                            "y.norm.4." = "Koe88",
-                            "y.norm.5." = "Koe88*",
-                            "y.norm.6." = "Dam18*",
-                            "y.norm.7." = "Gib59*",
+                          c("y.norm.5." = "Koe88",
+                            "y.norm.6." = "Dam18",
+                            "y.norm.7." = "Gib59",
                             "y.norm.8." = "Her19",
                             "y.norm.9." = "Cer89",
                             "y.norm.10." = "Tom19"))
 
-
-gg <- ggplot(Sa, aes(x = value, y = Parameter, fill=Parameter)) +
+ gg <- ggplot(Sa, aes(x = value, y = Parameter)) +
    geom_vline(xintercept = 1,linetype="dashed",color="gray30") +
-  stat_halfeyeh(slab_type = "pdf",adjust=3,normalize="panels") + 
+  stat_halfeyeh(slab_type = "pdf",adjust=3,normalize="panels",fill="#e41a1c",alpha=0.9) + 
   
 #  stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE, 
 #                     quantile_lines = FALSE,bandwidth = 0.01,
@@ -36,10 +37,10 @@ gg <- ggplot(Sa, aes(x = value, y = Parameter, fill=Parameter)) +
  
   theme_economist_white() +
 
-  scale_fill_manual(name = "Probability", values = c("#d95f02","#e41a1c","#377eb8","#984ea3",
-                                                     "#4daf4a",
-                                                     "#e41a1c","#e41a1c","#e41a1c",
-                                                     "#e41a1c","#e41a1c")) +
+#  scale_fill_manual(name = "Probability", values = c("#d95f02","#e41a1c","#377eb8","#984ea3",
+#                                                     "#4daf4a",
+#                                                     "#e41a1c","#e41a1c","#e41a1c",
+#                                                     "#e41a1c","#e41a1c")) +
   scale_alpha_manual(values=c(0,1,0)) +
   
   #  scale_fill_manual(values=c(rep("gray75",7))) +

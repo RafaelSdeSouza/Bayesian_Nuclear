@@ -34,17 +34,17 @@ gg <- ggplot(joind, aes(x = value,y=type, fill=Parameter,alpha=type)) +
   
   stat_halfeyeh(slab_type = "pdf",normalize="groups") + 
   # stat_ecdf() +
-  scale_x_continuous(breaks = scales::pretty_breaks(n = 4)) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 4,min.n = 4)) +
   
   theme_economist_white() +
   
   scale_fill_manual(name = "Probability",
-                    values = c("#411BEA","#008000","#BF40BF","#A6761D",
-                               "#ff7f00","#f781bf","cyan3")) +
+                    values = c("#e31a1c","#008000","#1f78b4","#b15928",
+                               "#ff7f00","#fdbf6f","#6a3d9a")) +
   scale_color_manual(name = "Probability",
-                     values = c("#411BEA","#008000","#BF40BF","#A6761D",
-                                "#ff7f00","#f781bf","cyan3")) +
-  scale_alpha_manual(values=c(0.9,0.7)) +
+                     values = c("#e31a1c","#008000","#1f78b4","#b15928",
+                                "#ff7f00","#fdbf6f","#6a3d9a")) +
+  scale_alpha_manual(values=c(1,1)) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = "none",
@@ -52,13 +52,13 @@ gg <- ggplot(joind, aes(x = value,y=type, fill=Parameter,alpha=type)) +
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="black", size=15),
-        axis.text  = element_text(size=11),
-        strip.text = element_text(size=15),
+        axis.title = element_text(color="black", size=23),
+        axis.text  = element_text(size=18),
+        strip.text = element_text(size=25),
         strip.background = element_rect("gray85")) +
   ylab("") +
   #  xlab("Highest Probability Interval")
-  xlab(expression(paste("Energy (MeV)"))) +
+  xlab(expression(paste(E["c.m."]," (MeV)"))) + 
   facet_wrap(.~Parameter,scale="free_x",nrow=1,labeller = "label_parsed")
 return(gg)
 }
