@@ -50,7 +50,7 @@ plot_normfactors <- function(Normfit){
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="black", size=15),
+        axis.title = element_text(color="black", size=12),
         axis.text  = element_text(size=10),
         strip.background = element_rect("white")) +
   ylab("") +

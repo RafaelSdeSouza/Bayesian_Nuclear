@@ -54,12 +54,13 @@ gg <- ggplot(joind, aes(x = value, y=type, fill=Parameter,alpha=type)) +
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="black", size=23),
-        axis.text  = element_text(size=18),
+        axis.title = element_text(color="black", size=25),
+        axis.text.y = element_text(size=25),
+        axis.text.x = element_text(size=18),
+        axis.title.x  = element_text(vjust = -1),
         strip.text = element_text(size=25),
         strip.background = element_rect("gray85")) +
      ylab("") +
-  #  xlab("Highest Probability Interval")
   xlab(expression(paste(E["c.m."]," (MeV)"))) + 
   facet_wrap(.~Parameter,scale="free_x",nrow=1,labeller = "label_parsed")
 return(gg)

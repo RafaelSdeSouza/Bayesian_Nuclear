@@ -53,9 +53,8 @@ ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="black", size=17.5),
-        strip.text = element_text(size=10),
+        axis.title = element_text(color="black", size=27),
         strip.background = element_rect("gray85"),
-        axis.text.y = element_text(size = 16, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
-        axis.text.x = element_text(size = 16, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")))
+        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")))
 dev.off()

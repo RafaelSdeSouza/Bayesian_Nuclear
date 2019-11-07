@@ -20,17 +20,17 @@ mat <- read.csv("MCMC_ApJ_ultimaterun.csv",header = T)
 
 sigma7Benp  <-  function(ecm, e0, ga, gb, ra, rb, jr, la, lb){
   # input masses, charges, angular momenta
-  m1_i = 7.0147344
-  m2_i = 1.0086649158   # masses (amu) of 7Be and n
-  m1_f = 7.014357697
-  m2_f = 1.007276452    # masses (amu) of 7Li and p
+  m1_i = 7.01473482886
+  m2_i = 1.00866491582  # masses (amu) of 7Be and n
+  m1_f = 7.01435791572
+  m2_f = 1.00727646658  # masses (amu) of 7Li and p
   z1_i = 4
   z2_i = 0              # charges of 7Be and n
   z1_f = 3
   z2_f = 1              # charges of 7Li and p
   jt = 1.5              # spins of target, projectile
   jp = 0.5
-  Q = 1.6442402         # reaction Q-value (MeV)
+  Q = 1.644425          # reaction Q-value (MeV) [from nuclear masses]
 
   # reduced masses
   mue_i <- (m1_i*m2_i)/(m1_i+m2_i)
@@ -113,8 +113,8 @@ NumRate7Benp   <- function(x, T9){
 
   # CALCULATE Nuclear rate
 
-  m1 = 7.0147344
-  m2 = 1.0086649158   # masses (amu) of 7Be and n
+  m1 = 7.01473482886
+  m2 = 1.00866491582   # masses (amu) of 7Be and n
   mue = (m1*m2)/(m1+m2)
 
   Nasv <- function(Temp){(3.7318e10/Temp^{3/2})*sqrt(1/mue)*integrate(integrand, lower = 1e-10, upper = 2,
