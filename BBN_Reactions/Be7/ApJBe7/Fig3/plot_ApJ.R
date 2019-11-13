@@ -179,7 +179,7 @@ dr=data.frame(x=c(0,0.15,0.34,0.51,0.96,1.23,1.32),
               vy=rep(9.5,7))
 
 
-Be7npG$E[155:160] <- c(1.672947e-08, 2.569022e-08, 1.247648e-02, 1.790060e-03, 2.416324e-08, 1.833538e-08)
+Be7npG$E[155:160] <- c(1.672947e-08, 2.569022e-08, 1.247648e-02, 1.790060e-03, 0.85*2.416324e-08, 1.5*1.833538e-08)
 absdat <- filter(Be7npG, type=="abs") %>% mutate(syst = exp(fu)*S-S)
 
 # Plot all
@@ -187,8 +187,8 @@ pdf("Be7_slice.pdf", width=7.5, height=5)
 ggplot(Be7npG,aes(x=E,y=S)) +
   
   
-#  geom_area(data=MBD,aes(x=x,y=y),color="#a6cee3",fill="#a6cee3",
-#            size=0,alpha=0.4) +
+  geom_area(data=MBD,aes(x=x,y=y),color="#BbC2C2",fill="#BbC2C2",
+            size=0,alpha=0.4) +
   
 #
 #  geom_ribbon(data=gr1,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#6baed6"),show.legend=FALSE) +
