@@ -108,7 +108,10 @@ formtab(tabG6)
 tabG7 <- apply(G7,2,probBe7)
 formtab(tabG7)
 
-Ex1 = M[,c("e0_1","e0_2",
+Ex = M[,c("e0_1","e0_2",
            "e0_3","e0_4",
            "e0_5","e0_6",
-           "e0_7")] + rnorm(40000,18898.64,0.08)
+           "e0_7")] + rnorm(40000,18898.64,0.08)*1e-3
+
+tabEx <- apply(Ex ,2,probBe7)
+formtab(tabEx)

@@ -2,6 +2,16 @@ require(plyr)
 require(ggridges)
 plot_normfactors <- function(Normfit){
 
+  prior <- ggs(as.mcmc(data.frame(
+    ga1 = rtruncnorm(1e4, a = 0, b = Inf, mean = 0, sd = 2.5),
+    ga2 = rtruncnorm(1e4, a = 0, b = Inf, mean = 0, sd = 2.5),
+    ga3 = rtruncnorm(1e4, a = 0, b = Inf, mean = 0, sd = 2.5),
+    ga4 = rtruncnorm(1e4, a = 0, b = Inf, mean = 0, sd = 2.5),
+    ga5 = rtruncnorm(1e4, a = 0, b = Inf, mean = 0, sd = 2.5),
+    ga6 = rtruncnorm(1e4, a = 0, b = Inf, mean = 0, sd = 2.5),
+    ga7 = rtruncnorm(1e4, a = 0, b = Inf, mean = 0, sd = 2.5)
+  ))) %>% mutate(type="Prior")  
+
 #  Sa <- ggs(as.mcmc(Normfit[,c("y.norm.1.","y.norm.2.",
 #                               "y.norm.3.","y.norm.4.",
 #                               "y.norm.5.","y.norm.6.",

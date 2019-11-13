@@ -4,6 +4,7 @@ require(dplyr)
 require(tidyverse)
 require(ggplot2)
 require(ggthemes)
+require(cowplot)
 require(colorspace)
 NABe7 <- read.csv("MCMCrates_Be7.csv",header = TRUE)
 Norm <- NABe7$median
@@ -31,7 +32,7 @@ joint$data <- as.factor(joint$data)
 joint$data <- factor(joint$data, levels = c("previous","presentI"))
 
 
-pdf("Be7_NAratio.pdf", width=7.5, height=5)
+pdf("Be7_NAratio.pdf", width=7.75, height=5.5)
 ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper,alpha=data),show.legend=FALSE) +
   scale_alpha_manual(values=c(1,0.375))+
@@ -53,8 +54,8 @@ ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
         plot.background = element_rect(colour = "white", fill = "white"),
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
-        axis.title = element_text(color="black", size=27),
+        axis.title = element_text(color="black", size=27.5),
         strip.background = element_rect("gray85"),
-        axis.text.y = element_text(size = 20, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
-        axis.text.x = element_text(size = 20, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")))
+        axis.text.y = element_text(size = 25, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
+        axis.text.x = element_text(size = 25, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")))
 dev.off()
