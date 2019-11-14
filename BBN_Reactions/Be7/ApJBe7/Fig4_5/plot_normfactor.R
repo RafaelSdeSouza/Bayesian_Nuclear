@@ -2,6 +2,8 @@ require(plyr)
 require(ggridges)
 require(ggmcmc)
 require(tidybayes)
+require(coda)
+require(ggthemes)
 plot_normfactors <- function(Normfit){
 
    prior <- ggs(as.mcmc(data.frame(
@@ -45,8 +47,8 @@ joind <- rbind(prior,post) %>% mutate(type=as.factor(type))  %>%
   
   theme_economist_white() +
 
-  scale_fill_manual(name = "Probability", values = c("#74c476","#fb6a4a")) +
-  scale_color_manual(name = "Probability", values = c("#00441b","#67000d")) +
+  scale_fill_manual(name = "Probability", values = c("#fb6a4a","gray80")) +
+  scale_color_manual(name = "Probability", values = c("#67000d","gray40")) +
   scale_alpha_manual(values=c(1,1)) +
   
   #  scale_fill_manual(values=c(rep("gray75",7))) +
@@ -62,7 +64,7 @@ joind <- rbind(prior,post) %>% mutate(type=as.factor(type))  %>%
         strip.background = element_rect("white")) +
   ylab("") +
   #  xlab("Highest Probability Interval")
-  xlab(expression(paste("Normalization factors ")))
+  xlab(expression(paste("Normalization factor ",f[k])))
 
 
 return(gg)
