@@ -58,6 +58,11 @@ Gamma7Benp <- function(e0, ga, gb, ra, rb, jr, la, lb){
 probBe7 <- function(x){
   quantile(x,probs=c(0.16, 0.5, 0.84))
 }
+
+uplimit <- function(x){
+  quantile(x,probs=c(0.95))
+}
+
 formtab <- function(tab){
   low <-  tab[2,] - tab[1,]
   up <- tab[3,] - tab[2,]
@@ -106,6 +111,9 @@ formtab(tabG1)
 G1s <- (G1$Ga + G1$Gb) %>% as.data.frame()
 tabG1s <- apply(G1s,2,probBe7)
 formtabs(tabG1s)
+apply(G1s,2,uplimit)
+
+
 
 tabG2 <- apply(G2,2,probBe7)
 formtab(tabG2)
@@ -113,6 +121,7 @@ formtab(tabG2)
 G2s <- (G2$Ga + G2$Gb) %>% as.data.frame()
 tabG2s <- apply(G2s,2,probBe7)
 formtabs(tabG2s)
+
 
 
 tabG3 <- apply(G3,2,probBe7)
@@ -153,6 +162,8 @@ formtabs(tabG7s)
 GAMMASUM <- data.frame(G1s,G2s, G3s, G4s, G5s, G6s, G7s) %>% set_names(c("G1","G2","G3","G4","G5",
                                                                          "G6","G7")) %>%
   melt()
+
+
 ggplot(GAMMASUM,aes(x= value,fill=variable)) +
   geom_density() +
   facet_wrap(.~variable,scales="free")
@@ -168,3 +179,13 @@ Ex = M[,c("e0_1","e0_2",
 
 tabEx <- apply(Ex ,2,probBe7)
 formtab(tabEx)
+
+
+
+
+
+
+gan <- M[,c('ga_1','ga_2', 'ga_3', 'ga_4', 'ga_5', 'ga_6', 'ga_7')]
+gbn <- M[,c('gb_1','gb_2', 'gb_3', 'gb_4', 'gb_5', 'gb_6', 'gb_7')]
+
+apply(gan,2,uplimit)
