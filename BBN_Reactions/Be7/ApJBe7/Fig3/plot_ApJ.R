@@ -13,7 +13,6 @@ require(gsl)
 require(cowplot)
 
 source("pair_wise_plot.R")
-source("plot_normfactor_II.R")
 source("sigma7Benp7mod.R")
 
 Be7np <- read.csv("Be7np.csv")
@@ -165,7 +164,7 @@ grall <-  data.frame(x = xx, mean = yall[,"50%"],lwr1=yall[,"25%"],lwr2=yall[,"2
                      upr1=yall[,"75%"],
                      upr2=yall[,"97.5%"])
 
-MB <- function(x1){3e2*(x1*(2.718^(-x1/(0.086173*0.5))))}
+MB <- function(E){0.75e2*(sqrt(E)*(exp(-E/(0.086173*0.5))))}
 MBD <- data.frame(x=xx,y=MB(xx))
 
 Be7npG <-  Be7np 
