@@ -1,6 +1,13 @@
 require(dplyr)
 require(nuclear)
 require(gsl)
+require(purrr)
+require(ggplot2)
+require(reshape)
+source('theme_GAMMA.R')
+source('asinh.R')
+colpal <- c("#e31a1c","#008000","#1f78b4","#b15928",
+            "#ff7f00","#fdbf6f","#6a3d9a")
 
 M <- read.csv("MCMC_ApJ_ultimaterun.csv",header = T) 
 
@@ -159,6 +166,34 @@ G7s <- (G7$Ga + G7$Gb) %>% as.data.frame()
 tabG7s <- apply(G7s,2,probBe7)
 formtabs(tabG7s)
 
+<<<<<<< HEAD
+GAMMASUM <- data.frame(G1s,G2s, G3s, G4s, G5s, G6s, G7s) %>% 
+  set_names(c("G1","G2","G3","G4","G5","G6","G7")) %>%
+  melt() %>%
+  mutate(variable  = factor(variable, labels = c("Gamma[1]","Gamma[2]","Gamma[3]",
+                                                   "Gamma[4]","Gamma[5]",
+                                                   "Gamma[6]","Gamma[7]")))  
+
+
+pdf("GAMMA.pdf", width=9, height=5)
+ggplot(GAMMASUM,aes(x= value,color=variable)) +
+  geom_vline(xintercept = 1e-1, color="gray45",linetype="dashed",size=0.75) +
+  stat_ecdf(geom = "step",size=1.25) +
+  scale_x_log10(breaks = c(1e-4,1e-3,1e-2,1e-1,1),
+                labels=c(expression(10^-4),
+                         expression(10^-3),expression(10^-2),
+                         expression(10^-1),"1")) + 
+  scale_color_manual(values = colpal) +
+  facet_wrap(.~variable,nrow=2,labeller = "label_parsed") +
+  scale_y_continuous(breaks = c(1e-4,1e-3,1e-2,1e-1,1),
+                labels=c(expression(10^-4),
+                         expression(10^-3),expression(10^-2),
+                         expression(10^-1),"1"),trans="log") + 
+  theme_GAMMA() +
+  xlab(expression(paste(E["c.m."]," (MeV)"))) +
+  ylab("ECDF")
+dev.off()
+=======
 GAMMASUM <- data.frame(G1s,G2s, G3s, G4s, G5s, G6s, G7s) %>% set_names(c("G1","G2","G3","G4","G5",
                                                                          "G6","G7")) %>%
   melt()
@@ -167,6 +202,7 @@ GAMMASUM <- data.frame(G1s,G2s, G3s, G4s, G5s, G6s, G7s) %>% set_names(c("G1","G
 ggplot(GAMMASUM,aes(x= value,fill=variable)) +
   geom_density() +
   facet_wrap(.~variable,scales="free")
+>>>>>>> 0c3d9e1f3365f33ca4ff94939b76bb912cc10efa
 
 
 

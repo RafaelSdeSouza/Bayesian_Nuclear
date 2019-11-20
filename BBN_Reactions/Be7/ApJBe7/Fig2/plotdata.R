@@ -33,7 +33,7 @@ fu <- log(c(1.020,1.10,1.050,1.051,1.085,1.032))
 
 xx <- exp(seq(log(1e-9),log(3),length.out = 400))
 
-MB <- function(x1){3e2*(x1*(2.718^(-x1/(0.086173*0.5))))}
+MB <- function(E){0.75e2*(sqrt(E)*(exp(-E/(0.086173*0.5))))}
 MBD <- data.frame(x=xx,y=MB(xx))
 
 Be7npG <-  Be7np 
