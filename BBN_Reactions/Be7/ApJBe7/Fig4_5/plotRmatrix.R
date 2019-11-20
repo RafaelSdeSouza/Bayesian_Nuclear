@@ -13,7 +13,7 @@ theta1 <- plot_Er(samp)
 theta2 <- plot_ga(samp)
 theta3 <- plot_gb(samp)
 
-pdf("Be7_Rmatrix.pdf", width=21, height=4.25*3)
+pdf("Be7_Rmatrix.pdf", width=22, height=4.25*3)
 plot_grid(
   theta1,theta2,theta3 ,
   align = "hv", axis = "tb",

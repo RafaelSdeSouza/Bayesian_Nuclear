@@ -4,6 +4,7 @@ require(ggmcmc)
 require(tidybayes)
 require(coda)
 require(ggthemes)
+require(forcats)
 plot_normfactors <- function(Normfit){
 
    prior <- ggs(as.mcmc(data.frame(
@@ -39,18 +40,22 @@ plot_normfactors <- function(Normfit){
 
  
 joind <- rbind(prior,post) %>% mutate(type=as.factor(type))  %>%
-  mutate(Parameter=as.factor(Parameter))   
+  mutate(Parameter=as.factor(Parameter)) 
+
+joind$type <- factor(joind$type,c("Prior","Posterior"))
+
+
  
  gg <- ggplot(joind, aes(x = value, y=Parameter, fill=type,color=type,alpha = type)) +
    geom_vline(xintercept = 1,linetype="dashed",color="black") +
-   stat_halfeyeh(slab_type = "pdf",adjust=3,normalize="panels",alpha=0.9) + 
+   
   
-  theme_economist_white() +
+   theme_economist_white() +
 
-  scale_fill_manual(name = "Probability", values = c("#fb6a4a","gray80")) +
-  scale_color_manual(name = "Probability", values = c("#67000d","gray40")) +
-  scale_alpha_manual(values=c(1,1)) +
-  
+  scale_fill_manual(name = "Probability", values = c("gray80","#fb6a4a")) +
+  scale_color_manual(name = "Probability", values = c("gray40","#67000d")) +
+  scale_alpha_manual(values=c(0.6,1)) +
+   stat_halfeyeh(slab_type = "pdf",adjust=3,normalize="panels",alpha=0.95) + 
   #  scale_fill_manual(values=c(rep("gray75",7))) +
   # geom_point(size=1,color="red") +
   theme(legend.position = "none",

@@ -28,7 +28,7 @@ joind <- rbind(prior,post) %>% mutate(type=as.factor(type)) %>% mutate(type=as.f
 
 
 gg <- ggplot(joind, aes(x = value,y=type, fill=Parameter,alpha=type)) +
-  stat_halfeyeh(slab_type = "pdf",normalize="groups") + 
+  stat_slabh(slab_type = "pdf",normalize="groups") + 
   scale_x_continuous(breaks = scales::pretty_breaks(n = 4,min.n = 4)) +
   scale_fill_manual(name = "Probability",values = colpal) +
   scale_color_manual(name = "Probability",values = colpal) +

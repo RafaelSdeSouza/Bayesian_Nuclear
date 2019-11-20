@@ -223,14 +223,14 @@ ggplot(Be7npG,aes(x=E,y=S)) +
   
   
 #  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fccde5"),show.legend=FALSE) +
-  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#fdbf6f"),show.legend=FALSE) +
+  geom_ribbon(data=gr6,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#ff7f00"),show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 3.25+2, yend = 3.25+2,size=1.5,
-           colour = "#fdbf6f") +
+           colour = "#ff7f00") +
   annotate(geom="text",  x = 1.25,  y = 3.25+2,
            label=expression(2^"+"*", 1.23"),size=4) +
   
   
-
+ 
   
   
 #  geom_ribbon(data=gr7,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("cyan"),show.legend=FALSE) +
@@ -241,9 +241,9 @@ ggplot(Be7npG,aes(x=E,y=S)) +
            label=expression(0^"+"*", 1.32"),size=4) +
   
 #  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr2, ymax=upr2,y=NULL),  fill = c("#fdb462"),show.legend=FALSE) +
-  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#ff7f00"),show.legend=FALSE) +
+  geom_ribbon(data=gr5,aes(x=xx,ymin=lwr1, ymax=upr1,y=NULL),fill=c("#fdbf6f"),show.legend=FALSE) +
   annotate("segment", x = 0.2, xend = 0.35, y = 3.75+2, yend = 3.75+2,size=1.5,
-           colour = "#ff7f00") +
+           colour = "#fdbf6f") +
   annotate(geom="text", x = 1.25,  y = 3.75+2,
            label=expression(4^"+"*", 0.96"),size=4) +
   

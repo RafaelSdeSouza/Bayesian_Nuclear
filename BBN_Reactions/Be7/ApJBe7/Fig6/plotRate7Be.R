@@ -27,24 +27,26 @@ old <- old[,c("T.9","Adopted","Lower","Upper")]  %>%
   mutate(Upper = Upper/Norm)
 
 
-joint <- rbind(old,NAI_new)
+joint <- rbind(old,NAI_new) %>%
+  filter(T9 <=1)
 joint$data <- as.factor(joint$data)
-joint$data <- factor(joint$data, levels = c("previous","presentI"))
+joint$data <- factor(joint$data, levels = c("previous","presentI")) 
 
 
 pdf("Be7_NAratio.pdf", width=7.75, height=5.5)
 ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
   geom_ribbon(aes(x=T9,ymin=Lower, ymax=Upper,alpha=data),show.legend=FALSE) +
   scale_alpha_manual(values=c(1,0.375))+
-  geom_line(size=0.5) +
-  coord_cartesian(ylim=c(0.85,1.05),xlim=c(0.00125,10)) +
+  geom_line(size=0.7) +
+  coord_cartesian(ylim=c(0.85,1.05),xlim=c(0.00125,1)) +
   theme_cowplot() + xlab("Temperature (GK)") + ylab("Reaction rate ratio") +
   scale_fill_discrete_qualitative(name="") +
-  scale_x_log10(breaks = c(0.001,0.01,0.1,1,10),labels=c(expression(10^-3),expression(10^-2),
-                                                         expression(10^-1),"1","10"))  +
+  scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c(expression(10^-3),expression(10^-2),
+                                                         expression(10^-1),"1"))  +
   scale_y_continuous(breaks = scales::pretty_breaks(n = 7)) +
+   annotation_logticks(sides = "b") + 
    #  annotation_logticks(base=2.875,sides = "l") +
-  scale_linetype_manual(guide=F,values=c("dashed","solid"),name="") +
+  scale_linetype_manual(guide=F,values=c("solid","dashed"),name="") +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position = c(0.45,0.95),
