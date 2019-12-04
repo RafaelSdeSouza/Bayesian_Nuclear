@@ -51,8 +51,7 @@ ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
   scale_fill_discrete_qualitative(name="") +
   scale_x_log10(breaks = c(0.001,0.01,0.1,1),labels=c(expression(10^-3),expression(10^-2),
                                                          expression(10^-1),"1"))  +
-  scale_y_log10(breaks = c(0.9,1,1.1,1.2,1.3,1.4)) +
-   annotation_logticks(sides = "lb") + 
+   annotation_logticks(sides = "b") + 
   scale_linetype_manual(guide=F,values=c("solid","dotted","dashed"),name="") +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -65,8 +64,8 @@ ggplot(joint,aes(x=T9,y=Adopted, group=data,fill=data,linetype=data)) +
         legend.key = element_rect(colour = "white", fill = "white"),
         axis.title = element_text(color="black", size=27.5),
         strip.background = element_rect("gray85"),
-        axis.text.y = element_text(size = 25, margin = unit(c(t = 0, r = 5, b = 0, l = 0), "mm")),
-        axis.text.x = element_text(size = 25, margin = unit(c(t = 5, r = 0, b = 0, l = 0), "mm")))
+        axis.text.y = element_text(size = 25, hjust =1),
+        axis.text.x = element_text(size = 25, vjust =1))
 dev.off()
 
 panel1 <- filter(joint,data %in% c("previous","presentI"))
