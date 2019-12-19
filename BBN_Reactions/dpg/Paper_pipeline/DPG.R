@@ -81,14 +81,12 @@ mux[j] <- a.scale*interp.lin(xx[j], interp.x, interp.y)
 
 
 ### scaling factor of theory 
-a.scale ~ dt(0, pow(5,-2), 1)T(0,)    
+a.scale ~ dgamma(2,1)  
 
 for (k in 1:Nre){
 y.norm[k] ~ dlnorm(log(1.0),pow(syst[k],-2))
-tau[k] ~  dt(mt, pow(5,-2), 1)T(0,)
+tau[k] ~  dgamma(2,1) 
 }
-
-mt ~  dt(0, pow(5,-2), 1)T(0,)
 
 }"
 
@@ -103,13 +101,13 @@ Normfit <- jags(data = model.data,
                 n.thin = 5,
                 n.chains = 3,
                 n.burnin = 1000,
-                n.iter = 2000)
+                n.iter = 5000)
 
 
-Sp <- ggs(as.mcmc(Normfit)[,c("a.scale", "y.norm[1]","y.norm[2]","y.norm[3]","y.norm[4]",
-                              "tau[1]","tau[2]","tau[3]","tau[4]")]) %>% as_tibble()
+#Sp <- ggs(as.mcmc(Normfit)[,c("a.scale", "y.norm[1]","y.norm[2]","y.norm[3]","y.norm[4]",
+#                              "tau[1]","tau[2]","tau[3]","tau[4]")]) %>% as_tibble()
 
-pair_wise_plot(Sp)
+#pair_wise_plot(Sp)
 
 
 jagsresults(x=Normfit , params=c('tau',"a.scale", "y.norm"),probs=c(0.005,0.025, 0.25, 0.5, 0.75, 0.975,0.995))

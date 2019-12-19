@@ -174,9 +174,9 @@ print(xtable(dfFull[,c(1,2,5,6,7,10)],
 
 
 
+rata_tab <- read.csv("MCMCrates_Be7.csv",header = T)
 
-
-
+write.matrix(rata_tab[c("T9","median","fu")],"rateBe7.dat")
 
 
 
