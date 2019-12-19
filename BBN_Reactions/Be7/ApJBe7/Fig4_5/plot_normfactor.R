@@ -64,8 +64,8 @@ joind$type <- factor(joind$type,c("Prior","Posterior"))
         panel.background = element_rect(colour = "white", fill = "white"),
         legend.key = element_rect(colour = "white", fill = "white"),
         axis.title = element_text(color="black", size = 12),
-        axis.text.x   = element_text(size=11.5),
-        axis.text.y   = element_text(size=12),
+        axis.text.x   = element_text(size=11.5, vjust =1.5),
+        axis.text.y   = element_text(size=11),
         strip.background = element_rect("white")) +
   ylab("") +
   #  xlab("Highest Probability Interval")
